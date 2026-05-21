@@ -1,0 +1,17 @@
+{
+  "name": "estately-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Estately monorepo - mobile and web applications",
+  "workspaces": [
+    "estately-mobile",
+    "estately-web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspaces --if-present",
+    "web": "npm run web --workspace=estately-mobile",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}
