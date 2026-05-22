@@ -4,6 +4,7 @@ import { PropertyGrid } from '@/components/ui/property-grid';
 import { Container } from '@/components/ui/container';
 import { PropertyFilters } from '@/components/properties/property-filters';
 import { PropertyPagination } from '@/components/properties/property-pagination';
+import { PropertySortSelect } from '@/components/properties/property-sort-select';
 import { getCurrentUser } from '@/lib/auth';
 import { getFavoritePropertyIds } from '@/lib/favorites/actions';
 import { propertyImageUrl } from '@/lib/properties/images';
@@ -11,6 +12,7 @@ import {
   getPaginatedProperties,
   parsePropertyPaginationParams,
   parsePropertySearchParams,
+  parsePropertySortParam,
   type PropertySearchParams,
 } from '@/lib/properties/search';
 
@@ -36,11 +38,12 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
   const resolvedSearchParams = (await searchParams) ?? {};
   const filters = parsePropertySearchParams(resolvedSearchParams);
   const pagination = parsePropertyPaginationParams(resolvedSearchParams);
+  const sort = parsePropertySortParam(resolvedSearchParams);
   const user = await getCurrentUser();
   let paginatedProperties: Awaited<ReturnType<typeof getPaginatedProperties>>;
 
   try {
-    paginatedProperties = await getPaginatedProperties(filters, pagination);
+    paginatedProperties = await getPaginatedProperties(filters, pagination, sort);
   } catch (error) {
     console.error('Error fetching properties:', error);
     return (
@@ -101,14 +104,19 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
           </p>
         </div>
 
-        <PropertyFilters filters={filters} cities={fallbackCities} />
+        <PropertyFilters filters={filters} cities={fallbackCities} sort={sort} />
 
-        {!isEmpty ? (
-          <div className="mb-8 text-sm font-medium text-stone-600">
-            Showing {startResult}-{endResult} of {paginatedProperties.totalCount} propert
-            {paginatedProperties.totalCount !== 1 ? 'ies' : 'y'}
-          </div>
-        ) : null}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          {!isEmpty ? (
+            <p className="text-sm font-medium text-stone-600">
+              Showing {startResult}-{endResult} of {paginatedProperties.totalCount} propert
+              {paginatedProperties.totalCount !== 1 ? 'ies' : 'y'}
+            </p>
+          ) : (
+            <p className="text-sm font-medium text-stone-600">No properties match your search.</p>
+          )}
+          <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
+        </div>
 
         <PropertyGrid isEmpty={isEmpty}>
           {formattedProperties.map((property) => (

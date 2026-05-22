@@ -11,6 +11,7 @@ import { PropertySearchBar } from './property-search-bar';
 interface PropertyFiltersProps {
   filters: PropertySearchFilters;
   cities: string[];
+  sort: string;
 }
 
 interface FilterFormState {
@@ -44,7 +45,7 @@ function initialState(filters: PropertySearchFilters): FilterFormState {
   };
 }
 
-export function PropertyFilters({ filters, cities }: PropertyFiltersProps) {
+export function PropertyFilters({ filters, cities, sort }: PropertyFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -85,6 +86,10 @@ export function PropertyFilters({ filters, cities }: PropertyFiltersProps) {
         params.set(key, trimmedValue);
       }
     });
+
+    if (sort !== 'newest') {
+      params.set('sort', sort);
+    }
 
     const query = params.toString();
     startTransition(() => {

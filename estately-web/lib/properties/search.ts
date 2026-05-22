@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { LISTING_TYPES, PROPERTY_TYPES, type ListingType, type PropertyType } from './constants';
@@ -18,6 +18,17 @@ export interface PropertyPagination {
   page: number;
   pageSize: number;
 }
+
+export const PROPERTY_SORT_OPTIONS = [
+  { label: 'Newest first', value: 'newest' },
+  { label: 'Oldest first', value: 'oldest' },
+  { label: 'Price low to high', value: 'price_asc' },
+  { label: 'Price high to low', value: 'price_desc' },
+  { label: 'Largest area first', value: 'area_desc' },
+  { label: 'Smallest area first', value: 'area_asc' },
+] as const;
+
+export type PropertySortValue = (typeof PROPERTY_SORT_OPTIONS)[number]['value'];
 
 export interface PaginatedPropertiesResult {
   properties: (typeof properties.$inferSelect)[];
@@ -75,6 +86,13 @@ function cleanPropertyType(value: SearchParamValue): PropertyType | undefined {
 function cleanListingType(value: SearchParamValue): ListingType | undefined {
   const text = cleanText(value);
   return LISTING_TYPES.find((listingType) => listingType === text);
+}
+
+export function parsePropertySortParam(searchParams: PropertySearchParams): PropertySortValue {
+  const sort = cleanText(searchParams.sort);
+  return PROPERTY_SORT_OPTIONS.some((option) => option.value === sort)
+    ? (sort as PropertySortValue)
+    : 'newest';
 }
 
 export function parsePropertySearchParams(
@@ -151,6 +169,24 @@ function buildPropertyConditions(filters: PropertySearchFilters): SQL[] {
   return conditions;
 }
 
+function propertySortOrder(sort: PropertySortValue) {
+  switch (sort) {
+    case 'oldest':
+      return [asc(properties.createdAt), asc(properties.id)];
+    case 'price_asc':
+      return [asc(properties.price), desc(properties.createdAt)];
+    case 'price_desc':
+      return [desc(properties.price), desc(properties.createdAt)];
+    case 'area_desc':
+      return [desc(properties.areaSqm), desc(properties.createdAt)];
+    case 'area_asc':
+      return [asc(properties.areaSqm), desc(properties.createdAt)];
+    case 'newest':
+    default:
+      return [desc(properties.createdAt), desc(properties.id)];
+  }
+}
+
 export async function getFilteredProperties(filters: PropertySearchFilters) {
   return db
     .select()
@@ -162,6 +198,7 @@ export async function getFilteredProperties(filters: PropertySearchFilters) {
 export async function getPaginatedProperties(
   filters: PropertySearchFilters,
   pagination: PropertyPagination,
+  sort: PropertySortValue = 'newest',
 ): Promise<PaginatedPropertiesResult> {
   const conditions = buildPropertyConditions(filters);
   const whereClause = and(...conditions);
@@ -182,7 +219,7 @@ export async function getPaginatedProperties(
           .select()
           .from(properties)
           .where(whereClause)
-          .orderBy(desc(properties.createdAt))
+          .orderBy(...propertySortOrder(sort))
           .limit(pagination.pageSize)
           .offset(offset)
       : [];

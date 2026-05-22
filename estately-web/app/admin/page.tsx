@@ -19,6 +19,14 @@ export default async function AdminPage() {
             Signed in as {user.email}. This page requires the admin role in both middleware and the
             server component.
           </p>
+          <div className="mt-6">
+            <Link
+              className="inline-flex rounded-md bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300"
+              href="/admin/properties"
+            >
+              Manage properties
+            </Link>
+          </div>
         </section>
       </div>
     </main>
