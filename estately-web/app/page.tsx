@@ -11,28 +11,46 @@ export const metadata: Metadata = {
 
 const featuredProperties = [
   {
+    id: 1001,
     imageUrl:
       'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=900&auto=format&fit=crop',
     price: '$845,000',
     title: 'Glass House Retreat',
-    location: 'North Scottsdale, AZ',
-    meta: '4 beds / 3 baths / 3,180 sq ft',
+    city: 'Scottsdale',
+    address: 'North Scottsdale, AZ',
+    bedrooms: 4,
+    bathrooms: 3,
+    areaSqm: 3180,
+    propertyType: 'house',
+    listingType: 'sale' as const,
   },
   {
+    id: 1002,
     imageUrl:
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=900&auto=format&fit=crop',
     price: '$612,500',
     title: 'Townhome Near the Park',
-    location: 'Austin, TX',
-    meta: '3 beds / 2.5 baths / 2,040 sq ft',
+    city: 'Austin',
+    address: 'Austin, TX',
+    bedrooms: 3,
+    bathrooms: 2,
+    areaSqm: 2040,
+    propertyType: 'townhome',
+    listingType: 'sale' as const,
   },
   {
+    id: 1003,
     imageUrl:
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&auto=format&fit=crop',
     price: '$1,240,000',
     title: 'Modern Hillside Villa',
-    location: 'Laguna Beach, CA',
-    meta: '5 beds / 4 baths / 4,420 sq ft',
+    city: 'Laguna Beach',
+    address: 'Laguna Beach, CA',
+    bedrooms: 5,
+    bathrooms: 4,
+    areaSqm: 4420,
+    propertyType: 'villa',
+    listingType: 'sale' as const,
   },
 ];
 
@@ -113,7 +131,7 @@ export default function HomePage() {
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {featuredProperties.map((property) => (
-              <PropertyCard key={property.title} {...property} />
+              <PropertyCard key={property.id} {...property} />
             ))}
           </div>
         </Container>

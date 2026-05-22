@@ -10,28 +10,46 @@ export const metadata: Metadata = {
 
 const homesForSale = [
   {
+    id: 1,
     imageUrl:
       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=900&auto=format&fit=crop',
     price: '$735,000',
     title: 'Garden District Home',
-    location: 'Portland, OR',
-    meta: '4 beds / 3 baths / 2,860 sq ft',
+    city: 'Portland',
+    address: 'Portland, OR',
+    bedrooms: 4,
+    bathrooms: 3,
+    areaSqm: 2860,
+    propertyType: 'house',
+    listingType: 'sale' as const,
   },
   {
+    id: 2,
     imageUrl:
       'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=900&auto=format&fit=crop',
     price: '$980,000',
     title: 'Contemporary Courtyard House',
-    location: 'Denver, CO',
-    meta: '5 beds / 4 baths / 3,740 sq ft',
+    city: 'Denver',
+    address: 'Denver, CO',
+    bedrooms: 5,
+    bathrooms: 4,
+    areaSqm: 3740,
+    propertyType: 'house',
+    listingType: 'sale' as const,
   },
   {
+    id: 3,
     imageUrl:
       'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=900&auto=format&fit=crop',
     price: '$549,000',
     title: 'Bright Suburban Classic',
-    location: 'Raleigh, NC',
-    meta: '3 beds / 2 baths / 2,120 sq ft',
+    city: 'Raleigh',
+    address: 'Raleigh, NC',
+    bedrooms: 3,
+    bathrooms: 2,
+    areaSqm: 2120,
+    propertyType: 'house',
+    listingType: 'sale' as const,
   },
 ];
 
@@ -46,7 +64,7 @@ export default function BuyPage() {
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {homesForSale.map((property) => (
-            <PropertyCard key={property.title} {...property} />
+            <PropertyCard key={property.id} {...property} />
           ))}
         </div>
       </Container>

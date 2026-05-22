@@ -1,28 +1,90 @@
+import Link from 'next/link';
+
 interface PropertyCardProps {
+  id: number;
   imageUrl: string;
   price: string;
   title: string;
-  location: string;
-  meta: string;
+  city: string;
+  address: string;
+  bedrooms: number;
+  bathrooms: number;
+  areaSqm: number;
+  propertyType: string;
+  listingType: 'sale' | 'rent';
 }
 
-export function PropertyCard({ imageUrl, price, title, location, meta }: PropertyCardProps) {
+export function PropertyCard({
+  id,
+  imageUrl,
+  price,
+  title,
+  city,
+  address,
+  bedrooms,
+  bathrooms,
+  areaSqm,
+  propertyType,
+  listingType,
+}: PropertyCardProps) {
   return (
-    <article className="group overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition hover:shadow-estate hover:-translate-y-2">
-      <div
-        aria-label={title}
-        className="h-64 bg-cover bg-center transition group-hover:scale-105"
-        role="img"
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      />
-      <div className="p-6">
-        <p className="text-xl font-bold text-estate-700">{price}</p>
-        <h3 className="mt-3 text-lg font-semibold text-charcoal-950">{title}</h3>
-        <p className="mt-2 text-sm text-stone-600">{location}</p>
-        <p className="mt-4 border-t border-stone-100 pt-4 text-sm font-medium text-stone-600">
-          {meta}
-        </p>
-      </div>
-    </article>
+    <Link href={`/properties/${id}`}>
+      <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:shadow-estate hover:-translate-y-2 cursor-pointer">
+        {/* Image Container */}
+        <div className="relative h-64 overflow-hidden bg-stone-200">
+          <img
+            src={imageUrl}
+            alt={title}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
+          />
+          {/* Badge */}
+          <div className="absolute top-3 right-3 bg-estate-700 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            {listingType === 'sale' ? 'For Sale' : 'For Rent'}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-5 flex flex-col h-full">
+          {/* Price */}
+          <p className="text-2xl font-bold text-estate-700">
+            {price}
+            {listingType === 'rent' && <span className="text-sm font-normal text-stone-600">/mo</span>}
+          </p>
+
+          {/* Title */}
+          <h3 className="mt-3 text-lg font-semibold text-charcoal-950 line-clamp-2 group-hover:text-estate-700 transition">
+            {title}
+          </h3>
+
+          {/* Location */}
+          <p className="mt-1 text-sm text-stone-600">{city}</p>
+          <p className="text-sm text-stone-500 line-clamp-1">{address}</p>
+
+          {/* Property Type */}
+          <p className="mt-2 inline-block text-xs font-medium text-estate-700 bg-cream-100 px-2 py-1 rounded">
+            {propertyType}
+          </p>
+
+          {/* Features Divider */}
+          <div className="mt-4 pt-4 border-t border-stone-100" />
+
+          {/* Features Grid */}
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <p className="text-xl font-bold text-charcoal-950">{bedrooms}</p>
+              <p className="text-xs text-stone-600">Bed{bedrooms !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-charcoal-950">{bathrooms}</p>
+              <p className="text-xs text-stone-600">Bath{bathrooms !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-charcoal-950">{areaSqm}</p>
+              <p className="text-xs text-stone-600">m²</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 }

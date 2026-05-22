@@ -10,28 +10,46 @@ export const metadata: Metadata = {
 
 const rentals = [
   {
+    id: 101,
     imageUrl:
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&auto=format&fit=crop',
-    price: '$2,850/mo',
+    price: '$2,850',
     title: 'Light-Filled Loft',
-    location: 'Chicago, IL',
-    meta: '2 beds / 2 baths / 1,180 sq ft',
+    city: 'Chicago',
+    address: 'Chicago, IL',
+    bedrooms: 2,
+    bathrooms: 2,
+    areaSqm: 1180,
+    propertyType: 'loft',
+    listingType: 'rent' as const,
   },
   {
+    id: 102,
     imageUrl:
       'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&auto=format&fit=crop',
-    price: '$3,400/mo',
+    price: '$3,400',
     title: 'Downtown Apartment',
-    location: 'Seattle, WA',
-    meta: '2 beds / 2 baths / 1,320 sq ft',
+    city: 'Seattle',
+    address: 'Seattle, WA',
+    bedrooms: 2,
+    bathrooms: 2,
+    areaSqm: 1320,
+    propertyType: 'apartment',
+    listingType: 'rent' as const,
   },
   {
+    id: 103,
     imageUrl:
       'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=900&auto=format&fit=crop',
-    price: '$4,100/mo',
+    price: '$4,100',
     title: 'Quiet Brownstone Flat',
-    location: 'Brooklyn, NY',
-    meta: '3 beds / 2 baths / 1,540 sq ft',
+    city: 'Brooklyn',
+    address: 'Brooklyn, NY',
+    bedrooms: 3,
+    bathrooms: 2,
+    areaSqm: 1540,
+    propertyType: 'apartment',
+    listingType: 'rent' as const,
   },
 ];
 
@@ -46,7 +64,7 @@ export default function RentPage() {
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {rentals.map((property) => (
-            <PropertyCard key={property.title} {...property} />
+            <PropertyCard key={property.id} {...property} />
           ))}
         </div>
       </Container>
