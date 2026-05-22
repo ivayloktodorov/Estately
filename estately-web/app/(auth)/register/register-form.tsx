@@ -14,19 +14,19 @@ export function RegisterForm() {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
 
   return (
-    <form action={formAction} className="w-full max-w-md space-y-5">
+    <form action={formAction} className="w-full space-y-5">
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="fullName">
           Full name
         </label>
         <input
+          autoComplete="name"
+          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          defaultValue={state.fields?.fullName}
           id="fullName"
           name="fullName"
-          type="text"
-          autoComplete="name"
           required
-          defaultValue={state.fields?.fullName}
-          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          type="text"
         />
       </div>
       <div>
@@ -34,13 +34,13 @@ export function RegisterForm() {
           Email
         </label>
         <input
+          autoComplete="email"
+          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          defaultValue={state.fields?.email}
           id="email"
           name="email"
-          type="email"
-          autoComplete="email"
           required
-          defaultValue={state.fields?.email}
-          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          type="email"
         />
       </div>
       <div>
@@ -48,13 +48,13 @@ export function RegisterForm() {
           Password
         </label>
         <input
-          id="password"
-          name="password"
-          type="password"
           autoComplete="new-password"
-          minLength={6}
-          required
           className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          id="password"
+          minLength={6}
+          name="password"
+          required
+          type="password"
         />
       </div>
       {state.status === 'error' ? (
@@ -63,9 +63,9 @@ export function RegisterForm() {
         </p>
       ) : null}
       <button
-        type="submit"
+        className="h-12 w-full rounded-md bg-emerald-700 px-5 font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
         disabled={pending}
-        className="h-12 w-full rounded-md bg-emerald-700 px-5 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        type="submit"
       >
         {pending ? 'Creating account...' : 'Create account'}
       </button>

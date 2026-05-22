@@ -14,19 +14,19 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
-    <form action={formAction} className="w-full max-w-md space-y-5">
+    <form action={formAction} className="w-full space-y-5">
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="email">
           Email
         </label>
         <input
+          autoComplete="email"
+          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          defaultValue={state.fields?.email}
           id="email"
           name="email"
-          type="email"
-          autoComplete="email"
           required
-          defaultValue={state.fields?.email}
-          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          type="email"
         />
       </div>
       <div>
@@ -34,12 +34,12 @@ export function LoginForm() {
           Password
         </label>
         <input
+          autoComplete="current-password"
+          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
           id="password"
           name="password"
-          type="password"
-          autoComplete="current-password"
           required
-          className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 text-base outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+          type="password"
         />
       </div>
       {state.status === 'error' ? (
@@ -48,9 +48,9 @@ export function LoginForm() {
         </p>
       ) : null}
       <button
-        type="submit"
+        className="h-12 w-full rounded-md bg-emerald-700 px-5 font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-400"
         disabled={pending}
-        className="h-12 w-full rounded-md bg-emerald-700 px-5 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        type="submit"
       >
         {pending ? 'Signing in...' : 'Sign in'}
       </button>

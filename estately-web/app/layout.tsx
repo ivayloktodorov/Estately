@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,21 +16,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Estately",
+  title: {
+    default: "Estately | Modern Real Estate Search",
+    template: "%s | Estately",
+  },
   description: "A modern real estate platform for browsing and saving property listings.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col bg-white text-slate-950">
+        <Header user={user} />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }
