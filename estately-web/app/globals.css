@@ -1,60 +1,70 @@
 @import "tailwindcss";
-@config "../tailwind.config.ts";
-@source "../app/**/*.{js,ts,jsx,tsx,mdx}";
-@source "../components/**/*.{js,ts,jsx,tsx,mdx}";
-@source "../src/**/*.{js,ts,jsx,tsx,mdx}";
-@source "../lib/**/*.{js,ts,jsx,tsx,mdx}";
 
-:root {
-  --background: #fbfaf7;
-  --foreground: #171411;
-  --muted: #6f6860;
-  --border: #e8dfd2;
-  --surface: #ffffff;
-  --accent: #0f5a49;
+@theme {
+  --color-cream-50: #fbfaf7;
+  --color-cream-100: #f5f0e8;
+  --color-cream-200: #e9dece;
+  --color-charcoal-800: #25211d;
+  --color-charcoal-900: #171411;
+  --color-charcoal-950: #0f0d0b;
+  --color-estate-600: #126b58;
+  --color-estate-700: #0f5a49;
+  --color-estate-800: #0b463a;
+  --shadow-estate: 0 24px 70px rgba(23, 20, 17, 0.12);
+  --shadow-estate-soft: 0 14px 40px rgba(23, 20, 17, 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  :root {
+    --background: #fbfaf7;
+    --foreground: #171411;
+    --muted: #6f6860;
+    --border: #e8dfd2;
+    --surface: #ffffff;
+    --accent: #0f5a49;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  text-rendering: optimizeLegibility;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  body {
+    background-color: rgb(251, 250, 247);
+    color: rgb(15, 13, 11);
+    font-family: system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-* {
-  box-sizing: border-box;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
+  button {
+    cursor: pointer;
+  }
 
-::selection {
-  background: #d8c7ae;
-  color: #171411;
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  ::selection {
+    background-color: rgb(245, 240, 232);
+    color: rgb(15, 13, 11);
+  }
 }

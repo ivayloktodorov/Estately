@@ -14,56 +14,59 @@ export function RegisterForm() {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
 
   return (
-    <form action={formAction} className="w-full space-y-5">
+    <form action={formAction} className="w-full space-y-6">
       <div>
-        <label className="text-sm font-medium text-stone-700" htmlFor="fullName">
+        <label className="block text-sm font-semibold text-charcoal-950 mb-2" htmlFor="fullName">
           Full name
         </label>
         <input
           autoComplete="name"
-          className="mt-2 h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-base text-charcoal-950 outline-none transition focus:border-estate-700 focus:ring-2 focus:ring-cream-200"
+          className="w-full h-11 rounded-lg border border-stone-300 bg-white px-4 text-base text-charcoal-950 placeholder-stone-400 transition focus:border-estate-700 focus:ring-2 focus:ring-estate-700/20"
           defaultValue={state.fields?.fullName}
           id="fullName"
           name="fullName"
+          placeholder="John Doe"
           required
           type="text"
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-stone-700" htmlFor="email">
-          Email
+        <label className="block text-sm font-semibold text-charcoal-950 mb-2" htmlFor="email">
+          Email address
         </label>
         <input
           autoComplete="email"
-          className="mt-2 h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-base text-charcoal-950 outline-none transition focus:border-estate-700 focus:ring-2 focus:ring-cream-200"
+          className="w-full h-11 rounded-lg border border-stone-300 bg-white px-4 text-base text-charcoal-950 placeholder-stone-400 transition focus:border-estate-700 focus:ring-2 focus:ring-estate-700/20"
           defaultValue={state.fields?.email}
           id="email"
           name="email"
+          placeholder="you@example.com"
           required
           type="email"
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-stone-700" htmlFor="password">
+        <label className="block text-sm font-semibold text-charcoal-950 mb-2" htmlFor="password">
           Password
         </label>
         <input
           autoComplete="new-password"
-          className="mt-2 h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-base text-charcoal-950 outline-none transition focus:border-estate-700 focus:ring-2 focus:ring-cream-200"
+          className="w-full h-11 rounded-lg border border-stone-300 bg-white px-4 text-base text-charcoal-950 placeholder-stone-400 transition focus:border-estate-700 focus:ring-2 focus:ring-estate-700/20"
           id="password"
           minLength={6}
           name="password"
+          placeholder="••••••••"
           required
           type="password"
         />
       </div>
       {state.status === 'error' ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
           {state.message}
-        </p>
+        </div>
       ) : null}
       <button
-        className="h-12 w-full rounded-md bg-charcoal-950 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400"
+        className="w-full h-11 rounded-lg bg-charcoal-950 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400"
         disabled={pending}
         type="submit"
       >
@@ -71,7 +74,7 @@ export function RegisterForm() {
       </button>
       <p className="text-center text-sm text-stone-600">
         Already have an account?{' '}
-        <Link className="font-semibold text-estate-700 hover:text-estate-800" href="/login">
+        <Link className="font-semibold text-estate-700 hover:text-estate-800 transition" href="/login">
           Sign in
         </Link>
       </p>

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Container } from '@/components/ui/container';
 
 const footerLinks = [
   { href: '/', label: 'Home' },
@@ -13,52 +12,58 @@ const socialLinks = ['Instagram', 'LinkedIn', 'X'];
 
 export function Footer() {
   return (
-    <footer className="border-t border-stone-800 bg-charcoal-950 text-white">
-      <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
-          <div>
-            <Link className="text-2xl font-semibold" href="/">
-              Estately
-            </Link>
-            <p className="mt-4 max-w-md text-sm leading-6 text-stone-300">
-              A modern real estate platform for discovering homes, saving favorites, and managing
-              your property search with confidence.
-            </p>
+    <footer className="border-t border-stone-200 bg-charcoal-950 text-white">
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
+        <div className="py-12 md:py-16">
+          <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
+            <div>
+              <Link className="text-2xl font-bold hover:text-estate-600 transition" href="/">
+                Estately
+              </Link>
+              <p className="mt-4 max-w-md text-sm leading-6 text-stone-400">
+                A modern real estate platform for discovering homes, saving favorites, and managing
+                your property search with confidence.
+              </p>
+            </div>
+            <nav aria-label="Footer navigation">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-stone-300">
+                Explore
+              </h2>
+              <div className="mt-6 space-y-3">
+                {footerLinks.map((link) => (
+                  <Link
+                    className="block text-sm text-stone-400 hover:text-white transition"
+                    href={link.href}
+                    key={link.href}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-stone-300">
+                Social
+              </h2>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {socialLinks.map((link) => (
+                  <a
+                    aria-label={`${link} placeholder`}
+                    className="rounded-lg border border-stone-700 px-3 py-2 text-sm text-stone-400 transition hover:border-stone-500 hover:text-white"
+                    href="#"
+                    key={link}
+                  >
+                    {link}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
-          <nav aria-label="Footer navigation">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">
-              Explore
-            </h2>
-            <div className="mt-4 grid gap-3">
-              {footerLinks.map((link) => (
-                <Link className="text-sm text-stone-300 hover:text-white" href={link.href} key={link.href}>
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">
-              Social
-            </h2>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {socialLinks.map((link) => (
-                <a
-                  aria-label={`${link} placeholder`}
-                  className="rounded-md border border-white/15 px-3 py-2 text-sm text-stone-300 transition hover:border-white/40 hover:text-white"
-                  href="#"
-                  key={link}
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
+          <div className="mt-12 border-t border-stone-800 pt-8 text-sm text-stone-400">
+            <p>&copy; {new Date().getFullYear()} Estately. All rights reserved.</p>
           </div>
         </div>
-        <div className="mt-10 border-t border-white/10 pt-6 text-sm text-stone-400">
-          &copy; {new Date().getFullYear()} Estately. All rights reserved.
-        </div>
-      </Container>
+      </div>
     </footer>
   );
 }
