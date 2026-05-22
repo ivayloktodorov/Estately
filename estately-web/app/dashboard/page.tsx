@@ -28,6 +28,9 @@ export default async function DashboardPage() {
             <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/dashboard/properties/new">
               Add Property
             </Link>
+            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/dashboard/inquiries">
+              Inquiries
+            </Link>
             <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/profile">
               Profile
             </Link>

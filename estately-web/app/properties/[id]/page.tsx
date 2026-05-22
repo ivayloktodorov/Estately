@@ -9,6 +9,8 @@ import { PropertyOverview } from '@/components/ui/property-overview';
 import { PropertyDetailsSection } from '@/components/ui/property-details-section';
 import { PropertySidebar } from '@/components/ui/property-sidebar';
 import { propertyImageUrl } from '@/lib/properties/images';
+import { getCurrentUser } from '@/lib/auth';
+import { PropertyInquiryForm } from '@/components/properties/property-inquiry-form';
 
 interface PropertyPageProps {
   params: Promise<{
@@ -111,6 +113,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   }
 
   const { property, images } = data;
+  const user = await getCurrentUser();
   const price = `$${Number(property.price).toLocaleString()}`;
   const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl);
 
@@ -187,6 +190,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 </div>
               </div>
             </div>
+
+            <PropertyInquiryForm isAuthenticated={Boolean(user)} propertyId={property.id} />
           </div>
 
           {/* Sidebar - Right Column (1/3 width on desktop) */}
