@@ -35,7 +35,7 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-white text-slate-950">
+      <body className="flex min-h-screen flex-col bg-cream-50 text-charcoal-950">
         <Header user={user} />
         <div className="flex-1">{children}</div>
         <Footer />
