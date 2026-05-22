@@ -1,32 +1,10 @@
-import { fileURLToPath } from 'url';
-import * as path from 'path';
-import * as fs from 'fs';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users, cities, properties, propertyMessages, favorites } from '../src/db/schema';
-import { count, sql } from 'drizzle-orm';
-
-// Get current directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables from root .env
-const rootEnvPath = path.resolve(__dirname, '../../.env');
-if (fs.existsSync(rootEnvPath)) {
-  const envContent = fs.readFileSync(rootEnvPath, 'utf-8');
-  envContent.split('\n').forEach((line) => {
-    if (line.trim() && !line.startsWith('#')) {
-      const [key, ...valueParts] = line.split('=');
-      if (key && !process.env[key]) {
-        process.env[key] = valueParts.join('=').trim();
-      }
-    }
-  });
-}
+import { count } from 'drizzle-orm';
+import { requireDatabaseUrl } from './load-env';
 
 const db = drizzle({
-  connection: {
-    url: process.env.DATABASE_URL!,
-  },
+  connection: requireDatabaseUrl(),
   schema: { users, cities, properties, propertyMessages, favorites },
 });
 
