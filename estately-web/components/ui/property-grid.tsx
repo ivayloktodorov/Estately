@@ -8,11 +8,13 @@ interface PropertyGridProps {
 export function PropertyGrid({ children, isEmpty }: PropertyGridProps) {
   if (isEmpty) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] px-4">
+      <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-white px-4 shadow-estate-soft">
         <div className="text-center">
-          <div className="mb-4 text-6xl">🏠</div>
-          <h3 className="text-2xl font-semibold text-charcoal-950 mb-2">No Properties Found</h3>
-          <p className="text-stone-600">There are no properties available at the moment. Please check back soon!</p>
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-cream-100 text-3xl">
+            ?
+          </div>
+          <h3 className="mb-2 text-2xl font-semibold text-charcoal-950">No properties found</h3>
+          <p className="text-stone-600">Try changing your filters.</p>
         </div>
       </div>
     );

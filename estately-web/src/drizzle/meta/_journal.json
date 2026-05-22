@@ -15,6 +15,13 @@
       "when": 1779471945923,
       "tag": "0001_light_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779475200000,
+      "tag": "0002_properties_filter_indexes",
+      "breakpoints": true
     }
   ]
 }

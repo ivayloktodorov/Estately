@@ -3,6 +3,7 @@ import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
 import { PropertyCard } from '@/components/ui/property-card';
 import { SectionHeader } from '@/components/ui/section-header';
+import { getCurrentUser } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Modern Real Estate Search',
@@ -69,7 +70,9 @@ const benefits = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const user = await getCurrentUser();
+
   return (
     <main>
       <section className="bg-cream-50">
@@ -87,12 +90,25 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/buy">Browse Properties</ButtonLink>
-              <ButtonLink href="/login" variant="secondary">
-                Login
-              </ButtonLink>
-              <ButtonLink href="/register" variant="ghost">
-                Register
-              </ButtonLink>
+              {user ? (
+                <>
+                  <ButtonLink href="/dashboard" variant="secondary">
+                    Dashboard
+                  </ButtonLink>
+                  <ButtonLink href="/favorites" variant="ghost">
+                    Favorites
+                  </ButtonLink>
+                </>
+              ) : (
+                <>
+                  <ButtonLink href="/login" variant="secondary">
+                    Login
+                  </ButtonLink>
+                  <ButtonLink href="/register" variant="ghost">
+                    Register
+                  </ButtonLink>
+                </>
+              )}
             </div>
           </div>
           <div className="relative min-h-[520px] overflow-hidden rounded-xl bg-[url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&auto=format&fit=crop')] bg-cover bg-center shadow-xl shadow-charcoal-950/10">
@@ -170,8 +186,11 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink className="bg-cream-50 text-estate-800 hover:bg-cream-100" href="/register">
-              Register
+            <ButtonLink
+              className="bg-cream-50 text-estate-800 hover:bg-cream-100"
+              href={user ? '/favorites' : '/register'}
+            >
+              {user ? 'View favorites' : 'Register'}
             </ButtonLink>
             <ButtonLink
               className="border-white/30 bg-transparent text-white hover:border-white/60 hover:bg-white/10"

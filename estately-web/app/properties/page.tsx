@@ -1,10 +1,15 @@
 import { Metadata } from 'next';
-import { db } from '@/src/db/client';
-import { properties } from '@/src/db/schema';
-import { desc } from 'drizzle-orm';
 import { PropertyCard } from '@/components/ui/property-card';
 import { PropertyGrid } from '@/components/ui/property-grid';
 import { Container } from '@/components/ui/container';
+import { PropertyFilters } from '@/components/properties/property-filters';
+import { PropertyPagination } from '@/components/properties/property-pagination';
+import {
+  getPaginatedProperties,
+  parsePropertyPaginationParams,
+  parsePropertySearchParams,
+  type PropertySearchParams,
+} from '@/lib/properties/search';
 
 export const metadata: Metadata = {
   title: 'Browse Properties',
@@ -18,14 +23,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PropertiesPage() {
-  let allProperties: (typeof properties.$inferSelect)[] = [];
+interface PropertiesPageProps {
+  searchParams?: Promise<PropertySearchParams>;
+}
+
+const fallbackCities = ['Sofia', 'Varna', 'Burgas', 'Plovdiv'];
+
+export default async function PropertiesPage({ searchParams }: PropertiesPageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const filters = parsePropertySearchParams(resolvedSearchParams);
+  const pagination = parsePropertyPaginationParams(resolvedSearchParams);
+  let paginatedProperties: Awaited<ReturnType<typeof getPaginatedProperties>>;
 
   try {
-    allProperties = await db
-      .select()
-      .from(properties)
-      .orderBy(desc(properties.createdAt));
+    paginatedProperties = await getPaginatedProperties(filters, pagination);
   } catch (error) {
     console.error('Error fetching properties:', error);
     return (
@@ -44,7 +55,7 @@ export default async function PropertiesPage() {
     );
   }
 
-  const formattedProperties = allProperties.map((prop) => ({
+  const formattedProperties = paginatedProperties.properties.map((prop) => ({
     id: prop.id,
     title: prop.title,
     price: `$${Number(prop.price).toLocaleString()}`,
@@ -59,6 +70,13 @@ export default async function PropertiesPage() {
   }));
 
   const isEmpty = formattedProperties.length === 0;
+  const startResult = isEmpty
+    ? 0
+    : (paginatedProperties.currentPage - 1) * paginatedProperties.pageSize + 1;
+  const endResult = Math.min(
+    paginatedProperties.currentPage * paginatedProperties.pageSize,
+    paginatedProperties.totalCount,
+  );
 
   return (
     <main className="flex-1 py-12 md:py-16">
@@ -73,10 +91,12 @@ export default async function PropertiesPage() {
           </p>
         </div>
 
+        <PropertyFilters filters={filters} cities={fallbackCities} />
+
         {!isEmpty ? (
           <div className="mb-8 text-sm font-medium text-stone-600">
-            Showing {formattedProperties.length} propert
-            {formattedProperties.length !== 1 ? 'ies' : 'y'}
+            Showing {startResult}-{endResult} of {paginatedProperties.totalCount} propert
+            {paginatedProperties.totalCount !== 1 ? 'ies' : 'y'}
           </div>
         ) : null}
 
@@ -85,6 +105,16 @@ export default async function PropertiesPage() {
             <PropertyCard key={property.id} {...property} />
           ))}
         </PropertyGrid>
+
+        {!isEmpty ? (
+          <PropertyPagination
+            currentPage={paginatedProperties.currentPage}
+            totalPages={paginatedProperties.totalPages}
+            hasPreviousPage={paginatedProperties.hasPreviousPage}
+            hasNextPage={paginatedProperties.hasNextPage}
+            searchParams={resolvedSearchParams}
+          />
+        ) : null}
       </Container>
     </main>
   );

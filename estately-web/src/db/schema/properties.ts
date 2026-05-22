@@ -1,4 +1,15 @@
-import { pgTable, serial, varchar, text, integer, decimal, boolean, timestamp, foreignKey } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  varchar,
+  text,
+  integer,
+  decimal,
+  boolean,
+  timestamp,
+  foreignKey,
+  index,
+} from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const properties = pgTable(
@@ -22,6 +33,13 @@ export const properties = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (table) => [
+    index('properties_city_idx').on(table.city),
+    index('properties_property_type_idx').on(table.propertyType),
+    index('properties_listing_type_idx').on(table.listingType),
+    index('properties_price_idx').on(table.price),
+    index('properties_bedrooms_idx').on(table.bedrooms),
+    index('properties_bathrooms_idx').on(table.bathrooms),
+    index('properties_is_published_idx').on(table.isPublished),
     foreignKey({
       columns: [table.createdByUserId],
       foreignColumns: [users.id],
