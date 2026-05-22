@@ -28,8 +28,8 @@ export default function NotFound() {
             Property Not Found
           </h1>
           <p className="text-stone-600 mb-8">
-            The property you're looking for doesn't exist or has been removed. 
-            Let's get you back on track.
+            The property you are looking for does not exist or has been removed. Let us get you
+            back on track.
           </p>
 
           {/* CTA */}

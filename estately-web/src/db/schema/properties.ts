@@ -11,6 +11,7 @@ export const properties = pgTable(
     city: varchar('city', { length: 255 }).notNull(),
     address: varchar('address', { length: 255 }).notNull(),
     propertyType: varchar('property_type', { length: 50 }).notNull(),
+    listingType: varchar('listing_type', { length: 50 }).notNull().default('sale'),
     bedrooms: integer('bedrooms').notNull(),
     bathrooms: integer('bathrooms').notNull(),
     areaSqm: integer('area_sqm').notNull(),

@@ -1,0 +1,1 @@
+ALTER TABLE "properties" ADD COLUMN "listing_type" varchar(50) DEFAULT 'sale' NOT NULL;

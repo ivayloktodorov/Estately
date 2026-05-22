@@ -109,13 +109,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   const { property, images } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
 
-  // Determine listing type based on property type (simple heuristic)
-  const listingType = (
-    property.propertyType.toLowerCase().includes('apartment') ||
-    property.title.toLowerCase().includes('rent')
-      ? 'rent'
-      : 'sale'
-  ) as 'sale' | 'rent';
+  const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
 
   return (
     <main className="py-12 bg-cream-50">
