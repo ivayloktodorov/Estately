@@ -4,6 +4,9 @@ import { PropertyGrid } from '@/components/ui/property-grid';
 import { Container } from '@/components/ui/container';
 import { PropertyFilters } from '@/components/properties/property-filters';
 import { PropertyPagination } from '@/components/properties/property-pagination';
+import { getCurrentUser } from '@/lib/auth';
+import { getFavoritePropertyIds } from '@/lib/favorites/actions';
+import { propertyImageUrl } from '@/lib/properties/images';
 import {
   getPaginatedProperties,
   parsePropertyPaginationParams,
@@ -33,6 +36,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
   const resolvedSearchParams = (await searchParams) ?? {};
   const filters = parsePropertySearchParams(resolvedSearchParams);
   const pagination = parsePropertyPaginationParams(resolvedSearchParams);
+  const user = await getCurrentUser();
   let paginatedProperties: Awaited<ReturnType<typeof getPaginatedProperties>>;
 
   try {
@@ -65,9 +69,15 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     bathrooms: prop.bathrooms,
     areaSqm: prop.areaSqm,
     propertyType: prop.propertyType,
-    imageUrl: prop.imageCoverUrl,
+    imageUrl: propertyImageUrl(prop.imageCoverUrl),
     listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',
   }));
+  const favoritePropertyIds = user
+    ? await getFavoritePropertyIds(
+        user.id,
+        formattedProperties.map((property) => property.id),
+      )
+    : new Set<number>();
 
   const isEmpty = formattedProperties.length === 0;
   const startResult = isEmpty
@@ -102,7 +112,13 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
 
         <PropertyGrid isEmpty={isEmpty}>
           {formattedProperties.map((property) => (
-            <PropertyCard key={property.id} {...property} />
+            <PropertyCard
+              key={property.id}
+              {...property}
+              isAuthenticated={Boolean(user)}
+              isFavorited={favoritePropertyIds.has(property.id)}
+              showFavoriteButton
+            />
           ))}
         </PropertyGrid>
 

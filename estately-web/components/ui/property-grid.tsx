@@ -3,9 +3,16 @@ import { ReactNode } from 'react';
 interface PropertyGridProps {
   children: ReactNode;
   isEmpty?: boolean;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
-export function PropertyGrid({ children, isEmpty }: PropertyGridProps) {
+export function PropertyGrid({
+  children,
+  isEmpty,
+  emptyTitle = 'No properties found',
+  emptyDescription = 'Try changing your filters.',
+}: PropertyGridProps) {
   if (isEmpty) {
     return (
       <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-white px-4 shadow-estate-soft">
@@ -13,8 +20,8 @@ export function PropertyGrid({ children, isEmpty }: PropertyGridProps) {
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-cream-100 text-3xl">
             ?
           </div>
-          <h3 className="mb-2 text-2xl font-semibold text-charcoal-950">No properties found</h3>
-          <p className="text-stone-600">Try changing your filters.</p>
+          <h3 className="mb-2 text-2xl font-semibold text-charcoal-950">{emptyTitle}</h3>
+          <p className="text-stone-600">{emptyDescription}</p>
         </div>
       </div>
     );

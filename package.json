@@ -13,5 +13,17 @@
     "start": "npm run start --workspaces --if-present",
     "web": "npm run web --workspace=estately-mobile",
     "lint": "npm run lint --workspaces --if-present"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0"
+  },
+  "overrides": {
+    "expo": "56.0.3",
+    "uuid": "11.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "eslint-config-expo": "~56.0.4",
+    "expo": "56.0.3"
   }
 }

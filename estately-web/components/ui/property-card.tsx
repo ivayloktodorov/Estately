@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { FavoriteButton } from '@/components/favorites/favorite-button';
+import { propertyImageUrl } from '@/lib/properties/images';
 
 interface PropertyCardProps {
   id: number;
@@ -12,6 +14,9 @@ interface PropertyCardProps {
   areaSqm: number;
   propertyType: string;
   listingType: 'sale' | 'rent';
+  isFavorited?: boolean;
+  isAuthenticated?: boolean;
+  showFavoriteButton?: boolean;
 }
 
 export function PropertyCard({
@@ -26,14 +31,27 @@ export function PropertyCard({
   areaSqm,
   propertyType,
   listingType,
+  isFavorited = false,
+  isAuthenticated = false,
+  showFavoriteButton = false,
 }: PropertyCardProps) {
+  const coverImageUrl = propertyImageUrl(imageUrl);
+
   return (
-    <Link href={`/properties/${id}`}>
-      <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:shadow-estate hover:-translate-y-2 cursor-pointer">
+    <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">
+      <Link className="block h-full" href={`/properties/${id}`}>
         {/* Image Container */}
         <div className="relative h-64 overflow-hidden bg-stone-200">
+          {showFavoriteButton ? (
+            <FavoriteButton
+              propertyId={id}
+              initialIsFavorited={isFavorited}
+              isAuthenticated={isAuthenticated}
+              propertyTitle={title}
+            />
+          ) : null}
           <img
-            src={imageUrl}
+            src={coverImageUrl}
             alt={title}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
           />
@@ -84,7 +102,7 @@ export function PropertyCard({
             </div>
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+    </article>
   );
 }

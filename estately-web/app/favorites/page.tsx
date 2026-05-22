@@ -1,20 +1,74 @@
-import Link from 'next/link';
 import { requireAuth } from '@/lib/auth';
+import { getFavoriteProperties } from '@/lib/favorites/queries';
+import { Container } from '@/components/ui/container';
+import { PropertyCard } from '@/components/ui/property-card';
+import { PropertyGrid } from '@/components/ui/property-grid';
+import { ButtonLink } from '@/components/ui/button-link';
+import { propertyImageUrl } from '@/lib/properties/images';
 
 export default async function FavoritesPage() {
-  await requireAuth();
+  const user = await requireAuth();
+  const favoriteProperties = await getFavoriteProperties(user.id);
+
+  const formattedProperties = favoriteProperties.map((prop) => ({
+    id: prop.id,
+    title: prop.title,
+    price: `$${Number(prop.price).toLocaleString()}`,
+    city: prop.city,
+    address: prop.address,
+    bedrooms: prop.bedrooms,
+    bathrooms: prop.bathrooms,
+    areaSqm: prop.areaSqm,
+    propertyType: prop.propertyType,
+    imageUrl: propertyImageUrl(prop.imageCoverUrl),
+    listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',
+  }));
+
+  const isEmpty = formattedProperties.length === 0;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-10">
-      <div className="mx-auto max-w-3xl rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-        <Link className="text-sm font-medium text-emerald-700 hover:text-emerald-800" href="/dashboard">
-          Back to dashboard
-        </Link>
-        <h1 className="mt-6 text-3xl font-semibold text-slate-950">Favorites</h1>
-        <p className="mt-3 text-slate-600">
-          This protected page is ready for saved property listings.
-        </p>
-      </div>
+    <main className="flex-1 bg-cream-50 py-12 md:py-16">
+      <Container>
+        <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-estate-700">
+              Saved homes
+            </p>
+            <h1 className="mt-3 text-4xl font-bold text-charcoal-950 md:text-5xl">
+              Your favorite properties
+            </h1>
+            <p className="mt-4 max-w-2xl text-lg text-stone-600">
+              Revisit the homes you saved while comparing neighborhoods, budgets, and next steps.
+            </p>
+          </div>
+          <ButtonLink href="/properties" variant="secondary">
+            Browse properties
+          </ButtonLink>
+        </div>
+
+        {!isEmpty ? (
+          <div className="mb-8 text-sm font-medium text-stone-600">
+            Showing {formattedProperties.length} saved propert
+            {formattedProperties.length !== 1 ? 'ies' : 'y'}
+          </div>
+        ) : null}
+
+        <PropertyGrid
+          isEmpty={isEmpty}
+          emptyTitle="No favorite properties yet"
+          emptyDescription="Save properties from the listings page and they will appear here."
+        >
+          {formattedProperties.map((property) => (
+            <PropertyCard
+              key={property.id}
+              {...property}
+              isAuthenticated
+              isFavorited
+              showFavoriteButton
+            />
+          ))}
+        </PropertyGrid>
+      </Container>
     </main>
   );
 }

@@ -8,6 +8,7 @@ import { PropertyGallery } from '@/components/ui/property-gallery';
 import { PropertyOverview } from '@/components/ui/property-overview';
 import { PropertyDetailsSection } from '@/components/ui/property-details-section';
 import { PropertySidebar } from '@/components/ui/property-sidebar';
+import { propertyImageUrl } from '@/lib/properties/images';
 
 interface PropertyPageProps {
   params: Promise<{
@@ -36,9 +37,11 @@ async function getProperty(id: number) {
         results.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
       );
 
+    const uploadedImages = images.map((img) => img.imageUrl);
+
     return {
       property,
-      images: images.map((img) => img.imageUrl),
+      images: uploadedImages.length > 0 ? uploadedImages : [propertyImageUrl(property.imageCoverUrl)],
     };
   } catch (error) {
     console.error('Error fetching property:', error);
@@ -70,6 +73,7 @@ export async function generateMetadata(
 
   const { property } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
+  const coverImageUrl = propertyImageUrl(property.imageCoverUrl);
 
   return {
     title: `${property.title} - ${price} | Estately`,
@@ -80,7 +84,7 @@ export async function generateMetadata(
       type: 'website',
       images: [
         {
-          url: property.imageCoverUrl,
+          url: coverImageUrl,
           width: 1200,
           height: 630,
           alt: property.title,
@@ -108,6 +112,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   const { property, images } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
+  const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl);
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
 
@@ -117,9 +122,9 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
         {/* Hero Section with Gallery */}
         <div className="mb-12">
           <PropertyGallery
-            mainImage={property.imageCoverUrl}
+            mainImage={coverImageUrl}
             title={property.title}
-            allImages={images}
+            allImages={images.filter((image) => image !== coverImageUrl)}
           />
         </div>
 
