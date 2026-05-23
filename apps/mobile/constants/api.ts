@@ -1,6 +1,14 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
+const MOBILE_API_PATH = '/api/mobile';
+
+function normalizeApiUrl(url: string): string {
+  const trimmedUrl = url.trim().replace(/\/+$/, '');
+
+  return trimmedUrl.endsWith(MOBILE_API_PATH) ? trimmedUrl : `${trimmedUrl}${MOBILE_API_PATH}`;
+}
+
 function getExpoHostApiUrl(): string | null {
   const hostUri = Constants.expoConfig?.hostUri;
   const host = hostUri?.split(':')[0];
@@ -21,6 +29,4 @@ function getDefaultApiUrl(): string {
 }
 
 export const API_BASE_URL =
-  Constants.expoConfig?.extra?.apiBaseUrl ??
-  process.env.EXPO_PUBLIC_API_BASE_URL ??
-  getDefaultApiUrl();
+  normalizeApiUrl(process.env.EXPO_PUBLIC_API_URL ?? getDefaultApiUrl());

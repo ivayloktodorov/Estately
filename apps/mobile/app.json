@@ -16,6 +16,9 @@
       "bundler": "metro",
       "output": "static"
     },
+    "extra": {
+      "apiUrlEnv": "EXPO_PUBLIC_API_URL"
+    },
     "plugins": [
       "expo-router",
       "expo-splash-screen"

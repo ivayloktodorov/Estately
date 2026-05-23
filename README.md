@@ -63,7 +63,7 @@ estately/
 │   │   └── types/            # TypeScript interfaces
 │   └── package.json
 │
-├── estately-mobile/            # Expo React Native mobile app
+├── apps/mobile/                # Expo React Native mobile app
 │   ├── app/                    # Expo Router navigation
 │   │   ├── (auth)/            # Auth screens
 │   │   └── (tabs)/            # Tab navigation
@@ -187,7 +187,7 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 ```
 
-### Mobile App (`estately-mobile/.env.local`)
+### Mobile App (`apps/mobile/.env.local`)
 
 ```env
 # API
@@ -197,6 +197,24 @@ EXPO_PUBLIC_APP_NAME=Estately
 # Feature Flags (optional)
 EXPO_PUBLIC_DEBUG_MODE=false
 ```
+
+For Expo Web export, `EXPO_PUBLIC_API_URL` should be the Next.js backend origin. The mobile app appends `/api/mobile` automatically.
+
+### Mobile Web Export
+
+Run the mobile app in Expo Web mode:
+
+```bash
+EXPO_PUBLIC_API_URL=http://localhost:3000 npm run --workspace=@estately/mobile web
+```
+
+Export a static web build:
+
+```bash
+EXPO_PUBLIC_API_URL=https://your-next-backend.example.com npm run --workspace=@estately/mobile export:web
+```
+
+The export output is generated in `apps/mobile/dist`. For Netlify, use `apps/mobile` as the base directory, `npm run export:web` as the build command, `dist` as the publish directory, and set `EXPO_PUBLIC_API_URL` to the deployed backend URL.
 
 ---
 
