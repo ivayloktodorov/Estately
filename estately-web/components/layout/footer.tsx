@@ -51,7 +51,11 @@ export function Footer() {
         <div className="py-12 md:py-16">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.75fr_0.75fr] lg:gap-12">
             <div>
-              <Link className="text-2xl font-bold hover:text-estate-600 transition" href="/">
+              <Link
+                aria-label="Estately home"
+                className="inline-flex rounded-md text-2xl font-bold text-white transition hover:text-estate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-600 focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal-950"
+                href="/"
+              >
                 Estately
               </Link>
               <p className="mt-4 max-w-md text-sm leading-6 text-stone-400">

@@ -4,6 +4,7 @@
     "slug": "estately-mobile",
     "version": "0.1.0",
     "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
     "scheme": "estately",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -14,14 +15,22 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
     "extra": {
       "apiUrlEnv": "EXPO_PUBLIC_API_URL"
     },
     "plugins": [
       "expo-router",
-      "expo-splash-screen"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120,
+          "backgroundColor": "#FFFFFF"
+        }
+      ]
     ],
     "experiments": {}
   }

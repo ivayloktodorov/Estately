@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { AuthUser } from '@/lib/auth/types';
 import { getUnreadNotificationCount, getUserNotifications } from '@/lib/notifications/service';
 import { ButtonLink } from '@/components/ui/button-link';
@@ -33,10 +34,18 @@ export async function Header({ user }: HeaderProps) {
           {/* Logo */}
           <Link
             aria-label="Estately home"
-            className="shrink-0 text-2xl font-bold tracking-tight text-charcoal-950 hover:text-estate-700 transition"
+            className="shrink-0 transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50"
             href="/"
           >
-            Estately
+            <Image
+              alt="Estately"
+              className="h-auto w-[190px] object-contain"
+              height={96}
+              priority
+              src="/branding/logo-full.png?v=2"
+              unoptimized
+              width={360}
+            />
           </Link>
 
           {/* Desktop Navigation */}

@@ -21,6 +21,23 @@ export const metadata: Metadata = {
     template: "%s | Estately",
   },
   description: "A modern real estate platform for browsing and saving property listings.",
+  icons: {
+    icon: [
+      {
+        rel: "icon",
+        url: "/branding/favicon.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/branding/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default async function RootLayout({
