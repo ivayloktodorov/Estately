@@ -1,6 +1,10 @@
 import { apiRequest } from '@/services/api';
 import { clearStoredSession, storeSession } from '@/services/storage.service';
-import type { AuthSession, LoginInput, RegisterInput } from '@/types/auth';
+import type { AuthSession, AuthUser, LoginInput, RegisterInput } from '@/types/auth';
+
+export function getCurrentUser(): Promise<AuthUser> {
+  return apiRequest<AuthUser>('/me', { requiresAuth: true });
+}
 
 export async function login(input: LoginInput): Promise<AuthSession> {
   const session = await apiRequest<AuthSession, LoginInput>('/auth/login', {
