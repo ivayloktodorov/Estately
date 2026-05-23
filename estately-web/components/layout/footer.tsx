@@ -6,6 +6,7 @@ const footerLinks = [
   { href: '/rent', label: 'Rent' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
+  { href: '/docs/api', label: 'API Docs' },
 ];
 
 const socialLinks = ['Instagram', 'LinkedIn', 'X'];
