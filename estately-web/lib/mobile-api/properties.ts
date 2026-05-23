@@ -6,7 +6,7 @@ import type { MobilePropertyFilters } from './validation';
 type PropertySort = MobilePropertyFilters['sort'];
 
 function buildMobilePropertyConditions(filters: MobilePropertyFilters): SQL[] {
-  const conditions: SQL[] = [eq(properties.isPublished, true)];
+  const conditions: SQL[] = [eq(properties.moderationStatus, 'approved')];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;

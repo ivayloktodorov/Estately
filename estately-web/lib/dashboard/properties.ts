@@ -16,6 +16,8 @@ export type DashboardProperty = Pick<
   | 'bathrooms'
   | 'areaSqm'
   | 'isPublished'
+  | 'moderationStatus'
+  | 'moderationNotes'
   | 'createdAt'
 >;
 
@@ -34,6 +36,8 @@ export async function getUserProperties(userId: number): Promise<DashboardProper
       bathrooms: properties.bathrooms,
       areaSqm: properties.areaSqm,
       isPublished: properties.isPublished,
+      moderationStatus: properties.moderationStatus,
+      moderationNotes: properties.moderationNotes,
       createdAt: properties.createdAt,
     })
     .from(properties)
@@ -44,7 +48,12 @@ export async function getUserProperties(userId: number): Promise<DashboardProper
 export async function getUserPropertyById(
   propertyId: number,
   userId: number,
+  options: { includeAllForAdmin?: boolean } = {},
 ): Promise<DashboardProperty | null> {
+  const whereClause = options.includeAllForAdmin
+    ? eq(properties.id, propertyId)
+    : and(eq(properties.id, propertyId), eq(properties.createdByUserId, userId));
+
   const result = await db
     .select({
       id: properties.id,
@@ -59,10 +68,12 @@ export async function getUserPropertyById(
       bathrooms: properties.bathrooms,
       areaSqm: properties.areaSqm,
       isPublished: properties.isPublished,
+      moderationStatus: properties.moderationStatus,
+      moderationNotes: properties.moderationNotes,
       createdAt: properties.createdAt,
     })
     .from(properties)
-    .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, userId)))
+    .where(whereClause)
     .limit(1);
 
   return result[0] ?? null;

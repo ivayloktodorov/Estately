@@ -37,16 +37,17 @@ function RoleBadge({ role }: { role: string }) {
   );
 }
 
-function StatusBadge({ isPublished }: { isPublished: boolean }) {
+function StatusBadge({ status }: { status: string }) {
+  const styles =
+    status === 'approved'
+      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+      : status === 'rejected'
+        ? 'bg-red-50 text-red-700 ring-red-200'
+        : 'bg-amber-50 text-amber-700 ring-amber-200';
+
   return (
-    <span
-      className={
-        isPublished
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
-          : 'inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200'
-      }
-    >
-      {isPublished ? 'Published' : 'Hidden'}
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles}`}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
 }
@@ -148,7 +149,7 @@ function RecentProperties({ properties }: { properties: RecentAdminProperty[] })
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <StatusBadge isPublished={property.isPublished} />
+                <StatusBadge status={property.moderationStatus} />
                 <span className="text-sm text-slate-500">{formatDate(property.createdAt)}</span>
               </div>
             </article>
@@ -211,8 +212,9 @@ export default async function AdminPage() {
   const statCards = [
     { label: 'Users', value: overview.stats.totalUsers },
     { label: 'Properties', value: overview.stats.totalProperties },
-    { label: 'Published', value: overview.stats.publishedProperties },
-    { label: 'Hidden', value: overview.stats.unpublishedProperties },
+    { label: 'Pending', value: overview.stats.pendingProperties },
+    { label: 'Approved', value: overview.stats.approvedProperties },
+    { label: 'Rejected', value: overview.stats.rejectedProperties },
     { label: 'Favorites', value: overview.stats.totalFavorites },
     { label: 'Inquiries', value: overview.stats.totalInquiries },
   ];

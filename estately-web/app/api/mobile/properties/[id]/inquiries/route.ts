@@ -28,12 +28,12 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
     const propertyId = mobilePropertyIdSchema.parse(id);
     const { message } = mobileInquirySchema.parse(await request.json());
     const property = await db
-      .select({ id: properties.id, isPublished: properties.isPublished })
+      .select({ id: properties.id, moderationStatus: properties.moderationStatus })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
 
-    if (!property || !property.isPublished) {
+    if (!property || property.moderationStatus !== 'approved') {
       return mobileError('Property not found.', 404);
     }
 

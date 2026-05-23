@@ -20,6 +20,12 @@ const profileLinks = [
   { href: '/favorites', label: 'Favorites' },
 ];
 
+const adminLinks = [
+  { href: '/admin', label: 'Admin Dashboard' },
+  { href: '/admin/properties', label: 'Listing Moderation' },
+  { href: '/admin/users', label: 'User Management' },
+];
+
 export function ProfileDropdown({ align = 'right', className = '', user }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -60,6 +66,21 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
               {link.label}
             </Link>
           ))}
+          {user.role === 'admin' ? (
+            <div className="mt-2 border-t border-stone-200 pt-2">
+              {adminLinks.map((link) => (
+                <Link
+                  className="block px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-cream-50 hover:text-emerald-800"
+                  href={link.href}
+                  key={link.href}
+                  onClick={() => setIsOpen(false)}
+                  role="menuitem"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
           <div className="mt-2 border-t border-stone-200 px-2 pt-2">
             <LogoutButton
               className="min-h-0 h-10 justify-start rounded-md border-transparent bg-white px-2.5 py-2 text-left text-red-600 hover:border-transparent hover:bg-red-50 hover:text-red-700"

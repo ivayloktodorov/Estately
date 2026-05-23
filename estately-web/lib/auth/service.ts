@@ -74,6 +74,10 @@ export const authService = {
       throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password.');
     }
 
+    if (user.status === 'inactive') {
+      throw new AuthError('INVALID_CREDENTIALS', 'This account is inactive. Contact an administrator.');
+    }
+
     return toAuthUser(user);
   },
 

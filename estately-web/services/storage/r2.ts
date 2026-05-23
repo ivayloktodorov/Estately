@@ -81,14 +81,14 @@ export function validateR2ImageFile(file: File): string | null {
   return null;
 }
 
-function createObjectKey(file: File): string {
+function createObjectKey(file: File, folder = 'test-r2'): string {
   const extension = allowedImageTypes.get(file.type);
 
   if (!extension) {
     throw new Error('Unsupported image type.');
   }
 
-  return `test-r2/${Date.now()}-${randomUUID()}.${extension}`;
+  return `${folder}/${Date.now()}-${randomUUID()}.${extension}`;
 }
 
 export async function getR2PublicUrl(key: string): Promise<string> {
@@ -110,7 +110,7 @@ export async function getR2PublicUrl(key: string): Promise<string> {
   );
 }
 
-export async function uploadR2Image(file: File): Promise<R2UploadResult> {
+export async function uploadR2Image(file: File, folder?: string): Promise<R2UploadResult> {
   const validationError = validateR2ImageFile(file);
 
   if (validationError) {
@@ -118,7 +118,7 @@ export async function uploadR2Image(file: File): Promise<R2UploadResult> {
   }
 
   const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET');
-  const key = createObjectKey(file);
+  const key = createObjectKey(file, folder);
   const body = Buffer.from(await file.arrayBuffer());
 
   await getR2Client().send(

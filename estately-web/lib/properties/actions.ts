@@ -82,6 +82,8 @@ export async function createPropertyAction(
         imageCoverUrl: defaultCoverImageUrl,
         createdByUserId: user.id,
         isPublished: false,
+        moderationStatus: 'pending',
+        moderationNotes: null,
         updatedAt: new Date(),
       })
       .returning({ id: properties.id });

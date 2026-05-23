@@ -23,16 +23,17 @@ function readableLabel(value: string): string {
     .join(' ');
 }
 
-function StatusBadge({ isPublished }: { isPublished: boolean }) {
+function StatusBadge({ status }: { status: string }) {
+  const styles =
+    status === 'approved'
+      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+      : status === 'rejected'
+        ? 'bg-red-50 text-red-700 ring-red-200'
+        : 'bg-amber-50 text-amber-700 ring-amber-200';
+
   return (
-    <span
-      className={
-        isPublished
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
-          : 'inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200'
-      }
-    >
-      {isPublished ? 'Published' : 'Hidden / Draft'}
+    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles}`}>
+      {readableLabel(status)}
     </span>
   );
 }
@@ -125,7 +126,10 @@ export default async function DashboardPropertiesPage() {
                         <td className="px-4 py-4 text-slate-700">{readableLabel(property.propertyType)}</td>
                         <td className="px-4 py-4 text-slate-700">{readableLabel(property.listingType)}</td>
                         <td className="px-4 py-4">
-                          <StatusBadge isPublished={property.isPublished} />
+                          <StatusBadge status={property.moderationStatus} />
+                          {property.moderationNotes ? (
+                            <p className="mt-2 max-w-48 text-xs text-slate-500">{property.moderationNotes}</p>
+                          ) : null}
                         </td>
                         <td className="px-4 py-4 text-slate-700">{formatDate(property.createdAt)}</td>
                         <td className="px-4 py-4">
@@ -148,7 +152,7 @@ export default async function DashboardPropertiesPage() {
                         {property.city} · {formatPrice(property.price)}
                       </p>
                     </div>
-                    <StatusBadge isPublished={property.isPublished} />
+                    <StatusBadge status={property.moderationStatus} />
                   </div>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div>

@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { favorites, properties } from '@/src/db/schema';
 
@@ -24,6 +24,6 @@ export async function getFavoriteProperties(userId: number) {
     })
     .from(favorites)
     .innerJoin(properties, eq(favorites.propertyId, properties.id))
-    .where(eq(favorites.userId, userId))
+    .where(and(eq(favorites.userId, userId), eq(properties.moderationStatus, 'approved')))
     .orderBy(desc(favorites.createdAt));
 }

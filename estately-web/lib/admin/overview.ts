@@ -5,8 +5,9 @@ import { favorites, properties, propertyMessages, users } from '@/src/db/schema'
 export interface AdminOverviewStats {
   totalUsers: number;
   totalProperties: number;
-  publishedProperties: number;
-  unpublishedProperties: number;
+  pendingProperties: number;
+  approvedProperties: number;
+  rejectedProperties: number;
   totalFavorites: number;
   totalInquiries: number;
 }
@@ -24,7 +25,7 @@ export interface RecentAdminProperty {
   title: string;
   city: string;
   price: string;
-  isPublished: boolean;
+  moderationStatus: string;
   createdAt: Date;
 }
 
@@ -53,8 +54,9 @@ export async function getAdminOverview(): Promise<AdminOverview> {
   const [
     totalUsersRows,
     totalPropertiesRows,
-    publishedPropertiesRows,
-    unpublishedPropertiesRows,
+    pendingPropertiesRows,
+    approvedPropertiesRows,
+    rejectedPropertiesRows,
     totalFavoritesRows,
     totalInquiriesRows,
     recentUsers,
@@ -63,8 +65,9 @@ export async function getAdminOverview(): Promise<AdminOverview> {
   ] = await Promise.all([
     db.select({ value: count() }).from(users),
     db.select({ value: count() }).from(properties),
-    db.select({ value: count() }).from(properties).where(eq(properties.isPublished, true)),
-    db.select({ value: count() }).from(properties).where(eq(properties.isPublished, false)),
+    db.select({ value: count() }).from(properties).where(eq(properties.moderationStatus, 'pending')),
+    db.select({ value: count() }).from(properties).where(eq(properties.moderationStatus, 'approved')),
+    db.select({ value: count() }).from(properties).where(eq(properties.moderationStatus, 'rejected')),
     db.select({ value: count() }).from(favorites),
     db.select({ value: count() }).from(propertyMessages),
     db
@@ -84,7 +87,7 @@ export async function getAdminOverview(): Promise<AdminOverview> {
         title: properties.title,
         city: properties.city,
         price: properties.price,
-        isPublished: properties.isPublished,
+        moderationStatus: properties.moderationStatus,
         createdAt: properties.createdAt,
       })
       .from(properties)
@@ -111,8 +114,9 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     stats: {
       totalUsers: countValue(totalUsersRows),
       totalProperties: countValue(totalPropertiesRows),
-      publishedProperties: countValue(publishedPropertiesRows),
-      unpublishedProperties: countValue(unpublishedPropertiesRows),
+      pendingProperties: countValue(pendingPropertiesRows),
+      approvedProperties: countValue(approvedPropertiesRows),
+      rejectedProperties: countValue(rejectedPropertiesRows),
       totalFavorites: countValue(totalFavoritesRows),
       totalInquiries: countValue(totalInquiriesRows),
     },

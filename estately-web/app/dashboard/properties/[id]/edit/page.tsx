@@ -24,7 +24,9 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     notFound();
   }
 
-  const property = await getUserPropertyById(propertyId, user.id);
+  const property = await getUserPropertyById(propertyId, user.id, {
+    includeAllForAdmin: user.role === 'admin',
+  });
 
   if (!property) {
     notFound();
@@ -36,9 +38,9 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
         <div className="mb-10">
           <Link
             className="mb-6 inline-flex items-center text-sm font-medium text-estate-700 transition hover:text-estate-800"
-            href="/dashboard/properties"
+            href={user.role === 'admin' ? '/admin/properties' : '/dashboard/properties'}
           >
-            Back to My Properties
+            Back to {user.role === 'admin' ? 'moderation' : 'My Properties'}
           </Link>
           <h1 className="mb-2 text-4xl font-semibold text-charcoal-950">Edit Property</h1>
           <p className="text-lg text-slate-600">Update listing details for {property.title}.</p>

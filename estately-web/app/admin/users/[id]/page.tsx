@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUserDetails } from '@/lib/admin/users';
-import { updateUserRoleAction } from '../actions';
+import { AdminUserManagementForm } from './admin-user-management-form';
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -43,8 +43,22 @@ function RoleBadge({ role }: { role: string }) {
   );
 }
 
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={
+        status === 'active'
+          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          : 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200'
+      }
+    >
+      {status === 'active' ? 'Active' : 'Inactive'}
+    </span>
+  );
+}
+
 export default async function AdminUserDetailsPage({ params }: AdminUserDetailsPageProps) {
-  await requireAdmin();
+  const admin = await requireAdmin();
   const { id } = await params;
   const userId = Number(id);
 
@@ -95,27 +109,7 @@ export default async function AdminUserDetailsPage({ params }: AdminUserDetailsP
                 </div>
               </div>
             </div>
-
-            <form action={updateUserRoleAction} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <input name="userId" type="hidden" value={user.id} />
-              <label className="block text-sm font-semibold text-slate-950" htmlFor="role">
-                Change role
-              </label>
-              <div className="mt-2 flex gap-2">
-                <select
-                  className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
-                  defaultValue={user.role}
-                  id="role"
-                  name="role"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <button className="h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700">
-                  Save
-                </button>
-              </div>
-            </form>
+            <StatusBadge status={user.status} />
           </div>
         </section>
 
@@ -144,14 +138,26 @@ export default async function AdminUserDetailsPage({ params }: AdminUserDetailsP
               <dd className="mt-1 text-slate-950">{user.role}</dd>
             </div>
             <div>
+              <dt className="font-semibold text-slate-500">Status</dt>
+              <dd className="mt-1 text-slate-950">{user.status}</dd>
+            </div>
+            <div>
               <dt className="font-semibold text-slate-500">Created At</dt>
               <dd className="mt-1 text-slate-950">{formatDate(user.createdAt)}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-slate-500">Last Updated</dt>
+              <dd className="mt-1 text-slate-950">{formatDate(user.updatedAt)}</dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="font-semibold text-slate-500">Avatar</dt>
               <dd className="mt-1 text-slate-950">{user.avatarUrl ?? 'No avatar uploaded'}</dd>
             </div>
           </dl>
+        </section>
+
+        <section className="mt-6">
+          <AdminUserManagementForm actingAdminId={admin.id} user={user} />
         </section>
       </div>
     </main>

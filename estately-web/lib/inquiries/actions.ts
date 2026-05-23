@@ -46,12 +46,12 @@ export async function submitPropertyInquiryAction(
 
   try {
     const property = await db
-      .select({ id: properties.id, isPublished: properties.isPublished })
+      .select({ id: properties.id, moderationStatus: properties.moderationStatus })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
 
-    if (!property || !property.isPublished) {
+    if (!property || property.moderationStatus !== 'approved') {
       return {
         status: 'error',
         message: 'This property is no longer available.',

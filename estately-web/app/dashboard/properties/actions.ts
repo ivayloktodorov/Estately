@@ -74,6 +74,11 @@ export async function updatePropertyAction(
 
   try {
     const validatedData = parsed.data;
+    const whereClause =
+      user.role === 'admin'
+        ? eq(properties.id, propertyId)
+        : and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id));
+
     const updatedRows = await db
       .update(properties)
       .set({
@@ -87,9 +92,12 @@ export async function updatePropertyAction(
         bedrooms: validatedData.bedrooms,
         bathrooms: validatedData.bathrooms,
         areaSqm: validatedData.areaSqm,
+        moderationStatus: user.role === 'admin' ? undefined : 'pending',
+        moderationNotes: user.role === 'admin' ? undefined : null,
+        isPublished: user.role === 'admin' ? undefined : false,
         updatedAt: new Date(),
       })
-      .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)))
+      .where(whereClause)
       .returning({ id: properties.id });
 
     if (!updatedRows[0]) {
