@@ -17,30 +17,63 @@ The mobile app communicates with the deployed Next.js backend through `/api/mobi
 
 Deploy `estately-web` to Netlify, Vercel, or another hosting platform that supports Next.js.
 
-### Netlify
+### Build settings
 
-1. Connect the GitHub repository to Netlify.
-2. Set the base directory to:
+From the repository root:
 
-```text
-estately-web
+```bash
+npm run web:build
 ```
 
-3. Set the build command:
+From inside `estately-web`:
 
 ```bash
 npm run build
 ```
 
-4. Let Netlify detect the Next.js output, or use the platform default for Next.js.
-5. Add production environment variables in the Netlify dashboard.
-6. Deploy.
+Expected Next.js build output:
+
+```text
+estately-web/.next
+```
+
+### Netlify
+
+1. Connect the GitHub repository to Netlify.
+2. Use the committed `netlify.toml`, or set these values in the Netlify UI:
+
+```text
+Base directory:
+estately-web
+
+Build command:
+npm run build
+
+Publish directory:
+.next
+```
+
+3. Let Netlify detect Next.js. The Netlify Next runtime converts App Router pages, API routes, and middleware automatically.
+4. Add production environment variables in the Netlify dashboard.
+5. Deploy.
 
 ### Vercel
 
 1. Import the GitHub repository into Vercel.
 2. Select the `estately-web` project/root directory.
-3. Use the default Next.js build settings.
+3. Use the default Next.js build settings:
+
+```text
+Framework preset:
+Next.js
+
+Build command:
+npm run build
+
+Output:
+.next
+```
+
 4. Add production environment variables in the Vercel dashboard.
 5. Deploy.
 
@@ -51,6 +84,7 @@ Required production variables for the Next.js web/backend app:
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
+NEXT_PUBLIC_APP_URL=https://your-deployed-estately-web-url.com
 
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
@@ -119,7 +153,7 @@ EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com
 Run the export:
 
 ```bash
-EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com npm run --workspace=@estately/mobile export:web
+EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com npm run mobile:export-web
 ```
 
 The generated output is:
@@ -138,6 +172,8 @@ If deploying from the monorepo:
 - Build command: `npm run export:web`
 - Publish directory: `dist`
 - Environment variable: `EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com`
+
+Do not export mobile web without `EXPO_PUBLIC_API_URL`; production builds intentionally fail if this value is missing so localhost is not baked into the static output.
 
 ## 7. Mobile API URL Configuration
 
@@ -164,10 +200,16 @@ After deployment, verify:
 - Register works.
 - Properties page loads.
 - Property details page loads.
+- Dashboard redirects when logged out and loads when logged in.
+- Admin redirects/rejects non-admins and loads for an admin.
+- Docs pages load, including `/docs/deployment` and `/docs/final-qa-report`.
 - Mobile REST API works, for example `GET /api/mobile/properties`.
+- Protected REST endpoints return `401` without a Bearer token.
+- Invalid REST requests return safe `400` errors.
 - Mobile web export loads.
 - Mobile login works against the deployed backend.
 - Image upload works.
+- Uploaded images load from R2/public URL.
 - Admin login works.
 - Admin dashboard loads.
 

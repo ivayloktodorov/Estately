@@ -24,23 +24,32 @@ const sections = [
   },
   {
     title: '2. Web App Deployment',
-    body: 'Deploy estately-web to Netlify, Vercel, or another Next.js-capable platform. Connect the GitHub repo, select the web app root, configure production environment variables, and run the platform build.',
-    command: `# Netlify base directory
+    body: 'Deploy estately-web to Netlify, Vercel, or another Next.js-capable platform. The committed netlify.toml makes Netlify settings explicit; Vercel can use its default Next.js preset.',
+    command: `# Verify from repository root
+npm run web:build
+
+# Netlify base directory
 estately-web
 
 # Build command
-npm run build`,
+npm run build
+
+# Expected output
+estately-web/.next`,
   },
   {
     title: '3. Environment Variables',
     body: 'Configure these production variables in the hosting provider dashboard. Do not commit real secrets.',
     command: `DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
+NEXT_PUBLIC_APP_URL=https://your-deployed-estately-web-url.com
 
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
-R2_BUCKET_NAME=your-r2-bucket-name`,
+R2_BUCKET_NAME=your-r2-bucket-name
+
+EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com`,
   },
   {
     title: '4. Neon Production Database',
@@ -59,8 +68,8 @@ R2_BUCKET_NAME=`,
   },
   {
     title: '6. Expo Mobile Web Export',
-    body: 'Configure the mobile app to point at the deployed backend, export the static web build, and deploy apps/mobile/dist to Netlify or another static host.',
-    command: `EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com npm run --workspace=@estately/mobile export:web
+    body: 'Configure the mobile app to point at the deployed backend, export the static web build, and deploy apps/mobile/dist to Netlify or another static host. Production export requires EXPO_PUBLIC_API_URL so localhost is not baked into the build.',
+    command: `EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com npm run mobile:export-web
 
 # Output
 apps/mobile/dist`,
@@ -81,9 +90,16 @@ const verificationItems = [
   'Login works',
   'Register works',
   'Properties page loads',
+  'Property details page loads',
+  'Dashboard redirects when logged out and loads when logged in',
+  'Admin routes reject non-admins and load for admin users',
+  'Docs pages load',
   'Mobile REST API works',
+  'Protected REST endpoints return 401 without a Bearer token',
+  'Invalid REST requests return safe 400 errors',
   'Mobile web export loads',
   'Image upload works',
+  'Uploaded images load from R2',
   'Admin login works',
 ];
 

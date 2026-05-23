@@ -12,10 +12,17 @@
     "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspaces --if-present",
+    "web:dev": "npm run dev --workspace=estately-web",
+    "web:build": "npm run build --workspace=estately-web",
+    "web:start": "npm run start --workspace=estately-web",
     "mobile": "npm run dev --workspace=@estately/mobile",
+    "mobile:start": "npm run start --workspace=@estately/mobile",
     "mobile:web": "npm run web --workspace=@estately/mobile",
+    "mobile:export-web": "npm run export:web --workspace=@estately/mobile",
     "web": "npm run web --workspace=estately-mobile",
-    "lint": "npm run lint --workspaces --if-present"
+    "lint": "npm run lint --workspaces --if-present",
+    "db:migrate": "npm run db:migrate --workspace=estately-web",
+    "db:seed": "npm run db:seed --workspace=estately-web"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1053.0"

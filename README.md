@@ -280,6 +280,7 @@ Required web/backend variables:
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
+NEXT_PUBLIC_APP_URL=https://your-estately-web.example.com
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
@@ -329,6 +330,7 @@ Required production web/backend variables:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
+- `NEXT_PUBLIC_APP_URL`
 - `R2_ACCOUNT_ID`
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`

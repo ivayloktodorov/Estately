@@ -28,5 +28,18 @@ function getDefaultApiUrl(): string {
   return getExpoHostApiUrl() ?? 'http://localhost:3000/api/mobile';
 }
 
-export const API_BASE_URL =
-  normalizeApiUrl(process.env.EXPO_PUBLIC_API_URL ?? getDefaultApiUrl());
+function getConfiguredApiUrl(): string {
+  const configuredUrl = process.env.EXPO_PUBLIC_API_URL;
+
+  if (configuredUrl) {
+    return normalizeApiUrl(configuredUrl);
+  }
+
+  if (!__DEV__) {
+    throw new Error('EXPO_PUBLIC_API_URL must be set for production mobile builds.');
+  }
+
+  return normalizeApiUrl(getDefaultApiUrl());
+}
+
+export const API_BASE_URL = getConfiguredApiUrl();
