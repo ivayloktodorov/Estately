@@ -9,6 +9,7 @@ import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { createPropertySchema } from '@/lib/properties/validation';
 import { notifyPropertyOwnerOfAdminUpdate } from '@/lib/notifications/service';
+import { createActivity } from '@/lib/activity/service';
 import type { PropertyActionState } from '@/lib/properties/types';
 
 function formValue(formData: FormData, key: string): string {
@@ -99,7 +100,7 @@ export async function updatePropertyAction(
         updatedAt: new Date(),
       })
       .where(whereClause)
-      .returning({ id: properties.id });
+      .returning({ id: properties.id, title: properties.title, ownerId: properties.createdByUserId });
 
     if (!updatedRows[0]) {
       return {
@@ -111,6 +112,23 @@ export async function updatePropertyAction(
 
     if (user.role === 'admin') {
       await notifyPropertyOwnerOfAdminUpdate(propertyId);
+      await createActivity({
+        userId: updatedRows[0].ownerId,
+        type: 'property_updated',
+        title: 'Property updated',
+        description: `An administrator updated "${updatedRows[0].title}".`,
+        entityType: 'property',
+        entityId: propertyId,
+      });
+    } else {
+      await createActivity({
+        userId: user.id,
+        type: 'property_updated',
+        title: 'Property updated',
+        description: `You updated "${updatedRows[0].title}".`,
+        entityType: 'property',
+        entityId: propertyId,
+      });
     }
   } catch (error) {
     console.error('Property update error:', error);
@@ -129,10 +147,26 @@ export async function updatePropertyAction(
 export async function deleteOwnPropertyAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
   const propertyId = propertyIdValue(formData);
+  const property = await db
+    .select({ title: properties.title })
+    .from(properties)
+    .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)))
+    .then((rows) => rows[0]);
 
   await db
     .delete(properties)
     .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)));
+
+  if (property) {
+    await createActivity({
+      userId: user.id,
+      type: 'property_deleted',
+      title: 'Property deleted',
+      description: `You deleted "${property.title}".`,
+      entityType: 'property',
+      entityId: propertyId,
+    });
+  }
 
   revalidatePath('/dashboard/properties');
   revalidatePath('/properties');

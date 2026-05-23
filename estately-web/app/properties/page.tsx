@@ -7,6 +7,7 @@ import { PropertyPagination } from '@/components/properties/property-pagination'
 import { PropertySortSelect } from '@/components/properties/property-sort-select';
 import { PropertiesMapViewDynamic } from '@/components/properties/properties-map-view-dynamic';
 import { PropertyViewToggle } from '@/components/properties/property-view-toggle';
+import { SaveSearchButton } from '@/components/properties/save-search-button';
 import { getCurrentUser } from '@/lib/auth';
 import { getFavoritePropertyIds } from '@/lib/favorites/actions';
 import { propertyImageUrl } from '@/lib/properties/images';
@@ -125,6 +126,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
             <div aria-hidden="true" />
           )}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end lg:ml-auto">
+            <SaveSearchButton filters={filters} isAuthenticated={Boolean(user)} />
             <PropertyViewToggle searchParams={resolvedSearchParams} view={view} />
             <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
           </div>

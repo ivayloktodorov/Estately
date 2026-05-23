@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import { changeUserPassword, getUserProfile, updateUserProfile } from '@/lib/users/profile';
+import { createActivity } from '@/lib/activity/service';
 import { uploadR2Image, validateR2ImageFile } from '@/services/storage/r2';
 
 export interface ProfileActionState {
@@ -60,6 +61,14 @@ export async function updateProfileAction(
       email: String(formData.get('email') ?? ''),
       bio: String(formData.get('bio') ?? ''),
       avatarUrl,
+    });
+    await createActivity({
+      userId: user.id,
+      type: 'profile_updated',
+      title: 'Profile updated',
+      description: 'You updated your profile details.',
+      entityType: 'user',
+      entityId: user.id,
     });
 
     revalidatePath('/profile');

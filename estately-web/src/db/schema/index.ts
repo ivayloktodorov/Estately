@@ -8,3 +8,5 @@ export * from './notifications';
 export * from './conversations';
 export * from './messages';
 export * from './message-attachments';
+export * from './user-activity';
+export * from './saved-searches';

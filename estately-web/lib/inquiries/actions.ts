@@ -5,7 +5,9 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties, propertyMessages } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
+import { createActivity } from '@/lib/activity/service';
 import { createOrReuseConversationAndMessage } from '@/lib/messages/service';
+import { notifyPropertyOwnerOfInquiry } from '@/lib/notifications/service';
 import type { InquiryActionState } from './types';
 
 const minMessageLength = 10;
@@ -51,6 +53,7 @@ export async function submitPropertyInquiryAction(
         id: properties.id,
         moderationStatus: properties.moderationStatus,
         ownerUserId: properties.createdByUserId,
+        title: properties.title,
       })
       .from(properties)
       .where(eq(properties.id, propertyId))
@@ -60,6 +63,14 @@ export async function submitPropertyInquiryAction(
       return {
         status: 'error',
         message: 'This property is no longer available.',
+        fields: { message },
+      };
+    }
+
+    if (property.ownerUserId === user.id) {
+      return {
+        status: 'error',
+        message: 'You cannot send an inquiry to your own property.',
         fields: { message },
       };
     }
@@ -76,6 +87,15 @@ export async function submitPropertyInquiryAction(
       senderUserId: user.id,
       body: message,
     });
+    await createActivity({
+      userId: property.ownerUserId,
+      type: 'inquiry_received',
+      title: 'Inquiry received',
+      description: `You received an inquiry for "${property.title}".`,
+      entityType: 'property',
+      entityId: propertyId,
+    });
+    await notifyPropertyOwnerOfInquiry(propertyId);
 
     revalidatePath('/dashboard/inquiries');
     revalidatePath('/dashboard/messages');

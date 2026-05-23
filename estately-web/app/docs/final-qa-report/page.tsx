@@ -34,6 +34,36 @@ const docsLinks = [
 
 const testedModules: QaSection[] = [
   {
+    title: 'Final Pre-Deployment Checklist',
+    summary: 'Deployment readiness verification for web, mobile, REST API, database, storage, security, environment documentation, docs, and build checks.',
+    items: [
+      { label: 'Web app routes', status: 'Passed', notes: 'Homepage, properties, final QA docs, and mobile properties API smoke checks returned 200 from the running local Next server; dashboard and admin routes redirect unauthenticated users to login.' },
+      { label: 'Mobile app startup and flows', status: 'Passed', notes: 'Expo Metro started successfully with EXPO_PUBLIC_API_URL set; mobile typecheck and lint passed, covering auth, property list/detail, favorites, search, profile, and logout screens/services.' },
+      { label: 'REST API', status: 'Passed', notes: 'Mobile login returned a bearer token and user DTO, public mobile properties returned data, protected mobile endpoints returned 401 without a bearer token, and invalid login input returned a safe 400 error.' },
+      { label: 'Database', status: 'Passed', notes: 'Drizzle migrations, seed scripts, load-test scripts, and indexes are present; db:verify confirmed 10,001 properties in the configured database.' },
+      { label: 'Storage', status: 'Passed', notes: 'Cloudflare R2 test upload succeeded and the returned public image URL responded with 200 OK and image/png content.' },
+      { label: 'Security', status: 'Passed', notes: 'Auth responses return DTOs without passwordHash, admin routes are middleware/server protected, and private notification, conversation, attachment, favorite, profile, and saved-search operations are user-scoped.' },
+      { label: 'Environment documentation', status: 'Passed', notes: 'DATABASE_URL, JWT_SECRET, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, and EXPO_PUBLIC_API_URL are documented in README and setup/deployment docs.' },
+      { label: 'Documentation', status: 'Passed', notes: 'README, API docs, architecture docs, database schema docs, local setup docs, deployment docs, and SoftUni Exam page are present and included in the successful Next build.' },
+      { label: 'Build checks', status: 'Passed', notes: 'npm run build, npm run lint, mobile typecheck, mobile lint, and db:verify passed locally.' },
+      { label: 'Deployment readiness status', status: 'Passed', notes: 'Ready for deployment from the local verification pass. Remaining known issues are non-blocking warnings documented below.' },
+    ],
+  },
+  {
+    title: 'Startup Feature Integration QA',
+    summary: 'Header account controls, notifications, moderation, messaging, saved searches, activity history, and existing required flows were checked together for regressions.',
+    items: [
+      { label: 'Header navigation and dropdowns', status: 'Passed', notes: 'Avatar dropdown, notification bell, authenticated dashboard links, and admin-only menu links are role-gated in the shared header and mobile menu.' },
+      { label: 'Notifications', status: 'Passed', notes: 'Notifications load from the database, unread counts update, mark-read and mark-all-read actions are scoped to the current user, and notification links point to dashboard, message, admin, or property pages.' },
+      { label: 'Admin moderation', status: 'Passed', notes: 'New properties are created as pending; admin approve/reject updates publication state, notifies the owner, records owner activity, and triggers saved-search match alerts for approved listings.' },
+      { label: 'Messaging', status: 'Fixed', notes: 'Contacting a property owner creates/reuses a conversation, sends message notifications, supports replies and attachments, and attachment/conversation reads are restricted to participants or admins.' },
+      { label: 'Saved searches', status: 'Passed', notes: 'Filtered searches can be saved, listed, edited, deleted, opened from the dashboard, and notified when newly approved listings match.' },
+      { label: 'Activity history', status: 'Fixed', notes: 'Inquiry submissions now create explicit inquiry activity records in addition to conversation message activity, so recent activity and the activity page filters stay consistent.' },
+      { label: 'Existing required features', status: 'Passed', notes: 'Login/register/logout, listing browse/detail, search/filter/pagination, favorites, mobile API endpoints, and admin pages still build and pass verification.' },
+      { label: 'Unresolved issues', status: 'Known Warning', notes: 'No blocking startup integration issues remain from this pass; existing raw image lint warnings remain documented below.' },
+    ],
+  },
+  {
     title: 'Web Authentication',
     summary: 'Register, login, logout, invalid login, duplicate registration, protected routes, and role restrictions.',
     items: [
@@ -106,7 +136,7 @@ const testedModules: QaSection[] = [
       { label: 'Database verification', status: 'Passed', notes: 'db:verify passed with 10,000 users, 10,000 properties, 10,002 messages, and 10,001 favorites.' },
       { label: 'Relationships and indexes', status: 'Passed', notes: 'Schema and migrations include relationships and indexes for property search/filter workloads.' },
       { label: 'Invalid upload handling', status: 'Passed', notes: 'Upload routes validate file presence, MIME type, and 5MB size limit.' },
-      { label: 'Live R2 upload', status: 'Manual Verification', notes: 'Run /test-r2 with production credentials to confirm final bucket permissions and public image URLs.' },
+      { label: 'Live R2 upload', status: 'Passed', notes: 'The /api/test-r2-upload smoke path uploaded an image to R2 and the returned public image URL loaded successfully.' },
     ],
   },
   {
@@ -123,6 +153,8 @@ const testedModules: QaSection[] = [
 ];
 
 const fixesApplied = [
+  'Added explicit inquiry notifications and activity records for web and mobile inquiry submissions so notification-center and activity filters reflect contact-owner events.',
+  'Blocked owners from submitting inquiries to their own properties on web and mobile to prevent self-conversations and misleading notifications.',
   'Aligned property image uploads with documented R2_* environment variable names while preserving legacy CLOUDFLARE_R2_* aliases.',
   'Prevented public direct access to unpublished web property detail pages unless the viewer is the owner or an admin.',
   'Prevented web favorites from saving unpublished or unavailable properties.',
@@ -131,9 +163,10 @@ const fixesApplied = [
 ];
 
 const verificationCommands = [
-  'npm run lint',
   'npm run build',
-  'npm run --workspace=@estately/mobile typecheck',
+  'npm run lint',
+  'npm run typecheck --workspace=@estately/mobile',
+  'npm run lint --workspace=@estately/mobile',
   'npm run --workspace=estately-web db:verify',
 ];
 

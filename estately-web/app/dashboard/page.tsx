@@ -5,17 +5,44 @@ import { PropertyImageUpload } from '@/components/properties/property-image-uplo
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { propertyImageUrl } from '@/lib/properties/images';
+import { getRecentUserActivity, type UserActivityType } from '@/lib/activity/service';
+
+function formatActivityDate(date: Date): string {
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+}
+
+function activityIcon(type: UserActivityType): string {
+  switch (type) {
+    case 'message_received':
+      return '✉';
+    case 'inquiry_received':
+      return '?';
+    case 'favorite_added':
+      return '♥';
+    case 'profile_updated':
+      return 'i';
+    default:
+      return '⌂';
+  }
+}
 
 export default async function DashboardPage() {
   const user = await requireAuth();
-  const manageableProperties =
+  const [manageableProperties, recentActivity] = await Promise.all([
     user.role === 'admin'
-      ? await db.select().from(properties).orderBy(desc(properties.createdAt))
-      : await db
+      ? db.select().from(properties).orderBy(desc(properties.createdAt))
+      : db
           .select()
           .from(properties)
           .where(eq(properties.createdByUserId, user.id))
-          .orderBy(desc(properties.createdAt));
+          .orderBy(desc(properties.createdAt)),
+    getRecentUserActivity(user.id),
+  ]);
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-10">
@@ -31,7 +58,7 @@ export default async function DashboardPage() {
           </p>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-4">
+        <section className="mt-6 grid gap-4 md:grid-cols-5">
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/properties"
@@ -64,6 +91,52 @@ export default async function DashboardPage() {
             <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Notifications</h2>
             <p className="mt-2 text-sm text-slate-600">View and manage account alerts.</p>
           </Link>
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/saved-searches"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Alerts</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Saved Searches</h2>
+            <p className="mt-2 text-sm text-slate-600">Manage property search alerts.</p>
+          </Link>
+        </section>
+
+        <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Recent activity</p>
+              <h2 className="mt-2 text-2xl font-semibold text-charcoal-950">Latest updates</h2>
+            </div>
+            <Link className="text-sm font-semibold text-estate-700 hover:text-estate-800" href="/dashboard/activity">
+              View all activity
+            </Link>
+          </div>
+          {recentActivity.length === 0 ? (
+            <p className="mt-5 rounded-lg border border-dashed border-stone-300 bg-cream-50 p-5 text-sm font-medium text-slate-600">
+              No activity yet.
+            </p>
+          ) : (
+            <div className="mt-5 grid gap-3">
+              {recentActivity.map((activity) => (
+                <Link
+                  className="flex gap-3 rounded-lg border border-stone-200 bg-white p-4 transition hover:border-estate-300"
+                  href={activity.href ?? '/dashboard/activity'}
+                  key={activity.id}
+                >
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-estate-700">
+                    {activityIcon(activity.type)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold text-charcoal-950">{activity.title}</span>
+                    <span className="mt-1 block truncate text-sm text-slate-600">{activity.description}</span>
+                    <time className="mt-1 block text-xs font-medium text-slate-500" dateTime={activity.createdAt.toISOString()}>
+                      {formatActivityDate(activity.createdAt)}
+                    </time>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-8 shadow-estate-soft">

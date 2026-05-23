@@ -4,7 +4,9 @@ import { db } from '@/src/db/client';
 import { properties, propertyMessages } from '@/src/db/schema';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
 import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { createActivity } from '@/lib/activity/service';
 import { createOrReuseConversationAndMessage } from '@/lib/messages/service';
+import { notifyPropertyOwnerOfInquiry } from '@/lib/notifications/service';
 import {
   mobileInquirySchema,
   mobilePropertyIdSchema,
@@ -31,6 +33,7 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
     const property = await db
       .select({
         id: properties.id,
+        title: properties.title,
         moderationStatus: properties.moderationStatus,
         ownerUserId: properties.createdByUserId,
       })
@@ -40,6 +43,10 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
 
     if (!property || property.moderationStatus !== 'approved') {
       return mobileError('Property not found.', 404);
+    }
+
+    if (property.ownerUserId === user.id) {
+      return mobileError('You cannot send an inquiry to your own property.', 400);
     }
 
     const [inquiry] = await db
@@ -63,6 +70,15 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
       senderUserId: user.id,
       body: message,
     });
+    await createActivity({
+      userId: property.ownerUserId,
+      type: 'inquiry_received',
+      title: 'Inquiry received',
+      description: `You received an inquiry for "${property.title}".`,
+      entityType: 'property',
+      entityId: propertyId,
+    });
+    await notifyPropertyOwnerOfInquiry(propertyId);
 
     return mobileSuccess({ inquiry }, 201);
   } catch (error) {

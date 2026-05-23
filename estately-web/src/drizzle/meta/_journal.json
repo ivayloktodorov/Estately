@@ -71,6 +71,20 @@
       "when": 1779638400000,
       "tag": "0009_message_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1779724800000,
+      "tag": "0010_user_activity",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1779811200000,
+      "tag": "0011_saved_searches",
+      "breakpoints": true
     }
   ]
 }

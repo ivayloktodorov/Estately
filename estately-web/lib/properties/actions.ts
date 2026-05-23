@@ -6,6 +6,7 @@ import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema/properties';
 import { requireAuth } from '@/lib/auth';
 import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
+import { createActivity } from '@/lib/activity/service';
 import { createPropertySchema } from './validation';
 import type { PropertyActionState } from './types';
 
@@ -90,6 +91,17 @@ export async function createPropertyAction(
       .returning({ id: properties.id, title: properties.title });
 
     propertyId = result[0]?.id;
+    if (result[0]) {
+      await createActivity({
+        userId: user.id,
+        type: 'property_created',
+        title: 'Property created',
+        description: `You created "${result[0].title}".`,
+        entityType: 'property',
+        entityId: result[0].id,
+      });
+    }
+
     if (result[0] && user.role !== 'admin') {
       await notifyAdminsOfPendingListing(result[0].id, result[0].title);
     }

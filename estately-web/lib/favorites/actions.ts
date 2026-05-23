@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/src/db/client';
 import { favorites, properties } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
+import { createActivity } from '@/lib/activity/service';
 
 interface ToggleFavoriteResult {
   status: 'success' | 'error';
@@ -37,7 +38,7 @@ export async function toggleFavoriteAction(
   try {
     if (shouldFavorite) {
       const property = await db
-        .select({ id: properties.id })
+        .select({ id: properties.id, title: properties.title })
         .from(properties)
         .where(and(eq(properties.id, propertyId), eq(properties.moderationStatus, 'approved')))
         .then((rows) => rows[0]);
@@ -59,6 +60,14 @@ export async function toggleFavoriteAction(
         .onConflictDoNothing({
           target: [favorites.userId, favorites.propertyId],
         });
+      await createActivity({
+        userId: user.id,
+        type: 'favorite_added',
+        title: 'Favorite added',
+        description: `You saved "${property.title}" to your favorites.`,
+        entityType: 'property',
+        entityId: property.id,
+      });
     } else {
       await db
         .delete(favorites)

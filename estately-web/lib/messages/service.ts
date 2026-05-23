@@ -3,6 +3,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { db } from '@/src/db/client';
 import { conversations, messageAttachments, messages, properties, users } from '@/src/db/schema';
 import { createNotification } from '@/lib/notifications/service';
+import { createActivity } from '@/lib/activity/service';
 import { uploadR2MessageAttachment, validateR2MessageAttachment } from '@/services/storage/r2';
 
 export interface ConversationListItem {
@@ -105,6 +106,14 @@ async function notifyMessageReceiver(conversationId: number, receiverUserId: num
     entityType: 'conversation',
     entityId: conversationId,
     href: `/dashboard/messages/${conversationId}`,
+  });
+  await createActivity({
+    userId: receiverUserId,
+    type: 'message_received',
+    title: 'Message received',
+    description: `You received a message from ${senderName}.`,
+    entityType: 'conversation',
+    entityId: conversationId,
   });
 }
 
