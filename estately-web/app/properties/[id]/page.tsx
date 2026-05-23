@@ -11,6 +11,7 @@ import { PropertySidebar } from '@/components/ui/property-sidebar';
 import { propertyImageUrl } from '@/lib/properties/images';
 import { getCurrentUser } from '@/lib/auth';
 import { PropertyInquiryForm } from '@/components/properties/property-inquiry-form';
+import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
   params: Promise<{
@@ -18,7 +19,14 @@ interface PropertyPageProps {
   }>;
 }
 
-async function getProperty(id: number) {
+function canViewProperty(
+  property: typeof properties.$inferSelect,
+  user: AuthUser | null,
+): boolean {
+  return property.isPublished || user?.role === 'admin' || user?.id === property.createdByUserId;
+}
+
+async function getProperty(id: number, user: AuthUser | null) {
   try {
     const property = await db
       .select()
@@ -27,6 +35,10 @@ async function getProperty(id: number) {
       .then((results) => results[0]);
 
     if (!property) {
+      return null;
+    }
+
+    if (!canViewProperty(property, user)) {
       return null;
     }
 
@@ -64,7 +76,8 @@ export async function generateMetadata(
     };
   }
 
-  const data = await getProperty(numId);
+  const user = await getCurrentUser();
+  const data = await getProperty(numId, user);
 
   if (!data) {
     return {
@@ -106,14 +119,14 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   }
 
   // Fetch property data
-  const data = await getProperty(numId);
+  const user = await getCurrentUser();
+  const data = await getProperty(numId, user);
 
   if (!data) {
     notFound();
   }
 
   const { property, images } = data;
-  const user = await getCurrentUser();
   const price = `$${Number(property.price).toLocaleString()}`;
   const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl);
 

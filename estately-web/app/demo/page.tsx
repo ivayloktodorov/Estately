@@ -61,6 +61,7 @@ const quickLinks: QuickLink[] = [
   { href: '/docs/project-health', label: 'Project Health', description: 'Review GitHub requirements and project readiness checks.' },
   { href: '/docs/production-readiness', label: 'Production Readiness', description: 'Review deployment blockers, environment checks, and audit scores.' },
   { href: '/docs/compliance', label: 'Compliance', description: 'Validate mandatory assignment requirements and completion score.' },
+  { href: '/docs/final-qa-report', label: 'Final QA Report', description: 'Review final bug sweep results, fixes, and remaining manual checks.' },
 ];
 
 const featureGroups: FeatureGroup[] = [

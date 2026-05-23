@@ -3,7 +3,7 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/src/db/client';
-import { favorites } from '@/src/db/schema';
+import { favorites, properties } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
 
 interface ToggleFavoriteResult {
@@ -36,6 +36,20 @@ export async function toggleFavoriteAction(
 
   try {
     if (shouldFavorite) {
+      const property = await db
+        .select({ id: properties.id })
+        .from(properties)
+        .where(and(eq(properties.id, propertyId), eq(properties.isPublished, true)))
+        .then((rows) => rows[0]);
+
+      if (!property) {
+        return {
+          status: 'error',
+          isFavorited: false,
+          message: 'This property is no longer available.',
+        };
+      }
+
       await db
         .insert(favorites)
         .values({

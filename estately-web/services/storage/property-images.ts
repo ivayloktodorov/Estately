@@ -17,19 +17,31 @@ export interface UploadPropertyImageResult {
 
 function hasR2Config(): boolean {
   return Boolean(
-    process.env.CLOUDFLARE_R2_ACCOUNT_ID &&
-      process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
-      process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY &&
-      process.env.CLOUDFLARE_R2_BUCKET &&
-      process.env.CLOUDFLARE_R2_PUBLIC_URL,
+    optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID') &&
+      optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID') &&
+      optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY') &&
+      optionalEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET') &&
+      optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'),
   );
 }
 
-function requiredEnv(name: string): string {
-  const value = process.env[name];
+function optionalEnv(...names: string[]): string | null {
+  for (const name of names) {
+    const value = process.env[name];
+
+    if (value) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function requiredEnv(...names: string[]): string {
+  const value = optionalEnv(...names);
 
   if (!value) {
-    throw new Error(`${name} is not configured.`);
+    throw new Error(`${names.join(' or ')} is not configured.`);
   }
 
   return value;
@@ -95,11 +107,11 @@ function r2SigningKey(secretAccessKey: string, dateStamp: string): Buffer {
 }
 
 async function uploadToR2(file: File, propertyId: number): Promise<string> {
-  const accountId = requiredEnv('CLOUDFLARE_R2_ACCOUNT_ID');
-  const accessKeyId = requiredEnv('CLOUDFLARE_R2_ACCESS_KEY_ID');
-  const secretAccessKey = requiredEnv('CLOUDFLARE_R2_SECRET_ACCESS_KEY');
-  const bucket = requiredEnv('CLOUDFLARE_R2_BUCKET');
-  const publicUrl = requiredEnv('CLOUDFLARE_R2_PUBLIC_URL').replace(/\/$/, '');
+  const accountId = requiredEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID');
+  const accessKeyId = requiredEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID');
+  const secretAccessKey = requiredEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY');
+  const bucket = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET');
+  const publicUrl = requiredEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL').replace(/\/$/, '');
   const key = objectKey(file, propertyId);
   const encodedKey = key
     .split('/')

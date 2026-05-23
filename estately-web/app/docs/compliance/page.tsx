@@ -30,6 +30,7 @@ const docsLinks = [
   { href: '/docs/project-health', label: 'Project Health' },
   { href: '/docs/production-readiness', label: 'Production Readiness' },
   { href: '/docs/compliance', label: 'Compliance' },
+  { href: '/docs/final-qa-report', label: 'Final QA Report' },
 ];
 
 const complianceSections: ComplianceSection[] = [

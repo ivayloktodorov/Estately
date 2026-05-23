@@ -256,6 +256,7 @@ When the web app is running locally, these pages are available:
 - `/docs/project-health`
 - `/docs/production-readiness`
 - `/docs/compliance`
+- `/docs/final-qa-report`
 
 ## 16. Local Development
 
@@ -369,4 +370,5 @@ Additional reviewer pages:
 - `/docs/project-health`
 - `/docs/production-readiness`
 - `/docs/compliance`
+- `/docs/final-qa-report`
 - `/demo`
