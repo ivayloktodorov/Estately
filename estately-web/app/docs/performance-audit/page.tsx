@@ -40,9 +40,15 @@ const findings = [
   },
   {
     area: 'Dashboard data',
-    issue: 'Dashboard property cards selected full property rows while rendering only a small subset of fields.',
+    issue: 'The post-login dashboard selected every manageable property for admins. With seeded production data this loaded 10,001 rows immediately after login.',
     fixed:
-      'Narrowed the dashboard property query to id, title, city, address, and cover image only.',
+      'Narrowed the dashboard property query to id, title, city, address, and cover image only, and limited the initial dashboard list to the latest 5 rows.',
+  },
+  {
+    area: 'Login flow',
+    issue: 'The auth request itself was hard to distinguish from the redirected dashboard render in production timing.',
+    fixed:
+      'Added safe opt-in auth timing logs, selected only login/session fields from users, and cached the imported JWT HMAC signing key per serverless instance.',
   },
   {
     area: 'Client renders',
@@ -55,9 +61,15 @@ const findings = [
 const requestCounts = [
   {
     route: '/dashboard',
-    before: '5 server reads plus one duplicate client notification refresh on dropdown open',
-    after: '5 server reads, 0 duplicate client refreshes on initial dropdown open',
-    transferred: 'Lower image transfer through optimized dashboard thumbnails',
+    before: 'Admin dashboard loaded 10,001 property rows after login; local Neon query measured about 1,733ms before render/images',
+    after: 'Dashboard loads the latest 5 property rows; local Neon query measured about 457ms',
+    transferred: 'Far fewer dashboard image thumbnails are mounted on the login landing page',
+  },
+  {
+    route: 'login action',
+    before: 'Production navigation appeared around 9.5s including redirect and dashboard render',
+    after: 'Direct local auth timing measured about 730ms total: 494ms user lookup, 234ms bcrypt compare, 1ms JWT sign',
+    transferred: 'Auth request does not load related property, message, notification, favorite, or activity data',
   },
   {
     route: '/dashboard/messages',
@@ -83,6 +95,7 @@ const remainingNotes = [
   'File preview images in upload forms intentionally remain raw <img> tags because they render local blob URLs before upload.',
   'The internal /test-r2 diagnostic page still uses a raw preview image and is not part of the production user flow.',
   'Exact browser before/after transfer totals should be captured from Netlify after redeploy because production image optimization and CDN cache behavior depend on the deployed edge environment.',
+  'Enable AUTH_PERF_LOGS=1 temporarily in Netlify to split production login time into validation, DB lookup, bcrypt, JWT/cookie, and redirect phases without logging secrets.',
 ];
 
 export default function PerformanceAuditPage() {

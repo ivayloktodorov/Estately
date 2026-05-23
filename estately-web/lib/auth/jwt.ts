@@ -37,14 +37,18 @@ function getJwtSecret(): string {
 }
 
 async function getSigningKey(): Promise<CryptoKey> {
-  return crypto.subtle.importKey(
+  signingKeyPromise ??= crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(getJwtSecret()),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify'],
   );
+
+  return signingKeyPromise;
 }
+
+let signingKeyPromise: Promise<CryptoKey> | null = null;
 
 function isValidPayload(payload: Partial<JwtPayload>): payload is JwtPayload {
   return (

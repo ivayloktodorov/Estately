@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { AuthError } from './errors';
+import { authTimer } from './performance';
 import { authService } from './service';
 import { clearAuthSession, createAuthSession } from './session';
 import type { AuthActionState } from './types';
@@ -48,21 +49,27 @@ export async function loginAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
+  const timer = authTimer('login-action');
   const fields = {
     email: formValue(formData, 'email'),
   };
+  timer.mark('form-parsed');
 
   try {
     const user = await authService.login({
       email: fields.email,
       password: formValue(formData, 'password'),
     });
+    timer.mark('credentials-verified');
 
     await createAuthSession(user);
+    timer.mark('session-created');
   } catch (error) {
+    timer.end();
     return errorState(error, fields);
   }
 
+  timer.end();
   redirect('/dashboard');
 }
 

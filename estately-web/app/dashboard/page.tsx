@@ -8,6 +8,8 @@ import { properties } from '@/src/db/schema';
 import { propertyImageUrl } from '@/lib/properties/images';
 import { getRecentUserActivity, type UserActivityType } from '@/lib/activity/service';
 
+const DASHBOARD_PROPERTY_LIMIT = 5;
+
 interface ManageableProperty {
   id: number;
   title: string;
@@ -41,22 +43,28 @@ function activityIcon(type: UserActivityType): string {
 }
 
 async function getManageableProperties(user: Awaited<ReturnType<typeof requireAuth>>): Promise<ManageableProperty[]> {
-  const query = db
-    .select({
+  const columns = {
       id: properties.id,
       title: properties.title,
       city: properties.city,
       address: properties.address,
       imageCoverUrl: properties.imageCoverUrl,
-    })
-    .from(properties)
-    .orderBy(desc(properties.createdAt));
+    };
 
   if (user.role === 'admin') {
-    return query;
+    return db
+      .select(columns)
+      .from(properties)
+      .orderBy(desc(properties.createdAt))
+      .limit(DASHBOARD_PROPERTY_LIMIT);
   }
 
-  return query.where(eq(properties.createdByUserId, user.id));
+  return db
+    .select(columns)
+    .from(properties)
+    .where(eq(properties.createdByUserId, user.id))
+    .orderBy(desc(properties.createdAt))
+    .limit(DASHBOARD_PROPERTY_LIMIT);
 }
 
 export default async function DashboardPage() {
@@ -174,7 +182,7 @@ export default async function DashboardPage() {
                 Upload property images
               </h2>
               <p className="mt-2 max-w-2xl text-slate-600">
-                Add JPG, PNG, or WEBP photos up to 5MB. The first uploaded image becomes the cover.
+                Add JPG, PNG, or WEBP photos up to 5MB. Showing the latest {DASHBOARD_PROPERTY_LIMIT} listings here keeps the dashboard fast.
               </p>
             </div>
             <Link
