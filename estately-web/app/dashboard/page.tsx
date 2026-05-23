@@ -7,6 +7,14 @@ import { properties } from '@/src/db/schema';
 import { propertyImageUrl } from '@/lib/properties/images';
 import { getRecentUserActivity, type UserActivityType } from '@/lib/activity/service';
 
+interface ManageableProperty {
+  id: number;
+  title: string;
+  city: string;
+  address: string;
+  imageCoverUrl: string | null;
+}
+
 function formatActivityDate(date: Date): string {
   return new Intl.DateTimeFormat('en', {
     month: 'short',
@@ -31,18 +39,34 @@ function activityIcon(type: UserActivityType): string {
   }
 }
 
+async function getManageableProperties(user: Awaited<ReturnType<typeof requireAuth>>): Promise<ManageableProperty[]> {
+  const query = db
+    .select({
+      id: properties.id,
+      title: properties.title,
+      city: properties.city,
+      address: properties.address,
+      imageCoverUrl: properties.imageCoverUrl,
+    })
+    .from(properties)
+    .orderBy(desc(properties.createdAt));
+
+  if (user.role === 'admin') {
+    return query;
+  }
+
+  return query.where(eq(properties.createdByUserId, user.id));
+}
+
 export default async function DashboardPage() {
   const user = await requireAuth();
-  const [manageableProperties, recentActivity] = await Promise.all([
-    user.role === 'admin'
-      ? db.select().from(properties).orderBy(desc(properties.createdAt))
-      : db
-          .select()
-          .from(properties)
-          .where(eq(properties.createdByUserId, user.id))
-          .orderBy(desc(properties.createdAt)),
+  const [manageablePropertiesResult, recentActivityResult] = await Promise.allSettled([
+    getManageableProperties(user),
     getRecentUserActivity(user.id),
   ]);
+  const manageableProperties =
+    manageablePropertiesResult.status === 'fulfilled' ? manageablePropertiesResult.value : [];
+  const recentActivity = recentActivityResult.status === 'fulfilled' ? recentActivityResult.value : [];
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-10">

@@ -21,11 +21,12 @@ const publicLinks = [
 
 export async function Header({ user }: HeaderProps) {
   const notificationData = user
-    ? await Promise.all([getUserNotifications(user.id, 5), getUnreadNotificationCount(user.id)])
+    ? await Promise.allSettled([getUserNotifications(user.id, 5), getUnreadNotificationCount(user.id)])
     : null;
-  const notificationProps = notificationData
-    ? { initialNotifications: notificationData[0], initialUnreadCount: notificationData[1] }
-    : null;
+  const notificationProps =
+    notificationData?.[0].status === 'fulfilled' && notificationData[1].status === 'fulfilled'
+      ? { initialNotifications: notificationData[0].value, initialUnreadCount: notificationData[1].value }
+      : null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-cream-50 shadow-sm">
