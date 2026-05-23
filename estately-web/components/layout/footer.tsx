@@ -13,6 +13,7 @@ const footerLinks = [
   { href: '/docs/architecture', label: 'Architecture' },
   { href: '/docs/project-health', label: 'Project Health' },
   { href: '/docs/production-readiness', label: 'Production Readiness' },
+  { href: '/docs/compliance', label: 'Compliance' },
   { href: '/docs/local-setup', label: 'Local Setup' },
   { href: '/docs/deployment', label: 'Deployment' },
 ];

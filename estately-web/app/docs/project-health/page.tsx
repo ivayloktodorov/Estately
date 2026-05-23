@@ -152,6 +152,7 @@ const docsLinks = [
   { href: '/docs/database-schema', label: 'Database Schema' },
   { href: '/docs/project-health', label: 'Project Health' },
   { href: '/docs/production-readiness', label: 'Production Readiness' },
+  { href: '/docs/compliance', label: 'Compliance' },
 ];
 
 function badgeClassName(status: HealthStatus): string {

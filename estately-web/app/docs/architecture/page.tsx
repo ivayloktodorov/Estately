@@ -15,6 +15,7 @@ const docsLinks = [
   { href: '/docs/architecture', label: 'Architecture' },
   { href: '/docs/project-health', label: 'Project Health' },
   { href: '/docs/production-readiness', label: 'Production Readiness' },
+  { href: '/docs/compliance', label: 'Compliance' },
 ];
 
 const monorepoItems = [

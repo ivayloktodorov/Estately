@@ -1,193 +1,152 @@
 # Estately
 
-Estately is a Zillow-inspired real estate platform where users can browse, search, save, and manage property listings. The project includes a Next.js web application, an Expo React Native mobile app, a backend REST API, an admin panel, property image uploads, favorites, inquiries, map/search functionality, and a Neon PostgreSQL database managed with Drizzle ORM.
+Estately is a Zillow-inspired full-stack real estate platform with a web app, mobile app, backend REST API, admin panel, property listings, favorites, inquiries, and image uploads.
 
-## Project Overview
+The project is built as a TypeScript monorepo for reviewers to evaluate a complete web, mobile, backend, database, storage, and documentation workflow.
 
-Estately is built as a full-stack monorepo:
+## 1. Project Overview
 
-- **Web app:** public property browsing, property details, authentication, dashboards, admin moderation, favorites, inquiries, image uploads, maps, search, and pagination.
-- **Mobile app:** Expo app with login, registration, property feed, search and filters, property details, favorites, inquiries, profile, and logout.
-- **Backend API:** Next.js API routes for mobile clients and server-side web workflows.
-- **Admin panel:** user overview, property moderation, and dashboard views.
-- **Database:** Neon PostgreSQL with Drizzle schema and migrations.
-- **Storage:** Cloudflare R2 for property images.
+Estately lets users browse and search properties, view property details, save favorites, send inquiries, and manage their own listings. Admin users can review platform activity, manage users, and moderate properties.
 
-## Tech Stack
+Core project areas:
 
-### Web
+- Next.js web application and backend
+- Expo React Native mobile application
+- REST API for mobile clients
+- Neon PostgreSQL database
+- Drizzle ORM schema and migrations
+- JWT authentication with bcrypt password hashing
+- Cloudflare R2 property image uploads
+- Reviewer documentation and project health pages
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
+## 2. Live Demo / Local Demo
 
-### Backend
-
-- Next.js API routes
-- Next.js Server Actions
-- JWT authentication
-- bcrypt password hashing
-
-### Database
-
-- Neon PostgreSQL
-- Drizzle ORM
-- Drizzle migrations
-
-### Mobile
-
-- Expo
-- React Native
-- Expo Router
-- React Query
-
-### Storage
-
-- Cloudflare R2
-
-### Deployment
-
-- Netlify, Vercel, or another serverless/static hosting platform
-- Expo Web static export for the mobile app
-
-## Architecture
-
-Estately uses a client-server architecture inside a monorepo.
-
-The **web app** is a Next.js application. Public and dashboard pages use App Router patterns, Server Components where appropriate, and Server Actions for form-driven workflows such as authentication, property creation, favorites, inquiries, and dashboard operations.
-
-The **mobile app** is an Expo React Native application. It communicates with the backend through REST endpoints under `/api/mobile`. Authenticated mobile requests use `Authorization: Bearer <token>`.
-
-The **backend** runs inside the Next.js web app. It validates requests, checks authentication and authorization, and talks to Neon PostgreSQL through Drizzle ORM.
-
-The **database layer** is defined in `estately-web/src/db/schema`. Drizzle migrations live in `estately-web/src/drizzle`.
-
-The **file storage layer** uploads property images to Cloudflare R2. Uploaded images are stored externally and referenced by URL in the database.
-
-## Repo Structure
-
-```text
-Estately/
-├── apps/
-│   └── mobile/                       # Expo React Native app
-│       ├── app/                      # Expo Router screens
-│       │   ├── (auth)/               # Login and registration
-│       │   ├── (tabs)/               # Home, Search, Favorites, Profile
-│       │   └── property/[id]/        # Mobile property details
-│       ├── components/               # Mobile UI and property components
-│       ├── constants/                # Mobile API/theme config
-│       ├── hooks/                    # Mobile auth/favorites hooks
-│       ├── services/                 # Mobile REST API services
-│       ├── types/                    # Mobile TypeScript types
-│       └── README.md                 # Mobile web export notes
-│
-├── estately-web/                     # Next.js web app and backend
-│   ├── app/                          # App Router pages and route handlers
-│   │   ├── api/mobile/               # Mobile REST API
-│   │   ├── admin/                    # Admin dashboard
-│   │   ├── dashboard/                # User dashboard
-│   │   ├── favorites/                # Web favorites page
-│   │   └── properties/               # Property listing and details pages
-│   ├── components/                   # Web UI components
-│   ├── lib/                          # Auth, admin, favorites, inquiries, property logic
-│   ├── services/                     # Storage/R2 services
-│   ├── scripts/                      # Migrate, seed, verify, load-test scripts
-│   ├── src/db/schema/                # Drizzle table schemas
-│   └── src/drizzle/                  # Drizzle migrations
-│
-├── estately-mobile/                  # Legacy/starter Expo workspace kept in repo
-├── package.json                      # npm workspaces
-├── AGENTS.md                         # Agent/project instructions
-└── README.md                         # This documentation
-```
-
-## Database Schema
-
-Main tables:
-
-- **`users`**: registered accounts with email, bcrypt password hash, full name, avatar URL, role, and timestamps.
-- **`properties`**: property listings with title, description, price, city, address, property type, listing type, bedrooms, bathrooms, area, coordinates, cover image URL, published status, owner, and timestamps.
-- **`property_images`**: additional images for each property.
-- **`favorites`**: many-to-many relationship between users and saved properties.
-- **`property_messages`**: inquiry messages sent by users about properties.
-- **`cities`**: supported city metadata.
-
-Relationships:
-
-- A **user creates many properties** through `properties.createdByUserId`.
-- A **property has many images** through `property_images.propertyId`.
-- A **user saves many properties** through `favorites.userId`.
-- A **property can be saved by many users** through `favorites.propertyId`.
-- A **user sends property inquiry messages** through `property_messages.userId`.
-- A **property receives many inquiry messages** through `property_messages.propertyId`.
-
-Important indexes are defined for common browsing and admin workloads:
-
-- `properties_city_idx`
-- `properties_property_type_idx`
-- `properties_listing_type_idx`
-- `properties_price_idx`
-- `properties_created_at_idx`
-- `properties_is_published_idx`
-- Additional indexes for bedrooms, bathrooms, area, property owner, favorites, users, and inquiries.
-
-For a full ERD, table-by-table field reference, examples, and scalability notes, see [Database Schema Documentation](./docs/database-schema.md).
-
-## Scalability And Performance
-
-The project includes a scalability dataset for validating search, filtering, pagination, and dashboard performance.
-
-Verified performance state:
-
-- `properties` count: **10,000**
-- Mobile-style paginated query: around **48ms**
-- City filter query: around **46ms**
-- Property type filter query: around **47ms**
-
-Scalability features:
-
-- Server-side pagination for property lists.
-- Database filtering for city, property type, listing type, price, bedrooms, bathrooms, and publish status.
-- Indexed fields for common filters and sorting.
-- Load-test script for generating large datasets.
-
-Useful scripts:
+Final production deployment can be completed after project review. For local review:
 
 ```bash
-npm run --workspace=estately-web db:seed
-npm run --workspace=estately-web db:load-test
-npm run --workspace=estately-web db:verify
+npm install
+npm run --workspace=estately-web dev
 ```
 
-## Authentication
+Open:
 
-Estately supports account registration, login, logout, role-based access, and protected routes.
+```text
+http://localhost:3000
+```
 
-Authentication details:
+Reviewer shortcut:
 
-- Users register with email, password, and full name.
-- Passwords are hashed with bcrypt.
-- Login returns a JWT.
-- Web sessions use protected server-side checks.
-- Mobile API requests use bearer token authentication.
-- Supported roles include `user` and `admin`.
-- Admin-only areas deny non-admin users.
-- Invalid or expired mobile tokens are cleared and redirect users to login.
+```text
+http://localhost:3000/demo
+```
 
-Demo credentials:
+## 3. Demo Credentials
 
 ```text
 Admin:
 admin@estately.com / pass123
 
-Regular user:
+User:
 john@gmail.com / pass123
 ```
 
-## REST API Overview
+## 4. Features
 
-Mobile REST API endpoints live under `estately-web/app/api/mobile`.
+- Property browsing
+- Property details
+- Search and filters
+- Pagination
+- Favorites
+- Property inquiries
+- Property creation
+- User dashboard
+- Admin dashboard
+- Admin user management
+- Admin property moderation
+- Mobile app
+- REST API
+- Cloudflare R2 uploads
+
+## 5. Tech Stack
+
+**Web:** Next.js, React, TypeScript, Tailwind CSS
+
+**Backend:** Next.js API routes, Server Actions, JWT, bcrypt
+
+**Database:** Neon PostgreSQL, Drizzle ORM, Drizzle migrations
+
+**Mobile:** Expo, React Native, Expo Router
+
+**Storage:** Cloudflare R2
+
+## 6. Architecture Overview
+
+The web app uses Next.js App Router pages, Server Components, Server Actions, and API routes. Form-driven web workflows such as login, registration, property management, favorites, inquiries, and admin operations run through server-side logic.
+
+The mobile app uses the REST API under `/api/mobile`. Authenticated mobile requests send a bearer token.
+
+The backend validates input, checks authorization, and uses Drizzle ORM to read and write data in Neon PostgreSQL. Property images are uploaded to Cloudflare R2 and stored in the database as image URLs.
+
+## 7. Monorepo Structure
+
+```text
+Estately/
+├── estately-web/                 # Next.js web app, backend API, Server Actions
+│   ├── app/                      # Pages, docs, dashboard, admin, API routes
+│   ├── components/               # Reusable web UI and property components
+│   ├── lib/                      # Auth, admin, properties, favorites, inquiries
+│   ├── services/                 # Cloudflare R2 storage services
+│   ├── scripts/                  # Migrate, seed, verify, load-test scripts
+│   ├── src/db/schema/            # Drizzle database schema
+│   └── src/drizzle/              # Drizzle migrations
+├── apps/mobile/                  # Expo React Native app
+│   ├── app/                      # Expo Router screens
+│   ├── components/               # Mobile UI components
+│   ├── hooks/                    # Mobile hooks
+│   ├── services/                 # REST API client services
+│   └── types/                    # Mobile TypeScript types
+├── docs/                         # Root documentation assets
+├── AGENTS.md                     # AI agent/project instructions
+├── package.json                  # npm workspace config
+└── README.md
+```
+
+Note: this repository uses `estately-web/` for the web app rather than `apps/web/`.
+
+## 8. Database Schema
+
+Main tables:
+
+- `users`: accounts, roles, bcrypt password hashes, profile data, timestamps
+- `properties`: property listings, pricing, location, status, owner, metadata
+- `property_images`: additional property images
+- `favorites`: saved properties by user
+- `property_messages`: property inquiry messages
+- `cities`: supported city metadata
+
+The schema includes relationships for users to properties, properties to images, users to favorites, properties to favorites, users to messages, and properties to messages.
+
+Database documentation:
+
+- Local file: [docs/database-schema.md](./docs/database-schema.md)
+- Web page: `/docs/database-schema`
+
+## 9. Authentication
+
+Estately supports registration, login, logout, role-based access, protected web routes, and bearer-token mobile API access.
+
+Implementation notes:
+
+- Passwords are hashed with bcrypt.
+- JWT is used for authenticated sessions.
+- Web routes are protected with server-side checks.
+- Admin routes require the `admin` role.
+- Mobile API requests use `Authorization: Bearer <token>`.
+- Sensitive fields such as `passwordHash` are not returned in API responses.
+
+## 10. REST API
+
+The mobile REST API is served by the Next.js backend under `/api/mobile`.
 
 Authentication:
 
@@ -204,20 +163,6 @@ GET /api/mobile/properties
 GET /api/mobile/properties/[id]
 ```
 
-Supported `GET /api/mobile/properties` query params:
-
-- `search`
-- `city`
-- `propertyType`
-- `listingType`
-- `minPrice`
-- `maxPrice`
-- `bedrooms`
-- `bathrooms`
-- `sort`
-- `page`
-- `limit`
-
 Favorites:
 
 ```http
@@ -232,140 +177,134 @@ Inquiries:
 POST /api/mobile/properties/[id]/inquiries
 ```
 
-Authenticated mobile requests must include:
+API docs:
 
-```http
-Authorization: Bearer <token>
+- Web page: `/docs/api`
+
+## 11. Web App Screens
+
+- Home
+- Login
+- Register
+- Properties
+- Property Details
+- Favorites
+- Dashboard
+- Add Property
+- Edit Property
+- Inquiries
+- Admin Dashboard
+- Admin Users
+- Admin Properties
+- Documentation pages
+
+## 12. Mobile App Screens
+
+- Login
+- Register
+- Home / Property List
+- Search
+- Property Details
+- Favorites
+- Profile
+
+## 13. Scalability
+
+Estately includes scalability support for large listing datasets:
+
+- 10,000 property records supported by the load-test script
+- Server-side pagination
+- Database-level search and filtering
+- Indexes for common filter and sort fields
+- Performance verification scripts
+
+Useful scripts:
+
+```bash
+npm run --workspace=estately-web db:load-test
+npm run --workspace=estately-web db:verify
 ```
 
-## Web App Features
+## 14. File Storage
 
-Public web features:
+Property image uploads are integrated with Cloudflare R2.
 
-- Home and marketing pages.
-- Login and registration.
-- Property browsing.
-- Property details with image gallery.
-- Search and filters.
-- Pagination.
-- Map/search functionality.
-- Favorites.
-- Property inquiries.
+Storage coverage:
 
-Authenticated user features:
+- Cloudflare R2 client service
+- Property image upload workflow
+- Image URL persistence in the database
+- R2 smoke test page and API route
 
-- Add property.
-- Manage own properties.
-- View inquiry messages.
-- Save and remove favorites.
-- Upload property images.
+Run the R2 smoke test locally from:
 
-Admin features:
+```text
+http://localhost:3000/test-r2
+```
 
-- Admin dashboard.
-- User management.
-- Property moderation.
-- Publish/unpublish properties.
-- Delete invalid properties.
+## 15. Documentation Links
 
-## Mobile App Features
+When the web app is running locally, these pages are available:
 
-The Expo mobile app includes:
+- `/demo`
+- `/docs/api`
+- `/docs/architecture`
+- `/docs/database-schema`
+- `/docs/requirements`
+- `/docs/local-setup`
+- `/docs/deployment`
+- `/docs/project-health`
+- `/docs/production-readiness`
+- `/docs/compliance`
 
-- Login.
-- Register.
-- Home property list.
-- Property details.
-- Favorite/unfavorite properties.
-- Favorites tab.
-- Search and filters.
-- Property inquiry form.
-- Profile screen.
-- Logout.
+## 16. Local Development
 
-The mobile app can run as a native Expo app or as a static Expo Web export.
-
-## Local Development Setup
-
-### Prerequisites
+Prerequisites:
 
 - Node.js 20+
 - npm 10+
-- Git
 - Neon PostgreSQL database
-- Cloudflare R2 bucket for image upload features
+- Cloudflare R2 bucket for upload testing
 
-### 1. Clone The Repo
-
-```bash
-git clone <repository-url>
-cd Estately
-```
-
-### 2. Install Dependencies
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
+Configure environment variables in local env files. Do not commit real secrets.
 
-Create local environment files as needed. Do not commit real secrets.
-
-Web/backend variables:
+Required web/backend variables:
 
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
-
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 R2_BUCKET_NAME=your-r2-bucket-name
-R2_PUBLIC_URL=https://your-public-r2-domain.example.com
 ```
 
-Mobile variable:
+Required mobile variable:
 
 ```env
 EXPO_PUBLIC_API_URL=http://localhost:3000
 ```
 
-For production mobile web export, set `EXPO_PUBLIC_API_URL` to the deployed Next.js backend origin. The mobile app appends `/api/mobile` automatically.
-
-### 4. Run Database Migrations
+Run migrations and seed data:
 
 ```bash
 npm run --workspace=estately-web db:migrate
-```
-
-### 5. Seed The Database
-
-```bash
 npm run --workspace=estately-web db:seed
 ```
 
-For the large performance dataset:
-
-```bash
-npm run --workspace=estately-web db:load-test
-```
-
-For a complete reviewer setup walkthrough, see [Local Development Setup](./docs/local-setup.md).
-
-### 6. Start The Web App
+Start the web app:
 
 ```bash
 npm run --workspace=estately-web dev
 ```
 
-The web app runs at:
-
-```text
-http://localhost:3000
-```
-
-### 7. Start The Mobile App
+Start the mobile app:
 
 ```bash
 EXPO_PUBLIC_API_URL=http://localhost:3000 npm run --workspace=@estately/mobile start
@@ -377,15 +316,15 @@ Run Expo Web:
 EXPO_PUBLIC_API_URL=http://localhost:3000 npm run --workspace=@estately/mobile web
 ```
 
-Local mobile API URL notes:
+Full local setup guide:
 
-- iOS simulator and Expo Web can usually use `http://localhost:3000`.
-- Android emulator usually needs `http://10.0.2.2:3000`.
-- Physical devices must use your computer's LAN IP, for example `http://192.168.1.20:3000`.
+- `/docs/local-setup`
 
-## Environment Variables
+## 17. Deployment Notes
 
-Required backend variables:
+Deployment is documented and can be completed after project review.
+
+Required production web/backend variables:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
@@ -394,113 +333,40 @@ Required backend variables:
 - `R2_SECRET_ACCESS_KEY`
 - `R2_BUCKET_NAME`
 
-Common optional backend variables:
-
-- `R2_PUBLIC_URL`
-- `R2_URL`
-
-Required mobile variable:
+Required production mobile variable:
 
 - `EXPO_PUBLIC_API_URL`
 
-No real secrets should be committed to the repository.
+Production notes:
 
-## Deployment Notes
+- Deploy `estately-web` to a Next.js-compatible host.
+- Run Drizzle migrations against the production Neon database.
+- Configure Cloudflare R2 credentials in the hosting provider.
+- Set `EXPO_PUBLIC_API_URL` to the deployed backend origin for mobile builds.
+- Verify image uploads with the R2 smoke test.
 
-### Web / Backend
+Deployment guide:
 
-Deploy `estately-web` to Netlify, Vercel, or another platform that supports Next.js.
+- `/docs/deployment`
 
-Configure production environment variables:
+## 18. Assignment Requirements Coverage
 
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `R2_ACCOUNT_ID`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
-- `R2_BUCKET_NAME`
-- `R2_PUBLIC_URL` if serving R2 assets from a public domain
+- [x] Backend + Web + Mobile
+- [x] Neon PostgreSQL + Drizzle
+- [x] JWT auth + bcrypt
+- [x] Admin panel
+- [x] 10+ web screens
+- [x] 5+ mobile screens
+- [x] REST API
+- [x] 10,000 records support
+- [x] Pagination
+- [x] Object storage
+- [x] Documentation
+- [x] AGENTS.md
 
-Typical build command:
+Additional reviewer pages:
 
-```bash
-npm run --workspace=estately-web build
-```
-
-Typical start command:
-
-```bash
-npm run --workspace=estately-web start
-```
-
-### Mobile Web Export
-
-The mobile app can be exported as a static web app and hosted separately.
-
-Run locally:
-
-```bash
-EXPO_PUBLIC_API_URL=http://localhost:3000 npm run --workspace=@estately/mobile web
-```
-
-Export for production:
-
-```bash
-EXPO_PUBLIC_API_URL=https://your-deployed-backend.example.com npm run --workspace=@estately/mobile export:web
-```
-
-The export output is generated at:
-
-```text
-apps/mobile/dist
-```
-
-For Netlify:
-
-- Base directory: `apps/mobile`
-- Build command: `npm run export:web`
-- Publish directory: `dist`
-- Environment variable: `EXPO_PUBLIC_API_URL=https://your-deployed-backend.example.com`
-
-For complete web/backend and mobile export deployment notes, see [Deployment Guide](./docs/deployment.md).
-
-## Useful Commands
-
-```bash
-# Install all workspace dependencies
-npm install
-
-# Run the web app
-npm run --workspace=estately-web dev
-
-# Run the mobile app
-npm run --workspace=@estately/mobile start
-
-# Run Expo Web
-npm run --workspace=@estately/mobile web
-
-# Export mobile web build
-npm run --workspace=@estately/mobile export:web
-
-# Run web migrations
-npm run --workspace=estately-web db:migrate
-
-# Seed database
-npm run --workspace=estately-web db:seed
-
-# Create/verify load-test data
-npm run --workspace=estately-web db:load-test
-
-# Verify database counts
-npm run --workspace=estately-web db:verify
-```
-
-## Project Review Checklist
-
-- Web app supports property browsing, details, filters, favorites, inquiries, image uploads, and dashboards.
-- Mobile app supports auth, browsing, details, search, favorites, inquiries, and profile.
-- Mobile REST API is protected with bearer tokens where needed.
-- Database contains at least 10,000 property records.
-- Common filters and sorts use indexed database fields.
-- Expo mobile app can be exported for static web hosting.
-- Demo credentials are available for admin and regular user testing.
+- `/docs/project-health`
+- `/docs/production-readiness`
+- `/docs/compliance`
+- `/demo`

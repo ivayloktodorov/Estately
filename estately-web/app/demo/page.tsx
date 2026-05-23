@@ -60,6 +60,7 @@ const quickLinks: QuickLink[] = [
   { href: '/docs/database-schema', label: 'Database Documentation', description: 'Inspect tables, relationships, and indexing notes.' },
   { href: '/docs/project-health', label: 'Project Health', description: 'Review GitHub requirements and project readiness checks.' },
   { href: '/docs/production-readiness', label: 'Production Readiness', description: 'Review deployment blockers, environment checks, and audit scores.' },
+  { href: '/docs/compliance', label: 'Compliance', description: 'Validate mandatory assignment requirements and completion score.' },
 ];
 
 const featureGroups: FeatureGroup[] = [
