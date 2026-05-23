@@ -132,6 +132,8 @@ Important indexes are defined for common browsing and admin workloads:
 - `properties_is_published_idx`
 - Additional indexes for bedrooms, bathrooms, area, property owner, favorites, users, and inquiries.
 
+For a full ERD, table-by-table field reference, examples, and scalability notes, see [Database Schema Documentation](./docs/database-schema.md).
+
 ## Scalability And Performance
 
 The project includes a scalability dataset for validating search, filtering, pagination, and dashboard performance.
