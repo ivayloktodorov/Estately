@@ -7,7 +7,11 @@ const footerLinks = [
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
   { href: '/docs/api', label: 'API Docs' },
+  { href: '/docs/database-schema', label: 'Database Schema' },
   { href: '/docs/requirements', label: 'Requirements' },
+  { href: '/docs/architecture', label: 'Architecture' },
+  { href: '/docs/local-setup', label: 'Local Setup' },
+  { href: '/docs/deployment', label: 'Deployment' },
 ];
 
 const socialLinks = ['Instagram', 'LinkedIn', 'X'];

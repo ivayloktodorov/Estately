@@ -351,6 +351,8 @@ For the large performance dataset:
 npm run --workspace=estately-web db:load-test
 ```
 
+For a complete reviewer setup walkthrough, see [Local Development Setup](./docs/local-setup.md).
+
 ### 6. Start The Web App
 
 ```bash
@@ -459,6 +461,8 @@ For Netlify:
 - Build command: `npm run export:web`
 - Publish directory: `dist`
 - Environment variable: `EXPO_PUBLIC_API_URL=https://your-deployed-backend.example.com`
+
+For complete web/backend and mobile export deployment notes, see [Deployment Guide](./docs/deployment.md).
 
 ## Useful Commands
 
