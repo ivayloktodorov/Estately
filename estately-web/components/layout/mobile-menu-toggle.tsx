@@ -3,24 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button-link';
-import { NotificationDropdown } from './notification-dropdown';
-import { ProfileDropdown } from './profile-dropdown';
 import type { AuthUser } from '@/lib/auth/types';
-import type { NotificationListItem } from '@/lib/notifications/service';
 
 interface MobileMenuToggleProps {
   user: AuthUser | null;
   publicLinks: { href: string; label: string }[];
-  initialNotifications: NotificationListItem[];
-  initialUnreadCount: number;
 }
 
-export function HeaderMobileMenu({
-  initialNotifications,
-  initialUnreadCount,
-  user,
-  publicLinks,
-}: MobileMenuToggleProps) {
+export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -50,9 +40,9 @@ export function HeaderMobileMenu({
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div id="mobile-menu" className="absolute left-0 right-0 top-full border-t border-stone-200 bg-cream-50 py-4">
+        <div id="mobile-menu" className="absolute left-0 right-0 top-full border-t border-stone-200 bg-cream-50 py-4 shadow-lg shadow-slate-900/5">
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
-            <nav aria-label="Mobile navigation" className="mb-4 space-y-1">
+            <nav aria-label="Mobile navigation" className="space-y-1">
               {publicLinks.map((link) => (
                 <Link
                   className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
@@ -63,24 +53,37 @@ export function HeaderMobileMenu({
                   {link.label}
                 </Link>
               ))}
-            </nav>
-
-            {/* Mobile Actions */}
-            <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:flex-nowrap">
               {user ? (
                 <>
-                  <ButtonLink className="h-11 flex-1 whitespace-nowrap px-4" href="/softuni-exam" onClick={() => setMobileMenuOpen(false)} variant="secondary">
+                  <div className="my-3 border-t border-stone-200" />
+                  <Link
+                    className="block rounded-md px-3 py-2 text-base font-semibold text-stone-800 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    href="/softuni-exam"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     SoftUni Exam
-                  </ButtonLink>
-                  <div className="flex items-center gap-2 sm:flex-1">
-                    <NotificationDropdown
-                      initialNotifications={initialNotifications}
-                      initialUnreadCount={initialUnreadCount}
-                    />
-                    <ProfileDropdown align="right" className="min-w-0 flex-1" user={user} />
-                  </div>
+                  </Link>
+                  <div className="my-3 border-t border-stone-200" />
+                  <Link
+                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    href="/dashboard/notifications"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Notifications
+                  </Link>
+                  <Link
+                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    href="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
                 </>
-              ) : (
+              ) : null}
+            </nav>
+
+            {!user ? (
+              <div className="mt-4 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:flex-nowrap">
                 <>
                   <ButtonLink className="flex-1" href="/login" onClick={() => setMobileMenuOpen(false)} variant="outline">
                     Login
@@ -89,8 +92,8 @@ export function HeaderMobileMenu({
                     Register
                   </ButtonLink>
                 </>
-              )}
-            </div>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

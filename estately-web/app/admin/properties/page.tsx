@@ -127,7 +127,7 @@ function ModerationActionForm({ property, status }: { property: AdminProperty; s
 
 function PropertyActions({ property }: { property: AdminProperty }) {
   return (
-    <div className="grid w-40 gap-2">
+    <div className="grid w-full gap-2 sm:w-40">
       <div className="grid grid-cols-2 gap-2">
         <Link
           className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
@@ -337,7 +337,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
               </form>
             </section>
 
-            <section className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <section className="mt-6 hidden overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm lg:block">
               <div className="overflow-x-auto">
                 <table className="min-w-full table-fixed divide-y divide-slate-200 text-left text-sm">
                   <thead className="bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-600">
@@ -410,6 +410,78 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                   </tbody>
                 </table>
               </div>
+            </section>
+
+            <section className="mt-6 grid gap-4 lg:hidden">
+              {result.properties.map((property) => (
+                <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm" key={property.id}>
+                  <div className="flex items-start gap-3">
+                    <input
+                      aria-label={`Select ${property.title}`}
+                      className="mt-8 h-4 w-4 shrink-0 rounded border-slate-300 text-emerald-700"
+                      form="bulk-property-form"
+                      name="propertyIds"
+                      type="checkbox"
+                      value={property.id}
+                    />
+                    <Image
+                      alt=""
+                      className="h-20 w-20 shrink-0 rounded-md object-cover"
+                      height={80}
+                      src={propertyImageUrl(property.imageCoverUrl)}
+                      width={80}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-mono text-xs text-slate-500">#{property.id}</p>
+                      <h2 className="truncate font-semibold text-slate-950">{property.title}</h2>
+                      <p className="mt-1 text-sm font-semibold text-slate-950">{formatPrice(property.price)}</p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        {property.city} · {readableLabel(property.propertyType)} · {readableLabel(property.listingType)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div>
+                      <dt className="text-slate-500">Owner / User</dt>
+                      <dd className="min-w-0 font-medium text-slate-900">
+                        {property.owner ? (
+                          <>
+                            <span className="block truncate">{property.owner.fullName}</span>
+                            <span className="block truncate text-xs font-normal text-slate-500">{property.owner.email}</span>
+                          </>
+                        ) : (
+                          'Owner unavailable'
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Created</dt>
+                      <dd className="font-medium text-slate-900">{formatDate(property.createdAt)}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Details</dt>
+                      <dd className="font-medium text-slate-900">
+                        {property.bedrooms} bed · {property.bathrooms} bath · {property.areaSqm} m²
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Status</dt>
+                      <dd className="mt-1">
+                        <StatusBadge status={property.moderationStatus} />
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {property.moderationNotes ? (
+                    <p className="mt-4 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">{property.moderationNotes}</p>
+                  ) : null}
+
+                  <div className="mt-5">
+                    <PropertyActions property={property} />
+                  </div>
+                </article>
+              ))}
             </section>
           </>
         )}

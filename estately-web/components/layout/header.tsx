@@ -30,8 +30,8 @@ export async function Header({ user }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-cream-50 shadow-sm">
-      <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="flex min-h-20 items-center justify-between gap-4">
+      <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="flex min-h-20 items-center justify-between gap-3">
           {/* Logo */}
           <Link
             aria-label="Estately home"
@@ -40,7 +40,7 @@ export async function Header({ user }: HeaderProps) {
           >
             <Image
               alt="Estately"
-              className="h-auto w-[190px] object-contain"
+              className="h-auto w-28 object-contain sm:w-[190px]"
               height={96}
               priority
               src="/branding/logo-full.png?v=2"
@@ -83,12 +83,21 @@ export async function Header({ user }: HeaderProps) {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <HeaderMobileMenu
-            initialNotifications={notificationProps?.initialNotifications ?? []}
-            initialUnreadCount={notificationProps?.initialUnreadCount ?? 0}
-            user={user}
-            publicLinks={publicLinks}
-          />
+          <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
+            {user ? (
+              <>
+                {notificationProps ? (
+                  <NotificationDropdown
+                    className="shrink-0"
+                    initialNotifications={notificationProps.initialNotifications}
+                    initialUnreadCount={notificationProps.initialUnreadCount}
+                  />
+                ) : null}
+                <ProfileDropdown className="min-w-0 max-w-[9.5rem] sm:max-w-none" user={user} />
+              </>
+            ) : null}
+            <HeaderMobileMenu user={user} publicLinks={publicLinks} />
+          </div>
         </div>
       </div>
     </header>

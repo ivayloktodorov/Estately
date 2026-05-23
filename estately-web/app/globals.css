@@ -26,10 +26,14 @@
   }
 
   html {
+    max-width: 100%;
+    overflow-x: clip;
     scroll-behavior: smooth;
   }
 
   body {
+    max-width: 100%;
+    overflow-x: clip;
     background-color: rgb(251, 250, 247);
     color: rgb(15, 13, 11);
     font-family: system-ui, -apple-system, sans-serif;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { AuthUser } from '@/lib/auth/types';
@@ -88,13 +88,24 @@ function UserAvatar({ user }: { user: AuthUser }) {
 
 export function ProfileDropdown({ align = 'right', className = '', user }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const name = displayName(user);
+
+  useEffect(() => {
+    function closeOnOutsideClick(event: MouseEvent) {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
+  }, []);
 
   return (
     <div
-      className={`group relative ${className}`}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      className={`relative ${className}`}
+      ref={containerRef}
     >
       <button
         aria-expanded={isOpen}
@@ -112,12 +123,16 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
       </button>
 
       <div
-        className={`absolute top-full z-50 w-64 pt-2 ${
+        className={`absolute top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10 transition duration-200 ${
           align === 'right' ? 'right-0' : 'left-0'
-        } ${isOpen ? 'block' : 'hidden group-hover:block'}`}
+        } ${
+          isOpen
+            ? 'visible translate-y-0 scale-100 opacity-100'
+            : 'invisible -translate-y-1 scale-95 opacity-0'
+        }`}
         role="menu"
       >
-        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10">
+        <div className="max-h-[min(32rem,calc(100vh-7rem))] overflow-y-auto rounded-xl">
           <div className="border-b border-stone-100 px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
               <UserAvatar user={user} />
@@ -128,17 +143,17 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
             </div>
           </div>
           <div className="py-2">
-          {profileLinks.map((link) => (
-            <Link
-              className="block px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-cream-50 hover:text-estate-700"
-              href={link.href}
-              key={link.href}
-              onClick={() => setIsOpen(false)}
-              role="menuitem"
-            >
-              {link.label}
-            </Link>
-          ))}
+            {profileLinks.map((link) => (
+              <Link
+                className="block px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-cream-50 hover:text-estate-700"
+                href={link.href}
+                key={link.href}
+                onClick={() => setIsOpen(false)}
+                role="menuitem"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
           {user.role === 'admin' ? (
             <div className="border-t border-stone-100 py-2">
