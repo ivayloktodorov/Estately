@@ -26,6 +26,8 @@ export const properties = pgTable(
     bedrooms: integer('bedrooms').notNull(),
     bathrooms: integer('bathrooms').notNull(),
     areaSqm: integer('area_sqm').notNull(),
+    latitude: decimal('latitude', { precision: 10, scale: 7 }),
+    longitude: decimal('longitude', { precision: 10, scale: 7 }),
     imageCoverUrl: text('image_cover_url').notNull(),
     isPublished: boolean('is_published').default(false).notNull(),
     createdByUserId: integer('created_by_user_id').notNull(),
@@ -40,6 +42,9 @@ export const properties = pgTable(
     index('properties_bedrooms_idx').on(table.bedrooms),
     index('properties_bathrooms_idx').on(table.bathrooms),
     index('properties_is_published_idx').on(table.isPublished),
+    index('properties_created_by_user_id_idx').on(table.createdByUserId),
+    index('properties_created_at_idx').on(table.createdAt),
+    index('properties_area_sqm_idx').on(table.areaSqm),
     foreignKey({
       columns: [table.createdByUserId],
       foreignColumns: [users.id],

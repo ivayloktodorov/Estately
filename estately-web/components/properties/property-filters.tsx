@@ -12,6 +12,7 @@ interface PropertyFiltersProps {
   filters: PropertySearchFilters;
   cities: string[];
   sort: string;
+  view: string;
 }
 
 interface FilterFormState {
@@ -45,7 +46,7 @@ function initialState(filters: PropertySearchFilters): FilterFormState {
   };
 }
 
-export function PropertyFilters({ filters, cities, sort }: PropertyFiltersProps) {
+export function PropertyFilters({ filters, cities, sort, view }: PropertyFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -89,6 +90,10 @@ export function PropertyFilters({ filters, cities, sort }: PropertyFiltersProps)
 
     if (sort !== 'newest') {
       params.set('sort', sort);
+    }
+
+    if (view === 'map') {
+      params.set('view', view);
     }
 
     const query = params.toString();

@@ -1,7 +1,14 @@
 import { and, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
-import { LISTING_TYPES, PROPERTY_TYPES, type ListingType, type PropertyType } from './constants';
+import {
+  LISTING_TYPES,
+  PROPERTY_SORT_OPTIONS,
+  PROPERTY_TYPES,
+  type ListingType,
+  type PropertySortValue,
+  type PropertyType,
+} from './constants';
 
 export interface PropertySearchFilters {
   search?: string;
@@ -18,17 +25,6 @@ export interface PropertyPagination {
   page: number;
   pageSize: number;
 }
-
-export const PROPERTY_SORT_OPTIONS = [
-  { label: 'Newest first', value: 'newest' },
-  { label: 'Oldest first', value: 'oldest' },
-  { label: 'Price low to high', value: 'price_asc' },
-  { label: 'Price high to low', value: 'price_desc' },
-  { label: 'Largest area first', value: 'area_desc' },
-  { label: 'Smallest area first', value: 'area_asc' },
-] as const;
-
-export type PropertySortValue = (typeof PROPERTY_SORT_OPTIONS)[number]['value'];
 
 export interface PaginatedPropertiesResult {
   properties: (typeof properties.$inferSelect)[];

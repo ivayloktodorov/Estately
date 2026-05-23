@@ -22,6 +22,20 @@
       "when": 1779475200000,
       "tag": "0002_properties_filter_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779494400000,
+      "tag": "0003_property_coordinates",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779580800000,
+      "tag": "0004_load_test_indexes",
+      "breakpoints": true
     }
   ]
 }

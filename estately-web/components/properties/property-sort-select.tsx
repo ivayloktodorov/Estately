@@ -2,11 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import {
-  PROPERTY_SORT_OPTIONS,
-  type PropertySearchParams,
-  type PropertySortValue,
-} from '@/lib/properties/search';
+import { PROPERTY_SORT_OPTIONS, type PropertySortValue } from '@/lib/properties/constants';
+import type { PropertySearchParams } from '@/lib/properties/search';
 
 interface PropertySortSelectProps {
   searchParams: PropertySearchParams;

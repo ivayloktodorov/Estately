@@ -32,6 +32,13 @@ const sampleCities = [
   { name: 'Plovdiv', slug: 'plovdiv' },
 ];
 
+const cityCoordinates: Record<string, { latitude: number; longitude: number }> = {
+  Sofia: { latitude: 42.6977, longitude: 23.3219 },
+  Varna: { latitude: 43.2141, longitude: 27.9147 },
+  Burgas: { latitude: 42.5048, longitude: 27.4626 },
+  Plovdiv: { latitude: 42.1354, longitude: 24.7453 },
+};
+
 const sampleProperties = [
   {
     title: 'Modern Apartment in Sofia Center',
@@ -319,6 +326,8 @@ async function seed() {
     console.log('🏠 Seeding properties...');
     const propertiesToInsert = sampleProperties.map((prop, index) => ({
       ...prop,
+      latitude: (cityCoordinates[prop.city].latitude + (index % 4) * 0.006).toFixed(7),
+      longitude: (cityCoordinates[prop.city].longitude + (index % 5) * 0.006).toFixed(7),
       createdByUserId: (index % sampleUsers.length) + 1,
     }));
 

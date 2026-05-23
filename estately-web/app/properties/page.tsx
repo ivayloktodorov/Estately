@@ -5,6 +5,8 @@ import { Container } from '@/components/ui/container';
 import { PropertyFilters } from '@/components/properties/property-filters';
 import { PropertyPagination } from '@/components/properties/property-pagination';
 import { PropertySortSelect } from '@/components/properties/property-sort-select';
+import { PropertiesMapViewDynamic } from '@/components/properties/properties-map-view-dynamic';
+import { PropertyViewToggle } from '@/components/properties/property-view-toggle';
 import { getCurrentUser } from '@/lib/auth';
 import { getFavoritePropertyIds } from '@/lib/favorites/actions';
 import { propertyImageUrl } from '@/lib/properties/images';
@@ -34,11 +36,16 @@ interface PropertiesPageProps {
 
 const fallbackCities = ['Sofia', 'Varna', 'Burgas', 'Plovdiv'];
 
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
 export default async function PropertiesPage({ searchParams }: PropertiesPageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const filters = parsePropertySearchParams(resolvedSearchParams);
   const pagination = parsePropertyPaginationParams(resolvedSearchParams);
   const sort = parsePropertySortParam(resolvedSearchParams);
+  const view = firstParam(resolvedSearchParams.view) === 'map' ? 'map' : 'list';
   const user = await getCurrentUser();
   let paginatedProperties: Awaited<ReturnType<typeof getPaginatedProperties>>;
 
@@ -73,6 +80,8 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     areaSqm: prop.areaSqm,
     propertyType: prop.propertyType,
     imageUrl: propertyImageUrl(prop.imageCoverUrl),
+    latitude: prop.latitude ? Number(prop.latitude) : null,
+    longitude: prop.longitude ? Number(prop.longitude) : null,
     listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',
   }));
   const favoritePropertyIds = user
@@ -104,9 +113,9 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
           </p>
         </div>
 
-        <PropertyFilters filters={filters} cities={fallbackCities} sort={sort} />
+        <PropertyFilters filters={filters} cities={fallbackCities} sort={sort} view={view} />
 
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           {!isEmpty ? (
             <p className="text-sm font-medium text-stone-600">
               Showing {startResult}-{endResult} of {paginatedProperties.totalCount} propert
@@ -115,20 +124,27 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
           ) : (
             <p className="text-sm font-medium text-stone-600">No properties match your search.</p>
           )}
-          <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <PropertyViewToggle searchParams={resolvedSearchParams} view={view} />
+            <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
+          </div>
         </div>
 
-        <PropertyGrid isEmpty={isEmpty}>
-          {formattedProperties.map((property) => (
-            <PropertyCard
-              key={property.id}
-              {...property}
-              isAuthenticated={Boolean(user)}
-              isFavorited={favoritePropertyIds.has(property.id)}
-              showFavoriteButton
-            />
-          ))}
-        </PropertyGrid>
+        {view === 'map' ? (
+          <PropertiesMapViewDynamic properties={formattedProperties} />
+        ) : (
+          <PropertyGrid isEmpty={isEmpty}>
+            {formattedProperties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                {...property}
+                isAuthenticated={Boolean(user)}
+                isFavorited={favoritePropertyIds.has(property.id)}
+                showFavoriteButton
+              />
+            ))}
+          </PropertyGrid>
+        )}
 
         {!isEmpty ? (
           <PropertyPagination

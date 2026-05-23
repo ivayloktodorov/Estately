@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, timestamp, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, timestamp, foreignKey, index } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { properties } from './properties';
 
@@ -20,5 +20,8 @@ export const propertyMessages = pgTable(
       columns: [table.userId],
       foreignColumns: [users.id],
     }).onDelete('cascade'),
+    index('property_messages_property_id_idx').on(table.propertyId),
+    index('property_messages_user_id_idx').on(table.userId),
+    index('property_messages_created_at_idx').on(table.createdAt),
   ]
 );

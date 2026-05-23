@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, timestamp, foreignKey, unique } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, timestamp, foreignKey, unique, index } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { properties } from './properties';
 
@@ -20,5 +20,7 @@ export const favorites = pgTable(
       foreignColumns: [properties.id],
     }).onDelete('cascade'),
     unique('unique_user_property_favorite').on(table.userId, table.propertyId),
+    index('favorites_property_id_idx').on(table.propertyId),
+    index('favorites_created_at_idx').on(table.createdAt),
   ]
 );
