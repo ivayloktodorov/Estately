@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { PropertyCard } from '@/components/property/property-card';
 import { Button } from '@/components/ui/button';
+import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
 import { getProperties } from '@/services/property.service';
 import type { Property } from '@/types/property';
 
@@ -17,9 +18,12 @@ export default function HomeScreen() {
     queryKey: ['properties', 'home'],
     queryFn: ({ pageParam }) => getProperties({ page: pageParam, limit: pageSize }),
     initialPageParam: 1,
+    retry: false,
     getNextPageParam: (lastPage) =>
       lastPage.pagination.hasNextPage ? lastPage.pagination.page + 1 : undefined,
   });
+  const favoriteIds = useFavoriteIds();
+  const toggleFavoriteMutation = useToggleFavorite();
   const properties = flattenProperties(propertiesQuery.data?.pages);
   const hasProperties = properties.length > 0;
 
@@ -37,7 +41,7 @@ export default function HomeScreen() {
       keyExtractor={(property) => String(property.id)}
       ListEmptyComponent={
         <View className="rounded-lg border border-slate-200 bg-white p-6">
-          {propertiesQuery.isLoading ? (
+          {propertiesQuery.isPending ? (
             <View className="items-center gap-3">
               <ActivityIndicator color="#16a34a" />
               <Text className="text-base text-slate-600">Loading properties...</Text>
@@ -77,7 +81,18 @@ export default function HomeScreen() {
         </View>
       }
       renderItem={({ item }) => (
-        <PropertyCard property={item} onPress={() => router.push(`/property/${item.id}`)} />
+        <PropertyCard
+          isFavorite={favoriteIds.has(item.id)}
+          isFavoriteLoading={
+            toggleFavoriteMutation.isPending &&
+            toggleFavoriteMutation.variables?.property.id === item.id
+          }
+          onFavoritePress={() =>
+            toggleFavoriteMutation.mutate({ property: item, isFavorite: favoriteIds.has(item.id) })
+          }
+          property={item}
+          onPress={() => router.push(`/property/${item.id}`)}
+        />
       )}
     />
   );

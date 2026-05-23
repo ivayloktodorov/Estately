@@ -1,26 +1,16 @@
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 import { Screen } from '@/components/layout/screen';
 import { Button } from '@/components/ui/button';
 import { useAuthSession, useLogout } from '@/hooks/use-auth';
 
 export default function ProfileScreen() {
-  const { data: session, isLoading } = useAuthSession();
+  const { data: session } = useAuthSession();
   const logoutMutation = useLogout();
 
   async function handleLogout() {
     await logoutMutation.mutateAsync();
     router.replace('/(auth)/login');
-  }
-
-  if (isLoading) {
-    return (
-      <Screen>
-        <View className="flex-1 justify-center">
-          <Text className="text-center text-base text-slate-600">Loading profile...</Text>
-        </View>
-      </Screen>
-    );
   }
 
   if (session) {
@@ -60,12 +50,12 @@ export default function ProfileScreen() {
         </View>
 
         <View className="gap-3">
-          <Link href="/(auth)/login" asChild>
-            <Button label="Log in" />
-          </Link>
-          <Link href="/(auth)/register" asChild>
-            <Button label="Create account" variant="secondary" />
-          </Link>
+          <Button label="Log in" onPress={() => router.push('/(auth)/login')} />
+          <Button
+            label="Create account"
+            onPress={() => router.push('/(auth)/register')}
+            variant="secondary"
+          />
         </View>
       </View>
     </Screen>

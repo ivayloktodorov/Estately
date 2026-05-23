@@ -24,6 +24,7 @@ export interface Property {
   createdByUserId: number;
   createdAt: string;
   updatedAt: string;
+  favoritedAt?: string;
 }
 
 export interface PropertyDetails extends Property {
@@ -56,4 +57,13 @@ export interface PaginationMeta {
 export interface PropertyListResponse {
   properties: Property[];
   pagination: PaginationMeta;
+}
+
+export interface FavoritesResponse {
+  properties: Property[];
+}
+
+export interface FavoriteMutationResponse {
+  propertyId: number;
+  isFavorited: boolean;
 }

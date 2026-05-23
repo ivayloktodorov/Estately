@@ -1,49 +1,62 @@
-import { Image, Pressable, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
+import { formatPrice, formatPropertyLabel } from '@/components/property/property-format';
 import type { Property } from '@/types/property';
 
 interface PropertyCardProps {
   property: Property;
   onPress?: () => void;
+  isFavorite?: boolean;
+  isFavoriteLoading?: boolean;
+  onFavoritePress?: () => void;
 }
 
-function formatPrice(price: string): string {
-  const value = Number(price);
-
-  if (!Number.isFinite(value)) {
-    return price;
-  }
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatLabel(value: string): string {
-  return value
-    .split('_')
-    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
-    .join(' ');
-}
-
-export function PropertyCard({ property, onPress }: PropertyCardProps) {
+export function PropertyCard({
+  property,
+  onPress,
+  isFavorite = false,
+  isFavoriteLoading = false,
+  onFavoritePress,
+}: PropertyCardProps) {
   return (
     <Pressable
       accessibilityRole="button"
       className="overflow-hidden rounded-lg border border-slate-200 bg-white active:opacity-80"
       onPress={onPress}>
-      {property.imageCoverUrl ? (
-        <Image
-          className="h-48 w-full bg-slate-200"
-          resizeMode="cover"
-          source={{ uri: property.imageCoverUrl }}
-        />
-      ) : (
-        <View className="h-48 w-full items-center justify-center bg-slate-200">
-          <Text className="text-sm font-medium text-slate-500">No image</Text>
-        </View>
-      )}
+      <View>
+        {property.imageCoverUrl ? (
+          <Image
+            className="h-48 w-full bg-slate-200"
+            resizeMode="cover"
+            source={{ uri: property.imageCoverUrl }}
+          />
+        ) : (
+          <View className="h-48 w-full items-center justify-center bg-slate-200">
+            <Text className="text-sm font-medium text-slate-500">No image</Text>
+          </View>
+        )}
+
+        <Pressable
+          accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+          accessibilityRole="button"
+          className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow"
+          disabled={isFavoriteLoading}
+          hitSlop={8}
+          onPress={(event) => {
+            event.stopPropagation();
+            onFavoritePress?.();
+          }}>
+          {isFavoriteLoading ? (
+            <ActivityIndicator color="#16a34a" size="small" />
+          ) : (
+            <Ionicons
+              color={isFavorite ? '#dc2626' : '#334155'}
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={24}
+            />
+          )}
+        </Pressable>
+      </View>
 
       <View className="gap-3 p-4">
         <View className="gap-1">
@@ -64,10 +77,10 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
             {property.areaSqm} sqm
           </Text>
           <Text className="rounded-md bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700">
-            {formatLabel(property.listingType)}
+            {formatPropertyLabel(property.listingType)}
           </Text>
           <Text className="rounded-md bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700">
-            {formatLabel(property.propertyType)}
+            {formatPropertyLabel(property.propertyType)}
           </Text>
         </View>
       </View>

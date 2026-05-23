@@ -1,14 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as authService from '@/services/auth.service';
 import { getStoredSession } from '@/services/storage.service';
-import type { LoginInput, RegisterInput } from '@/types/auth';
+import type { AuthSession, LoginInput, RegisterInput } from '@/types/auth';
 
 const authSessionQueryKey = ['auth', 'session'] as const;
 
 export function useAuthSession() {
-  return useQuery({
+  return useQuery<AuthSession | null>({
     queryKey: authSessionQueryKey,
     queryFn: getStoredSession,
+    initialData: null,
+    retry: false,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
