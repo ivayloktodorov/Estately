@@ -19,22 +19,21 @@ export function PropertyCard({
   onFavoritePress,
 }: PropertyCardProps) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      className="overflow-hidden rounded-lg border border-slate-200 bg-white active:opacity-80"
-      onPress={onPress}>
+    <View className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <View>
-        {property.imageCoverUrl ? (
-          <Image
-            className="h-48 w-full bg-slate-200"
-            resizeMode="cover"
-            source={{ uri: property.imageCoverUrl }}
-          />
-        ) : (
-          <View className="h-48 w-full items-center justify-center bg-slate-200">
-            <Text className="text-sm font-medium text-slate-500">No image</Text>
-          </View>
-        )}
+        <Pressable accessibilityRole="button" className="active:opacity-80" onPress={onPress}>
+          {property.imageCoverUrl ? (
+            <Image
+              className="h-48 w-full bg-slate-200"
+              resizeMode="cover"
+              source={{ uri: property.imageCoverUrl }}
+            />
+          ) : (
+            <View className="h-48 w-full items-center justify-center bg-slate-200">
+              <Text className="text-sm font-medium text-slate-500">No image</Text>
+            </View>
+          )}
+        </Pressable>
 
         <Pressable
           accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
@@ -42,8 +41,7 @@ export function PropertyCard({
           className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow"
           disabled={isFavoriteLoading}
           hitSlop={8}
-          onPress={(event) => {
-            event.stopPropagation();
+          onPress={() => {
             onFavoritePress?.();
           }}>
           {isFavoriteLoading ? (
@@ -58,7 +56,7 @@ export function PropertyCard({
         </Pressable>
       </View>
 
-      <View className="gap-3 p-4">
+      <Pressable accessibilityRole="button" className="gap-3 p-4 active:opacity-80" onPress={onPress}>
         <View className="gap-1">
           <Text className="text-2xl font-bold text-slate-950">{formatPrice(property.price)}</Text>
           <Text className="text-lg font-semibold text-slate-900">{property.title}</Text>
@@ -83,7 +81,7 @@ export function PropertyCard({
             {formatPropertyLabel(property.propertyType)}
           </Text>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }

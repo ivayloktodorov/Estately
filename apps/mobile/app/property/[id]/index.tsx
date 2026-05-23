@@ -78,7 +78,7 @@ export default function PropertyDetailsScreen() {
           property={property}
         />
         <PropertySummary property={property} />
-        <ContactAgentCard />
+        <ContactAgentCard propertyId={property.id} />
       </View>
     </Screen>
   );
