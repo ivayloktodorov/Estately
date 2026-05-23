@@ -1,10 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUserDetails } from '@/lib/admin/users';
 import { AdminUserManagementForm } from './admin-user-management-form';
-
-/* eslint-disable @next/next/no-img-element */
 
 interface AdminUserDetailsPageProps {
   params: Promise<{
@@ -94,7 +93,7 @@ export default async function AdminUserDetailsPage({ params }: AdminUserDetailsP
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
               {user.avatarUrl ? (
-                <img alt="" className="h-20 w-20 rounded-full object-cover" src={user.avatarUrl} />
+                <Image alt="" className="h-20 w-20 rounded-full object-cover" height={80} src={user.avatarUrl} width={80} />
               ) : (
                 <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-cream-100 text-2xl font-bold text-estate-700">
                   {initials(user.fullName)}

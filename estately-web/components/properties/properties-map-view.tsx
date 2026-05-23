@@ -1,10 +1,9 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
-
+import Image from 'next/image';
 import Link from 'next/link';
 import L from 'leaflet';
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 
 export interface MapProperty {
@@ -90,7 +89,15 @@ function MapContent({ properties, selectedPropertyId, onSelectProperty }: MapCon
 function PropertyPreview({ property }: { property: MapProperty }) {
   return (
     <article className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft">
-      <img alt={property.title} className="h-28 w-full object-cover" src={property.imageUrl} />
+      <div className="relative h-28 w-full">
+        <Image
+          alt={property.title}
+          className="object-cover"
+          fill
+          sizes="(min-width: 1024px) 320px, 100vw"
+          src={property.imageUrl}
+        />
+      </div>
       <div className="p-4">
         <p className="text-base font-bold text-charcoal-950">{property.price}</p>
         <h3 className="mt-1 line-clamp-2 text-sm font-semibold text-charcoal-950">{property.title}</h3>
@@ -106,15 +113,23 @@ function PropertyPreview({ property }: { property: MapProperty }) {
   );
 }
 
+const MemoizedMapContent = memo(MapContent);
+
 export function PropertiesMapView({ properties }: PropertiesMapViewProps) {
-  const mappedProperties = properties.filter(
-    (property) => property.latitude !== null && property.longitude !== null,
+  const mappedProperties = useMemo(
+    () => properties.filter((property) => property.latitude !== null && property.longitude !== null),
+    [properties],
   );
   const [selectedPropertyId, setSelectedPropertyId] = useState<number | null>(
     mappedProperties[0]?.id ?? null,
   );
-  const selectedProperty =
-    mappedProperties.find((property) => property.id === selectedPropertyId) ?? mappedProperties[0];
+  const selectedProperty = useMemo(
+    () => mappedProperties.find((property) => property.id === selectedPropertyId) ?? mappedProperties[0],
+    [mappedProperties, selectedPropertyId],
+  );
+  const handleSelectProperty = useCallback((propertyId: number) => {
+    setSelectedPropertyId(propertyId);
+  }, []);
 
   if (mappedProperties.length === 0) {
     return (
@@ -139,7 +154,15 @@ export function PropertiesMapView({ properties }: PropertiesMapViewProps) {
             onClick={() => setSelectedPropertyId(property.id)}
             type="button"
           >
-            <img alt={property.title} className="aspect-video w-full rounded-xl object-cover md:aspect-square" src={property.imageUrl} />
+            <span className="relative block aspect-video w-full overflow-hidden rounded-xl bg-stone-100 md:aspect-square">
+              <Image
+                alt={property.title}
+                className="object-cover"
+                fill
+                sizes="(min-width: 768px) 120px, 100vw"
+                src={property.imageUrl}
+              />
+            </span>
             <span>
               <span className="block text-lg font-bold text-charcoal-950">{property.price}</span>
               <span className="mt-1 block font-semibold text-charcoal-950">{property.title}</span>
@@ -154,10 +177,10 @@ export function PropertiesMapView({ properties }: PropertiesMapViewProps) {
       <div className="order-1 lg:sticky lg:top-6 lg:order-2 lg:self-start">
         <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-estate-soft">
           <div className="h-[460px] lg:h-[760px]">
-            <MapContent
+            <MemoizedMapContent
               properties={mappedProperties}
               selectedPropertyId={selectedProperty?.id ?? null}
-              onSelectProperty={setSelectedPropertyId}
+              onSelectProperty={handleSelectProperty}
             />
           </div>
           {selectedProperty ? (

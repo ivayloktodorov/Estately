@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { desc, eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 import { PropertyImageUpload } from '@/components/properties/property-image-upload';
@@ -191,10 +192,13 @@ export default async function DashboardPage() {
                   className="grid gap-5 rounded-xl border border-stone-200 bg-white p-4 shadow-sm md:grid-cols-[180px_1fr]"
                   key={property.id}
                 >
-                  <img
+                  <Image
                     alt={property.title}
                     className="aspect-video w-full rounded-lg object-cover md:aspect-square"
+                    height={180}
                     src={propertyImageUrl(property.imageCoverUrl)}
+                    width={180}
+                    sizes="(min-width: 768px) 180px, 100vw"
                   />
                   <div>
                     <div className="flex flex-col justify-between gap-3 sm:flex-row">

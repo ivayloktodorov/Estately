@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { requireAdmin } from '@/lib/auth';
 import {
   getAdminProperties,
@@ -9,8 +10,6 @@ import {
 import { propertyImageUrl } from '@/lib/properties/images';
 import { bulkModeratePropertiesAction, deletePropertyAction, moderatePropertyAction } from './actions';
 import { DeletePropertyButton } from './delete-property-button';
-
-/* eslint-disable @next/next/no-img-element */
 
 interface AdminPropertiesPageProps {
   searchParams?: Promise<AdminPropertiesSearchParams>;
@@ -365,7 +364,13 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                         </td>
                         <td className="px-4 py-6">
                           <div className="flex min-w-0 gap-3">
-                            <img alt="" className="h-20 w-20 rounded-md object-cover" src={propertyImageUrl(property.imageCoverUrl)} />
+                            <Image
+                              alt=""
+                              className="h-20 w-20 rounded-md object-cover"
+                              height={80}
+                              src={propertyImageUrl(property.imageCoverUrl)}
+                              width={80}
+                            />
                             <div className="min-w-0">
                               <p className="font-mono text-xs text-slate-500">#{property.id}</p>
                               <p className="truncate font-semibold text-slate-950">{property.title}</p>

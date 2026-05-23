@@ -1,4 +1,4 @@
-import { and, desc, eq, ne, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '@/src/db/client';
 import { conversations, messageAttachments, messages, properties, users } from '@/src/db/schema';
@@ -203,53 +203,74 @@ export async function getUserConversations(userId: number): Promise<Conversation
     .where(or(eq(conversations.buyerUserId, userId), eq(conversations.ownerUserId, userId)))
     .orderBy(desc(conversations.updatedAt), desc(conversations.id));
 
-  return Promise.all(
-    rows.map(async (conversation) => {
-      const [lastMessage, unreadRows] = await Promise.all([
-        db
-          .select({ id: messages.id, body: messages.body, createdAt: messages.createdAt })
-          .from(messages)
-          .where(eq(messages.conversationId, conversation.id))
-          .orderBy(desc(messages.createdAt), desc(messages.id))
-          .limit(1)
-          .then((messageRows) => messageRows[0]),
-        db
-          .select({ value: sql<number>`count(*)::int` })
-          .from(messages)
-          .where(
-            and(
-              eq(messages.conversationId, conversation.id),
-              eq(messages.isRead, false),
-              ne(messages.senderUserId, userId),
-            ),
-          ),
-      ]);
+  if (rows.length === 0) {
+    return [];
+  }
 
-      const lastAttachment = lastMessage
-        ? await db
-            .select({ id: messageAttachments.id })
-            .from(messageAttachments)
-            .where(eq(messageAttachments.messageId, lastMessage.id))
-            .limit(1)
-            .then((attachmentRows) => attachmentRows[0])
-        : null;
+  const conversationIds = rows.map((conversation) => conversation.id);
+  const [messageRows, unreadRows] = await Promise.all([
+    db
+      .select({
+        id: messages.id,
+        conversationId: messages.conversationId,
+        body: messages.body,
+        createdAt: messages.createdAt,
+      })
+      .from(messages)
+      .where(inArray(messages.conversationId, conversationIds))
+      .orderBy(desc(messages.conversationId), desc(messages.createdAt), desc(messages.id)),
+    db
+      .select({
+        conversationId: messages.conversationId,
+        value: sql<number>`count(*)::int`,
+      })
+      .from(messages)
+      .where(
+        and(
+          inArray(messages.conversationId, conversationIds),
+          eq(messages.isRead, false),
+          ne(messages.senderUserId, userId),
+        ),
+      )
+      .groupBy(messages.conversationId),
+  ]);
 
-      return {
-        id: conversation.id,
-        propertyId: conversation.propertyId,
-        propertyTitle: conversation.propertyTitle,
-        propertyCity: conversation.propertyCity,
-        propertyImageCoverUrl: conversation.propertyImageCoverUrl,
-        otherParticipantName:
-          conversation.buyerUserId === userId ? conversation.ownerName : conversation.buyerName,
-        otherParticipantAvatarUrl:
-          conversation.buyerUserId === userId ? conversation.ownerAvatarUrl : conversation.buyerAvatarUrl,
-        lastMessagePreview: lastMessage?.body || (lastAttachment ? 'Attachment' : ''),
-        lastMessageAt: lastMessage?.createdAt ?? conversation.updatedAt,
-        unreadCount: unreadRows[0]?.value ?? 0,
-      };
-    }),
-  );
+  const lastMessages = new Map<number, (typeof messageRows)[number]>();
+  for (const message of messageRows) {
+    if (!lastMessages.has(message.conversationId)) {
+      lastMessages.set(message.conversationId, message);
+    }
+  }
+
+  const lastMessageIds = [...lastMessages.values()].map((message) => message.id);
+  const attachmentRows =
+    lastMessageIds.length > 0
+      ? await db
+          .select({ messageId: messageAttachments.messageId })
+          .from(messageAttachments)
+          .where(inArray(messageAttachments.messageId, lastMessageIds))
+      : [];
+  const messageIdsWithAttachments = new Set(attachmentRows.map((attachment) => attachment.messageId));
+  const unreadCounts = new Map(unreadRows.map((row) => [row.conversationId, row.value]));
+
+  return rows.map((conversation) => {
+    const lastMessage = lastMessages.get(conversation.id);
+
+    return {
+      id: conversation.id,
+      propertyId: conversation.propertyId,
+      propertyTitle: conversation.propertyTitle,
+      propertyCity: conversation.propertyCity,
+      propertyImageCoverUrl: conversation.propertyImageCoverUrl,
+      otherParticipantName:
+        conversation.buyerUserId === userId ? conversation.ownerName : conversation.buyerName,
+      otherParticipantAvatarUrl:
+        conversation.buyerUserId === userId ? conversation.ownerAvatarUrl : conversation.buyerAvatarUrl,
+      lastMessagePreview: lastMessage?.body || (lastMessage && messageIdsWithAttachments.has(lastMessage.id) ? 'Attachment' : ''),
+      lastMessageAt: lastMessage?.createdAt ?? conversation.updatedAt,
+      unreadCount: unreadCounts.get(conversation.id) ?? 0,
+    };
+  });
 }
 
 export async function getConversationForUser(

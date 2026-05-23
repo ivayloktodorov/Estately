@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { FavoriteButton } from '@/components/favorites/favorite-button';
 import { propertyImageUrl } from '@/lib/properties/images';
 
@@ -50,9 +51,11 @@ export function PropertyCard({
               propertyTitle={title}
             />
           ) : null}
-          <img
+          <Image
             src={coverImageUrl}
             alt={title}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
           />
           {/* Badge */}

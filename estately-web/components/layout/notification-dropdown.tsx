@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import {
   getCurrentUserNotificationsAction,
   markAllNotificationsAsReadAction,
@@ -82,6 +82,7 @@ export function NotificationDropdown({
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasLoadedRef = useRef(true);
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
@@ -94,18 +95,23 @@ export function NotificationDropdown({
     return () => document.removeEventListener('mousedown', closeOnOutsideClick);
   }, []);
 
-  function refreshNotifications() {
+  const refreshNotifications = useCallback(() => {
+    if (hasLoadedRef.current || isPending) {
+      return;
+    }
+
     setError('');
     startTransition(async () => {
       try {
         const result = await getCurrentUserNotificationsAction();
         setNotifications(result.notifications);
         setUnreadCount(result.unreadCount);
+        hasLoadedRef.current = true;
       } catch (refreshError) {
         setError(refreshError instanceof Error ? refreshError.message : 'Could not load notifications.');
       }
     });
-  }
+  }, [isPending]);
 
   function markAsRead(notificationId: number) {
     setError('');

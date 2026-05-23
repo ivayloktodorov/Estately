@@ -1,9 +1,8 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { requireAuth } from '@/lib/auth';
 import { getUserConversations } from '@/lib/messages/service';
 import { propertyImageUrl } from '@/lib/properties/images';
-
-/* eslint-disable @next/next/no-img-element */
 
 export const metadata = {
   title: 'Messages - Estately',
@@ -80,10 +79,13 @@ export default async function MessagesPage() {
                     key={conversation.id}
                   >
                     <div className="grid gap-4 sm:grid-cols-[96px_1fr]">
-                      <img
+                      <Image
                         alt=""
                         className="aspect-video w-full rounded-lg object-cover sm:h-24 sm:w-24"
+                        height={96}
                         src={propertyImageUrl(conversation.propertyImageCoverUrl)}
+                        width={96}
+                        sizes="(min-width: 640px) 96px, 100vw"
                       />
                       <div className="min-w-0">
                         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -104,10 +106,12 @@ export default async function MessagesPage() {
                             </div>
                             <div className="mt-2 flex min-w-0 items-center gap-2">
                               {conversation.otherParticipantAvatarUrl ? (
-                                <img
+                                <Image
                                   alt=""
                                   className="h-8 w-8 shrink-0 rounded-full object-cover"
+                                  height={32}
                                   src={conversation.otherParticipantAvatarUrl}
+                                  width={32}
                                 />
                               ) : (
                                 <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-estate-700 ring-1 ring-stone-200">

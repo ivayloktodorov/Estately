@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface PropertyGalleryProps {
@@ -22,9 +23,12 @@ export function PropertyGallery({
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative w-full overflow-hidden rounded-2xl bg-stone-100 aspect-video">
-        <img
+        <Image
           src={selectedImage}
           alt={title}
+          fill
+          priority
+          sizes="(min-width: 1024px) 70vw, 100vw"
           className="h-full w-full object-cover transition-all duration-300"
         />
         
@@ -50,9 +54,11 @@ export function PropertyGallery({
               }`}
               aria-label={`View image ${index + 1}`}
             >
-              <img
+              <Image
                 src={image}
                 alt={`${title} - Image ${index + 1}`}
+                fill
+                sizes="(min-width: 768px) 96px, 25vw"
                 className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </button>

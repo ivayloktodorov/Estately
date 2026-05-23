@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { AuthUser } from '@/lib/auth/types';
 import { LogoutButton } from './logout-button';
-
-/* eslint-disable @next/next/no-img-element */
 
 interface ProfileDropdownProps {
   user: AuthUser;
@@ -66,10 +65,12 @@ function UserAvatar({ user }: { user: AuthUser }) {
 
   if (user.avatarUrl) {
     return (
-      <img
+      <Image
         alt={label}
         className="h-10 w-10 shrink-0 rounded-full border border-stone-200 bg-cream-100 object-cover shadow-sm"
+        height={40}
         src={user.avatarUrl}
+        width={40}
       />
     );
   }

@@ -1,9 +1,8 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUsers, type AdminUserListItem, type AdminUsersSearchParams } from '@/lib/admin/users';
 import { updateUserRoleAction } from './actions';
-
-/* eslint-disable @next/next/no-img-element */
 
 interface AdminUsersPageProps {
   searchParams?: Promise<AdminUsersSearchParams>;
@@ -56,7 +55,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function UserAvatar({ user }: { user: AdminUserListItem }) {
   return user.avatarUrl ? (
-    <img alt="" className="h-10 w-10 rounded-full object-cover" src={user.avatarUrl} />
+    <Image alt="" className="h-10 w-10 rounded-full object-cover" height={40} src={user.avatarUrl} width={40} />
   ) : (
     <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cream-100 text-sm font-bold text-estate-700">
       {initials(user.fullName)}
