@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Estately",
+    "slug": "estately-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "estately",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-splash-screen"
+    ],
+    "experiments": {}
+  }
+}

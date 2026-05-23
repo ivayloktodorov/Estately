@@ -4,6 +4,7 @@
   "private": true,
   "description": "Estately monorepo - mobile and web applications",
   "workspaces": [
+    "apps/mobile",
     "estately-mobile",
     "estately-web"
   ],
@@ -11,6 +12,8 @@
     "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspaces --if-present",
+    "mobile": "npm run dev --workspace=@estately/mobile",
+    "mobile:web": "npm run web --workspace=@estately/mobile",
     "web": "npm run web --workspace=estately-mobile",
     "lint": "npm run lint --workspaces --if-present"
   },
@@ -19,11 +22,16 @@
   },
   "overrides": {
     "expo": "56.0.3",
-    "uuid": "11.1.1"
+    "uuid": "11.1.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "eslint": "^9.39.4",
     "eslint-config-expo": "~56.0.4",
-    "expo": "56.0.3"
+    "expo": "56.0.3",
+    "expo-router": "~56.2.5",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   }
 }

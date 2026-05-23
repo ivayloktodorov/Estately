@@ -5,6 +5,16 @@ import { AUTH_COOKIE_NAME } from './lib/auth/types';
 const protectedPagePaths = ['/dashboard', '/profile', '/favorites'];
 const adminPaths = ['/admin', '/api/admin'];
 const protectedApiPaths = ['/api/protected'];
+const mobileApiPaths = ['/api/mobile'];
+
+function withMobileCorsHeaders(response: NextResponse): NextResponse {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set('Access-Control-Max-Age', '86400');
+
+  return response;
+}
 
 function isPathMatch(pathname: string, paths: string[]): boolean {
   return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -23,11 +33,18 @@ function unauthorizedJson(status: 401 | 403, code: 'UNAUTHORIZED' | 'FORBIDDEN',
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminRoute = isPathMatch(pathname, adminPaths);
+  const isMobileApi = isPathMatch(pathname, mobileApiPaths);
   const isProtectedPage = isPathMatch(pathname, protectedPagePaths);
   const isProtectedApi = isPathMatch(pathname, protectedApiPaths);
 
+  if (isMobileApi && request.method === 'OPTIONS') {
+    return withMobileCorsHeaders(new NextResponse(null, { status: 204 }));
+  }
+
   if (!isAdminRoute && !isProtectedPage && !isProtectedApi) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+
+    return isMobileApi ? withMobileCorsHeaders(response) : response;
   }
 
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -35,7 +52,9 @@ export async function middleware(request: NextRequest) {
 
   if (!payload) {
     if (pathname.startsWith('/api/')) {
-      return unauthorizedJson(401, 'UNAUTHORIZED', 'Authentication required.');
+      const response = unauthorizedJson(401, 'UNAUTHORIZED', 'Authentication required.');
+
+      return isMobileApi ? withMobileCorsHeaders(response) : response;
     }
 
     return redirectToLogin(request);
@@ -43,13 +62,17 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminRoute && payload.role !== 'admin') {
     if (pathname.startsWith('/api/')) {
-      return unauthorizedJson(403, 'FORBIDDEN', 'Admin access required.');
+      const response = unauthorizedJson(403, 'FORBIDDEN', 'Admin access required.');
+
+      return isMobileApi ? withMobileCorsHeaders(response) : response;
     }
 
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  return isMobileApi ? withMobileCorsHeaders(response) : response;
 }
 
 export const config = {
@@ -60,5 +83,6 @@ export const config = {
     '/admin/:path*',
     '/api/protected/:path*',
     '/api/admin/:path*',
+    '/api/mobile/:path*',
   ],
 };
