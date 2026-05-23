@@ -13,6 +13,8 @@ const docsLinks = [
   { href: '/docs/database-schema', label: 'Database Schema' },
   { href: '/docs/requirements', label: 'Requirements' },
   { href: '/docs/architecture', label: 'Architecture' },
+  { href: '/docs/project-health', label: 'Project Health' },
+  { href: '/docs/production-readiness', label: 'Production Readiness' },
 ];
 
 const monorepoItems = [

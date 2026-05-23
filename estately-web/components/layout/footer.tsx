@@ -11,6 +11,8 @@ const footerLinks = [
   { href: '/docs/database-schema', label: 'Database Schema' },
   { href: '/docs/requirements', label: 'Requirements' },
   { href: '/docs/architecture', label: 'Architecture' },
+  { href: '/docs/project-health', label: 'Project Health' },
+  { href: '/docs/production-readiness', label: 'Production Readiness' },
   { href: '/docs/local-setup', label: 'Local Setup' },
   { href: '/docs/deployment', label: 'Deployment' },
 ];

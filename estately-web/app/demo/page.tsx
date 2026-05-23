@@ -58,6 +58,8 @@ const quickLinks: QuickLink[] = [
   { href: '/docs/api', label: 'API Documentation', description: 'Inspect mobile REST API endpoints and payloads.' },
   { href: '/docs/architecture', label: 'Architecture Documentation', description: 'Review system structure and technical choices.' },
   { href: '/docs/database-schema', label: 'Database Documentation', description: 'Inspect tables, relationships, and indexing notes.' },
+  { href: '/docs/project-health', label: 'Project Health', description: 'Review GitHub requirements and project readiness checks.' },
+  { href: '/docs/production-readiness', label: 'Production Readiness', description: 'Review deployment blockers, environment checks, and audit scores.' },
 ];
 
 const featureGroups: FeatureGroup[] = [
