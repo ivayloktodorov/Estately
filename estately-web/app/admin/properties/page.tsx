@@ -66,6 +66,13 @@ function AdminTabs() {
         <span aria-hidden="true">♙</span>
         Users
       </Link>
+      <Link
+        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-9 text-sm font-semibold text-slate-950 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
+        href="/admin/messages"
+      >
+        <span aria-hidden="true">◇</span>
+        Messages
+      </Link>
     </div>
   );
 }

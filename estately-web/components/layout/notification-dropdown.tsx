@@ -247,6 +247,16 @@ export function NotificationDropdown({
               );
             })}
           </div>
+
+          <div className="border-t border-stone-100 p-2">
+            <Link
+              className="flex h-10 items-center justify-center rounded-md text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 hover:text-emerald-800"
+              href="/dashboard/notifications"
+              onClick={() => setIsOpen(false)}
+            >
+              View all notifications
+            </Link>
+          </div>
         </div>
       ) : null}
     </div>

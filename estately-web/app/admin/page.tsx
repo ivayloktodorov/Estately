@@ -57,6 +57,7 @@ function AdminNav() {
     { href: '/admin', label: 'Overview' },
     { href: '/admin/properties', label: 'Properties' },
     { href: '/admin/users', label: 'Users' },
+    { href: '/admin/messages', label: 'Messages' },
     { href: '/dashboard/inquiries', label: 'Inquiries' },
   ];
 

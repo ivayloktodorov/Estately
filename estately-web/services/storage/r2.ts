@@ -14,9 +14,24 @@ const allowedImageTypes = new Map([
 ]);
 
 const maxImageSizeBytes = 5 * 1024 * 1024;
+const maxAttachmentSizeBytes = 10 * 1024 * 1024;
+
+const allowedAttachmentTypes = new Map([
+  ['image/jpeg', 'jpg'],
+  ['image/png', 'png'],
+  ['image/webp', 'webp'],
+  ['application/pdf', 'pdf'],
+  ['application/msword', 'doc'],
+  ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'],
+]);
 
 export interface R2UploadResult {
   imageUrl: string;
+  key: string;
+}
+
+export interface R2AttachmentUploadResult {
+  fileUrl: string;
   key: string;
 }
 
@@ -81,14 +96,47 @@ export function validateR2ImageFile(file: File): string | null {
   return null;
 }
 
-function createObjectKey(file: File, folder = 'test-r2'): string {
-  const extension = allowedImageTypes.get(file.type);
+export function validateR2MessageAttachment(file: File): string | null {
+  if (file.size === 0) {
+    return 'Please choose a file to attach.';
+  }
+
+  if (file.size > maxAttachmentSizeBytes) {
+    return 'Attachment must be 10MB or smaller.';
+  }
+
+  if (!allowedAttachmentTypes.has(file.type)) {
+    return 'Only JPG, JPEG, PNG, WEBP, PDF, DOC, and DOCX files are allowed.';
+  }
+
+  return null;
+}
+
+function sanitizeBaseName(fileName: string): string {
+  const parsed = path.parse(fileName);
+  const safeName = parsed.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  return safeName || 'attachment';
+}
+
+function createObjectKey(file: File, folder = 'test-r2', allowedTypes = allowedImageTypes): string {
+  const extension = allowedTypes.get(file.type);
 
   if (!extension) {
-    throw new Error('Unsupported image type.');
+    throw new Error('Unsupported file type.');
   }
 
   return `${folder}/${Date.now()}-${randomUUID()}.${extension}`;
+}
+
+function createAttachmentObjectKey(file: File, conversationId: number): string {
+  const extension = allowedAttachmentTypes.get(file.type);
+
+  if (!extension) {
+    throw new Error('Unsupported attachment type.');
+  }
+
+  return `message-attachments/${conversationId}/${Date.now()}-${sanitizeBaseName(file.name)}-${randomUUID()}.${extension}`;
 }
 
 export async function getR2PublicUrl(key: string): Promise<string> {
@@ -132,6 +180,35 @@ export async function uploadR2Image(file: File, folder?: string): Promise<R2Uplo
 
   return {
     imageUrl: await getR2PublicUrl(key),
+    key,
+  };
+}
+
+export async function uploadR2MessageAttachment(
+  file: File,
+  conversationId: number,
+): Promise<R2AttachmentUploadResult> {
+  const validationError = validateR2MessageAttachment(file);
+
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET');
+  const key = createAttachmentObjectKey(file, conversationId);
+  const body = Buffer.from(await file.arrayBuffer());
+
+  await getR2Client().send(
+    new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: body,
+      ContentType: file.type,
+    }),
+  );
+
+  return {
+    fileUrl: await getR2PublicUrl(key),
     key,
   };
 }

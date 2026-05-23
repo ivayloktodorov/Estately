@@ -170,6 +170,9 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
             <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/admin/properties">
               Properties
             </Link>
+            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/admin/messages">
+              Messages
+            </Link>
             <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/dashboard">
               Dashboard
             </Link>

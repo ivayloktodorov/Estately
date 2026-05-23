@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { notifications, properties, users, type NotificationType } from '@/src/db/schema';
 
@@ -28,6 +28,26 @@ export interface CreateNotificationInput {
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
+const DEFAULT_PAGE_SIZE = 20;
+const MIN_PAGE = 1;
+
+const NOTIFICATION_FILTERS = ['all', 'unread', 'read'] as const;
+const NOTIFICATION_GROUPS = ['all', 'listings', 'messages', 'inquiries', 'system'] as const;
+
+export type NotificationReadFilter = (typeof NOTIFICATION_FILTERS)[number];
+export type NotificationGroupFilter = (typeof NOTIFICATION_GROUPS)[number];
+export type NotificationsSearchParams = Record<string, string | string[] | undefined>;
+
+export interface PaginatedNotificationsResult {
+  notifications: NotificationListItem[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  status: NotificationReadFilter;
+  type: NotificationGroupFilter;
+}
 
 function notificationType(type: string): NotificationType {
   switch (type) {
@@ -56,6 +76,71 @@ function toListItem(row: typeof notifications.$inferSelect): NotificationListIte
     isRead: row.isRead,
     createdAt: row.createdAt,
   };
+}
+
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+function readFilter(value: string): NotificationReadFilter {
+  return NOTIFICATION_FILTERS.includes(value as NotificationReadFilter)
+    ? (value as NotificationReadFilter)
+    : 'all';
+}
+
+function groupFilter(value: string): NotificationGroupFilter {
+  return NOTIFICATION_GROUPS.includes(value as NotificationGroupFilter)
+    ? (value as NotificationGroupFilter)
+    : 'all';
+}
+
+function typesForGroup(group: NotificationGroupFilter): NotificationType[] {
+  switch (group) {
+    case 'listings':
+      return ['listing_pending', 'listing_approved', 'listing_rejected', 'listing_updated'];
+    case 'messages':
+      return ['message_received'];
+    case 'inquiries':
+      return ['inquiry_received'];
+    case 'system':
+      return ['system'];
+    case 'all':
+    default:
+      return [];
+  }
+}
+
+function parseNotificationsSearchParams(searchParams: NotificationsSearchParams) {
+  const pageValue = Number(firstParam(searchParams.page));
+
+  return {
+    page: Number.isInteger(pageValue) && pageValue >= MIN_PAGE ? pageValue : MIN_PAGE,
+    status: readFilter(firstParam(searchParams.status)),
+    type: groupFilter(firstParam(searchParams.type)),
+  };
+}
+
+function buildNotificationConditions(
+  userId: number,
+  parsed: ReturnType<typeof parseNotificationsSearchParams>,
+): SQL[] {
+  const conditions: SQL[] = [eq(notifications.userId, userId)];
+
+  if (parsed.status === 'read') {
+    conditions.push(eq(notifications.isRead, true));
+  }
+
+  if (parsed.status === 'unread') {
+    conditions.push(eq(notifications.isRead, false));
+  }
+
+  const types = typesForGroup(parsed.type);
+
+  if (types.length > 0) {
+    conditions.push(inArray(notifications.type, types));
+  }
+
+  return conditions;
 }
 
 export async function createNotification(input: CreateNotificationInput): Promise<void> {
@@ -99,6 +184,43 @@ export async function getUserNotifications(userId: number, limit = DEFAULT_LIMIT
   return rows.map(toListItem);
 }
 
+export async function getUserNotificationsPage(
+  userId: number,
+  searchParams: NotificationsSearchParams = {},
+): Promise<PaginatedNotificationsResult> {
+  const parsed = parseNotificationsSearchParams(searchParams);
+  const conditions = buildNotificationConditions(userId, parsed);
+  const whereClause = and(...conditions);
+
+  const totalRows = await db.select({ value: count() }).from(notifications).where(whereClause);
+  const totalCount = totalRows[0]?.value ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
+  const currentPage = Math.min(parsed.page, totalPages);
+  const offset = (currentPage - 1) * DEFAULT_PAGE_SIZE;
+
+  const rows =
+    totalCount > 0
+      ? await db
+          .select()
+          .from(notifications)
+          .where(whereClause)
+          .orderBy(desc(notifications.createdAt), desc(notifications.id))
+          .limit(DEFAULT_PAGE_SIZE)
+          .offset(offset)
+      : [];
+
+  return {
+    notifications: rows.map(toListItem),
+    totalCount,
+    currentPage,
+    totalPages,
+    hasPreviousPage: currentPage > 1,
+    hasNextPage: currentPage < totalPages,
+    status: parsed.status,
+    type: parsed.type,
+  };
+}
+
 export async function getUnreadNotificationCount(userId: number): Promise<number> {
   const rows = await db
     .select({ value: count() })
@@ -113,6 +235,17 @@ export async function markNotificationAsRead(userId: number, notificationId: num
     .update(notifications)
     .set({ isRead: true })
     .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)));
+}
+
+export async function markNotificationAsUnread(userId: number, notificationId: number): Promise<void> {
+  await db
+    .update(notifications)
+    .set({ isRead: false })
+    .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)));
+}
+
+export async function deleteNotification(userId: number, notificationId: number): Promise<void> {
+  await db.delete(notifications).where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId)));
 }
 
 export async function markAllNotificationsAsRead(userId: number): Promise<void> {

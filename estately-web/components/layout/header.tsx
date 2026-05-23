@@ -20,7 +20,7 @@ const publicLinks = [
 
 export async function Header({ user }: HeaderProps) {
   const notificationData = user
-    ? await Promise.all([getUserNotifications(user.id), getUnreadNotificationCount(user.id)])
+    ? await Promise.all([getUserNotifications(user.id, 5), getUnreadNotificationCount(user.id)])
     : null;
   const notificationProps = notificationData
     ? { initialNotifications: notificationData[0], initialUnreadCount: notificationData[1] }

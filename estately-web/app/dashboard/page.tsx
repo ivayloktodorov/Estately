@@ -31,7 +31,7 @@ export default async function DashboardPage() {
           </p>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
+        <section className="mt-6 grid gap-4 md:grid-cols-4">
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/properties"
@@ -55,6 +55,14 @@ export default async function DashboardPage() {
             <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Leads</p>
             <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Inquiries</h2>
             <p className="mt-2 text-sm text-slate-600">Review property inquiry history.</p>
+          </Link>
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/notifications"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Updates</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Notifications</h2>
+            <p className="mt-2 text-sm text-slate-600">View and manage account alerts.</p>
           </Link>
         </section>
 

@@ -7,3 +7,4 @@ export * from './property-messages';
 export * from './notifications';
 export * from './conversations';
 export * from './messages';
+export * from './message-attachments';

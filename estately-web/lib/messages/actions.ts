@@ -20,13 +20,14 @@ export async function sendMessageAction(
   const user = await requireAuth();
   const conversationId = Number(formData.get('conversationId'));
   const body = String(formData.get('body') ?? '');
+  const attachment = formData.get('attachment');
 
   if (!Number.isInteger(conversationId) || conversationId <= 0) {
     return state('error', 'Invalid conversation.');
   }
 
   try {
-    await sendConversationMessage({ conversationId, senderUserId: user.id, body });
+    await sendConversationMessage({ conversationId, senderUserId: user.id, body, attachment });
   } catch (error) {
     return state('error', error instanceof Error ? error.message : 'Could not send message.');
   }
