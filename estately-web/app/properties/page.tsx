@@ -122,9 +122,9 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
               {paginatedProperties.totalCount !== 1 ? 'ies' : 'y'}
             </p>
           ) : (
-            <p className="text-sm font-medium text-stone-600">No properties match your search.</p>
+            <div aria-hidden="true" />
           )}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end lg:ml-auto">
             <PropertyViewToggle searchParams={resolvedSearchParams} view={view} />
             <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
           </div>

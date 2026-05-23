@@ -164,7 +164,7 @@ export default function DeploymentDocsPage() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-950">Demo Credentials</h2>
+            <h2 className="text-2xl font-bold text-slate-950">Reviewer Credentials</h2>
             <div className="mt-4 space-y-3 text-sm text-slate-700">
               <p>
                 <span className="font-semibold text-slate-950">Admin:</span>{' '}

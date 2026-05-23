@@ -14,7 +14,6 @@ export default function ContactPage() {
         <div>
           <SectionHeader
             description="Questions about listings, saved homes, or platform access? Send a note and the team will follow up."
-            eyebrow="Contact"
             title="Let us help with your next move."
           />
           <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">

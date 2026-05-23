@@ -1,13 +1,14 @@
 'use client';
 
 interface PropertySearchBarProps {
+  className?: string;
   value: string;
   onChange: (value: string) => void;
 }
 
-export function PropertySearchBar({ value, onChange }: PropertySearchBarProps) {
+export function PropertySearchBar({ className = '', value, onChange }: PropertySearchBarProps) {
   return (
-    <label className="flex min-w-0 flex-1 flex-col gap-2 text-sm font-semibold text-charcoal-950">
+    <label className={`flex min-w-0 flex-1 flex-col gap-2 text-sm font-semibold text-charcoal-950 ${className}`}>
       Search
       <input
         type="search"

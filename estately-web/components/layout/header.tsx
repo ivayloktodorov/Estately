@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { AuthUser } from '@/lib/auth/types';
 import { ButtonLink } from '@/components/ui/button-link';
 import { HeaderMobileMenu } from './mobile-menu-toggle';
-import { LogoutButton } from './logout-button';
+import { ProfileDropdown } from './profile-dropdown';
 
 interface HeaderProps {
   user: AuthUser | null;
@@ -12,7 +12,6 @@ const publicLinks = [
   { href: '/', label: 'Home' },
   { href: '/buy', label: 'Buy' },
   { href: '/rent', label: 'Rent' },
-  { href: '/demo', label: 'Demo' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -45,17 +44,14 @@ export function Header({ user }: HeaderProps) {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden shrink-0 items-center gap-2 lg:flex">
+          <div className="hidden shrink-0 items-center lg:flex">
             {user ? (
-              <>
-                <ButtonLink href="/dashboard" variant="ghost">
-                  Dashboard
+              <div className="flex flex-nowrap items-center gap-2">
+                <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
+                  SoftUni Exam
                 </ButtonLink>
-                <ButtonLink href="/favorites" variant="outline">
-                  Favorites
-                </ButtonLink>
-                <LogoutButton />
-              </>
+                <ProfileDropdown user={user} />
+              </div>
             ) : (
               <>
                 <ButtonLink href="/login" variant="ghost">

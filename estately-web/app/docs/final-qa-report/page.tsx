@@ -23,7 +23,7 @@ interface QaSection {
 }
 
 const docsLinks = [
-  { href: '/demo', label: 'Demo' },
+  { href: '/softuni-exam', label: 'SoftUni Exam' },
   { href: '/docs/api', label: 'API Docs' },
   { href: '/docs/architecture', label: 'Architecture' },
   { href: '/docs/compliance', label: 'Compliance' },
@@ -70,9 +70,9 @@ const testedModules: QaSection[] = [
   },
   {
     title: 'Documentation',
-    summary: 'Docs pages, demo page, and navigation links.',
+    summary: 'Docs pages, SoftUni Exam hub, and navigation links.',
     items: [
-      { label: 'Docs routes', status: 'Passed', notes: 'Build output includes demo, API, architecture, database, requirements, setup, deployment, health, readiness, compliance, and final QA pages.' },
+      { label: 'Docs routes', status: 'Passed', notes: 'Build output includes SoftUni Exam, API, architecture, database, requirements, setup, deployment, health, readiness, compliance, and final QA pages.' },
       { label: 'Navigation links', status: 'Passed', notes: 'Footer and docs navigation expose the reviewer pages.' },
       { label: 'README', status: 'Passed', notes: 'Root README is aligned with assignment review requirements.' },
     ],

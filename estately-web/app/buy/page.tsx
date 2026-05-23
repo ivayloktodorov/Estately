@@ -59,7 +59,6 @@ export default function BuyPage() {
       <Container>
         <SectionHeader
           description="Preview homes for sale while the full listing search experience comes together."
-          eyebrow="Buy"
           title="Homes for sale"
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">

@@ -89,18 +89,11 @@ export default async function HomePage() {
               workflows into one elegant platform.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/buy">Browse Properties</ButtonLink>
               {user ? (
-                <>
-                  <ButtonLink href="/dashboard" variant="secondary">
-                    Dashboard
-                  </ButtonLink>
-                  <ButtonLink href="/favorites" variant="ghost">
-                    Favorites
-                  </ButtonLink>
-                </>
+                <ButtonLink href="/buy">Continue browsing</ButtonLink>
               ) : (
                 <>
+                  <ButtonLink href="/buy">Browse Properties</ButtonLink>
                   <ButtonLink href="/login" variant="secondary">
                     Login
                   </ButtonLink>
@@ -185,19 +178,19 @@ export default async function HomePage() {
               Start saving homes and building your shortlist today.
             </h2>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
             <ButtonLink
-              className="bg-cream-50 text-estate-800 hover:bg-cream-100"
-              href={user ? '/favorites' : '/register'}
+              className="border border-charcoal-950 bg-charcoal-950 text-white shadow-lg shadow-charcoal-950/20 hover:bg-charcoal-800 focus-visible:ring-white"
+              href="/buy"
             >
-              {user ? 'View favorites' : 'Register'}
+              Browse Properties
             </ButtonLink>
             <ButtonLink
-              className="border-white/30 bg-transparent text-white hover:border-white/60 hover:bg-white/10"
-              href="/contact"
+              className="border-white/35 bg-transparent text-white hover:border-white/70 hover:bg-white/10 focus-visible:ring-white"
+              href={user ? '/favorites' : '/register'}
               variant="outline"
             >
-              Contact us
+              {user ? 'View Favorites' : 'Create Account'}
             </ButtonLink>
           </div>
         </Container>

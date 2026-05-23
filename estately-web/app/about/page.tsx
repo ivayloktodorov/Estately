@@ -22,7 +22,6 @@ export default function AboutPage() {
           <div>
             <SectionHeader
               description="Estately is a Zillow-inspired platform focused on helping people browse, save, and manage property decisions without clutter."
-              eyebrow="About Estately"
               title="A calmer foundation for modern real estate."
             />
             <div className="mt-8">

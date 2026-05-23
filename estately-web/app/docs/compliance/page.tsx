@@ -24,7 +24,7 @@ interface ComplianceSection {
 }
 
 const docsLinks = [
-  { href: '/demo', label: 'Demo' },
+  { href: '/softuni-exam', label: 'SoftUni Exam' },
   { href: '/docs/api', label: 'API Docs' },
   { href: '/docs/architecture', label: 'Architecture' },
   { href: '/docs/project-health', label: 'Project Health' },

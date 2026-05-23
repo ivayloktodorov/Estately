@@ -120,10 +120,12 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
   const controls = (
     <>
       <PropertySearchBar
+        className="lg:col-span-3 xl:col-span-4"
         value={formState.search}
         onChange={(value) => updateField('search', value)}
       />
       <FilterSelect
+        className="lg:col-span-1 xl:col-span-2"
         label="City"
         name="city"
         value={formState.city}
@@ -132,6 +134,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <FilterSelect
+        className="lg:col-span-1 xl:col-span-2"
         label="Type"
         name="type"
         value={formState.type}
@@ -140,6 +143,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <FilterSelect
+        className="lg:col-span-1 xl:col-span-2"
         label="Listing"
         name="listing"
         value={formState.listing}
@@ -148,11 +152,13 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <PriceRangeInputs
+        className="lg:col-span-3 xl:col-span-4"
         minPrice={formState.minPrice}
         maxPrice={formState.maxPrice}
         onChange={updateField}
       />
       <FilterSelect
+        className="lg:col-span-1 xl:col-span-2"
         label="Beds"
         name="bedrooms"
         value={formState.bedrooms}
@@ -161,6 +167,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <FilterSelect
+        className="lg:col-span-1 xl:col-span-2"
         label="Baths"
         name="bathrooms"
         value={formState.bathrooms}
@@ -172,7 +179,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
   );
 
   return (
-    <section className="mb-8 rounded-2xl border border-stone-200 bg-white p-4 shadow-estate-soft md:p-5">
+    <section className="mb-8 rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft md:p-6">
       <div className="flex items-center justify-between gap-3 md:hidden">
         <div>
           <h2 className="text-lg font-semibold text-charcoal-950">Filters</h2>
@@ -190,14 +197,14 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
 
       <form
         onSubmit={handleSubmit}
-        className={`${isMobileOpen ? 'mt-5 grid' : 'hidden'} gap-4 md:grid md:grid-cols-2 md:items-end lg:grid-cols-[minmax(220px,1.35fr)_minmax(150px,.75fr)_minmax(150px,.75fr)_minmax(150px,.75fr)_minmax(280px,1fr)_minmax(120px,.6fr)_minmax(120px,.6fr)_auto]`}
+        className={`${isMobileOpen ? 'mt-5 grid' : 'hidden'} gap-4 md:grid md:grid-cols-2 md:items-end lg:grid-cols-6 xl:grid-cols-12`}
       >
         {controls}
-        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+        <div className="flex flex-col gap-3 sm:flex-row lg:col-span-1 lg:flex-col xl:col-span-2 xl:flex-row xl:self-end">
           <button
             type="submit"
             disabled={isPending}
-            className="h-12 rounded-xl bg-estate-700 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-70"
+            className="h-12 flex-1 whitespace-nowrap rounded-md bg-estate-700 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-70"
           >
             {isPending ? 'Searching...' : 'Search'}
           </button>
@@ -205,7 +212,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
             type="button"
             onClick={clearFilters}
             disabled={isPending}
-            className="h-12 rounded-xl border border-stone-200 bg-white px-5 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 disabled:cursor-wait disabled:opacity-70"
+            className="h-12 flex-1 whitespace-nowrap rounded-md border border-stone-200 bg-white px-5 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 disabled:cursor-wait disabled:opacity-70"
           >
             Clear filters
           </button>

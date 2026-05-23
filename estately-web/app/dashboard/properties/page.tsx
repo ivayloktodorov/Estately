@@ -37,30 +37,6 @@ function StatusBadge({ isPublished }: { isPublished: boolean }) {
   );
 }
 
-function DashboardNav() {
-  return (
-    <nav className="flex flex-wrap items-center justify-between gap-4">
-      <Link className="text-xl font-semibold text-charcoal-950" href="/dashboard">
-        Estately
-      </Link>
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <Link className="font-medium text-estate-700" href="/dashboard/properties">
-          My Properties
-        </Link>
-        <Link className="font-medium text-slate-700 hover:text-estate-700" href="/dashboard/properties/new">
-          Add Property
-        </Link>
-        <Link className="font-medium text-slate-700 hover:text-estate-700" href="/dashboard/inquiries">
-          Inquiries
-        </Link>
-        <Link className="font-medium text-slate-700 hover:text-estate-700" href="/favorites">
-          Favorites
-        </Link>
-      </div>
-    </nav>
-  );
-}
-
 function PropertyActions({ property }: { property: DashboardProperty }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -91,9 +67,7 @@ export default async function DashboardPropertiesPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <DashboardNav />
-
-        <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
+        <section className="rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
           <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
             Listing management
           </p>

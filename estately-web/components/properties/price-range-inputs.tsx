@@ -1,14 +1,15 @@
 'use client';
 
 interface PriceRangeInputsProps {
+  className?: string;
   minPrice: string;
   maxPrice: string;
   onChange: (name: string, value: string) => void;
 }
 
-export function PriceRangeInputs({ minPrice, maxPrice, onChange }: PriceRangeInputsProps) {
+export function PriceRangeInputs({ className = '', minPrice, maxPrice, onChange }: PriceRangeInputsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[280px]">
+    <div className={`grid gap-3 sm:grid-cols-2 ${className}`}>
       <label className="flex min-w-0 flex-col gap-2 text-sm font-semibold text-charcoal-950">
         Min price
         <input

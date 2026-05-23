@@ -102,7 +102,7 @@ const troubleshooting = [
     causes: ['Invalid credentials', 'Missing bucket variables', 'Bucket permissions are not configured'],
   },
   {
-    issue: 'Login fails with demo credentials',
+    issue: 'Login fails with reviewer credentials',
     causes: ['Seed script has not been run', 'App points to a different database', 'Demo users were deleted'],
   },
 ];
@@ -156,7 +156,7 @@ export default function LocalSetupPage() {
       <section className="bg-slate-50 py-14">
         <Container className="grid gap-5 lg:grid-cols-[0.8fr_1fr]">
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-950">Demo Credentials</h2>
+            <h2 className="text-2xl font-bold text-slate-950">Reviewer Credentials</h2>
             <div className="mt-4 space-y-3 text-sm text-slate-700">
               <p>
                 <span className="font-semibold text-slate-950">Admin:</span>{' '}

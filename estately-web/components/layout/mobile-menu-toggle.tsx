@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button-link';
-import { LogoutButton } from './logout-button';
+import { ProfileDropdown } from './profile-dropdown';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface MobileMenuToggleProps {
@@ -57,16 +57,13 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
             </nav>
 
             {/* Mobile Actions */}
-            <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row">
+            <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:flex-nowrap">
               {user ? (
                 <>
-                  <ButtonLink className="flex-1" href="/dashboard" onClick={() => setMobileMenuOpen(false)} variant="outline">
-                    Dashboard
+                  <ButtonLink className="h-11 flex-1 whitespace-nowrap px-4" href="/softuni-exam" onClick={() => setMobileMenuOpen(false)} variant="secondary">
+                    SoftUni Exam
                   </ButtonLink>
-                  <ButtonLink className="flex-1" href="/favorites" onClick={() => setMobileMenuOpen(false)} variant="outline">
-                    Favorites
-                  </ButtonLink>
-                  <LogoutButton className="flex-1" onClick={() => setMobileMenuOpen(false)} />
+                  <ProfileDropdown align="right" className="flex-1" user={user} />
                 </>
               ) : (
                 <>

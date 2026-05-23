@@ -59,7 +59,6 @@ export default function RentPage() {
       <Container>
         <SectionHeader
           description="Preview rentals with the same clean, comparison-friendly layout."
-          eyebrow="Rent"
           title="Rentals ready to explore"
         />
         <div className="mt-10 grid gap-6 md:grid-cols-3">

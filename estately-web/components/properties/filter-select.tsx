@@ -6,6 +6,7 @@ interface FilterSelectOption {
 }
 
 interface FilterSelectProps {
+  className?: string;
   label: string;
   name: string;
   value: string;
@@ -15,6 +16,7 @@ interface FilterSelectProps {
 }
 
 export function FilterSelect({
+  className = '',
   label,
   name,
   value,
@@ -23,7 +25,7 @@ export function FilterSelect({
   onChange,
 }: FilterSelectProps) {
   return (
-    <label className="flex min-w-0 flex-col gap-2 text-sm font-semibold text-charcoal-950">
+    <label className={`flex min-w-0 flex-col gap-2 text-sm font-semibold text-charcoal-950 ${className}`}>
       {label}
       <select
         name={name}
