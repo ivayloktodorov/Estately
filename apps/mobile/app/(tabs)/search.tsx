@@ -1,6 +1,5 @@
 import { Text, View } from 'react-native';
 import { Screen } from '@/components/layout/screen';
-import { PropertyCard } from '@/components/property/property-card';
 import { TextField } from '@/components/ui/text-field';
 
 export default function SearchScreen() {
@@ -13,7 +12,6 @@ export default function SearchScreen() {
         </View>
 
         <TextField label="Location or keyword" placeholder="City, address, or keyword" />
-        <PropertyCard />
       </View>
     </Screen>
   );
