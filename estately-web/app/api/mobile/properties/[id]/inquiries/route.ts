@@ -4,6 +4,7 @@ import { db } from '@/src/db/client';
 import { properties, propertyMessages } from '@/src/db/schema';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
 import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { createOrReuseConversationAndMessage } from '@/lib/messages/service';
 import {
   mobileInquirySchema,
   mobilePropertyIdSchema,
@@ -28,7 +29,11 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
     const propertyId = mobilePropertyIdSchema.parse(id);
     const { message } = mobileInquirySchema.parse(await request.json());
     const property = await db
-      .select({ id: properties.id, moderationStatus: properties.moderationStatus })
+      .select({
+        id: properties.id,
+        moderationStatus: properties.moderationStatus,
+        ownerUserId: properties.createdByUserId,
+      })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
@@ -51,6 +56,13 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
         message: propertyMessages.message,
         createdAt: propertyMessages.createdAt,
       });
+    await createOrReuseConversationAndMessage({
+      propertyId,
+      buyerUserId: user.id,
+      ownerUserId: property.ownerUserId,
+      senderUserId: user.id,
+      body: message,
+    });
 
     return mobileSuccess({ inquiry }, 201);
   } catch (error) {

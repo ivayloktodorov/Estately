@@ -3,15 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button-link';
+import { NotificationDropdown } from './notification-dropdown';
 import { ProfileDropdown } from './profile-dropdown';
 import type { AuthUser } from '@/lib/auth/types';
+import type { NotificationListItem } from '@/lib/notifications/service';
 
 interface MobileMenuToggleProps {
   user: AuthUser | null;
   publicLinks: { href: string; label: string }[];
+  initialNotifications: NotificationListItem[];
+  initialUnreadCount: number;
 }
 
-export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
+export function HeaderMobileMenu({
+  initialNotifications,
+  initialUnreadCount,
+  user,
+  publicLinks,
+}: MobileMenuToggleProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -63,7 +72,13 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
                   <ButtonLink className="h-11 flex-1 whitespace-nowrap px-4" href="/softuni-exam" onClick={() => setMobileMenuOpen(false)} variant="secondary">
                     SoftUni Exam
                   </ButtonLink>
-                  <ProfileDropdown align="right" className="flex-1" user={user} />
+                  <div className="flex items-center gap-2 sm:flex-1">
+                    <NotificationDropdown
+                      initialNotifications={initialNotifications}
+                      initialUnreadCount={initialUnreadCount}
+                    />
+                    <ProfileDropdown align="right" className="min-w-0 flex-1" user={user} />
+                  </div>
                 </>
               ) : (
                 <>

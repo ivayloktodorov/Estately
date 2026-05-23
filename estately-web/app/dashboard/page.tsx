@@ -31,6 +31,33 @@ export default async function DashboardPage() {
           </p>
         </section>
 
+        <section className="mt-6 grid gap-4 md:grid-cols-3">
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/properties"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Listings</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">My Properties</h2>
+            <p className="mt-2 text-sm text-slate-600">Manage your property listings.</p>
+          </Link>
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/messages"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Inbox</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Messages</h2>
+            <p className="mt-2 text-sm text-slate-600">Read and reply to conversations.</p>
+          </Link>
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/inquiries"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Leads</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Inquiries</h2>
+            <p className="mt-2 text-sm text-slate-600">Review property inquiry history.</p>
+          </Link>
+        </section>
+
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-8 shadow-estate-soft">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>

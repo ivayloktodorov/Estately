@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { eq, inArray } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/auth';
 import { updatePropertyModeration, type ModerationStatus } from '@/lib/admin/properties';
+import { notifyPropertyOwnersOfModeration } from '@/lib/notifications/service';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 
@@ -36,6 +37,7 @@ export async function moderatePropertyAction(formData: FormData): Promise<void> 
   const status = formData.get('status') === 'rejected' ? 'rejected' : 'approved';
 
   await updatePropertyModeration([propertyId], status, notesValue(formData));
+  await notifyPropertyOwnersOfModeration([propertyId], status);
 
   revalidatePath('/admin/properties');
   revalidatePath(`/properties/${propertyId}`);
@@ -65,6 +67,7 @@ export async function bulkModeratePropertiesAction(formData: FormData): Promise<
   } else {
     const status: ModerationStatus = action === 'reject' ? 'rejected' : 'approved';
     await updatePropertyModeration(propertyIds, status, notesValue(formData));
+    await notifyPropertyOwnersOfModeration(propertyIds, status);
   }
 
   revalidatePath('/admin/properties');

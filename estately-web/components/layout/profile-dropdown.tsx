@@ -18,6 +18,7 @@ const profileLinks = [
   { href: '/dashboard/properties', label: 'My Properties' },
   { href: '/dashboard/properties/new', label: 'Add Property' },
   { href: '/dashboard/inquiries', label: 'Inquiries' },
+  { href: '/dashboard/messages', label: 'Messages' },
   { href: '/profile', label: 'Profile' },
   { href: '/favorites', label: 'Favorites' },
 ];

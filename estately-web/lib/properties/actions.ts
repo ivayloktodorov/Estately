@@ -5,6 +5,7 @@ import { ZodError } from 'zod';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema/properties';
 import { requireAuth } from '@/lib/auth';
+import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { createPropertySchema } from './validation';
 import type { PropertyActionState } from './types';
 
@@ -86,9 +87,12 @@ export async function createPropertyAction(
         moderationNotes: null,
         updatedAt: new Date(),
       })
-      .returning({ id: properties.id });
+      .returning({ id: properties.id, title: properties.title });
 
     propertyId = result[0]?.id;
+    if (result[0] && user.role !== 'admin') {
+      await notifyAdminsOfPendingListing(result[0].id, result[0].title);
+    }
   } catch (error) {
     console.error('Property creation error:', error);
     return {

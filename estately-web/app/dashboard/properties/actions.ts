@@ -8,6 +8,7 @@ import { requireAuth } from '@/lib/auth';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { createPropertySchema } from '@/lib/properties/validation';
+import { notifyPropertyOwnerOfAdminUpdate } from '@/lib/notifications/service';
 import type { PropertyActionState } from '@/lib/properties/types';
 
 function formValue(formData: FormData, key: string): string {
@@ -106,6 +107,10 @@ export async function updatePropertyAction(
         message: 'Property not found or you do not have permission to edit it.',
         fields,
       };
+    }
+
+    if (user.role === 'admin') {
+      await notifyPropertyOwnerOfAdminUpdate(propertyId);
     }
   } catch (error) {
     console.error('Property update error:', error);

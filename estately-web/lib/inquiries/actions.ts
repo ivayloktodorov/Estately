@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties, propertyMessages } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
+import { createOrReuseConversationAndMessage } from '@/lib/messages/service';
 import type { InquiryActionState } from './types';
 
 const minMessageLength = 10;
@@ -46,7 +47,11 @@ export async function submitPropertyInquiryAction(
 
   try {
     const property = await db
-      .select({ id: properties.id, moderationStatus: properties.moderationStatus })
+      .select({
+        id: properties.id,
+        moderationStatus: properties.moderationStatus,
+        ownerUserId: properties.createdByUserId,
+      })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
@@ -64,8 +69,16 @@ export async function submitPropertyInquiryAction(
       userId: user.id,
       message,
     });
+    await createOrReuseConversationAndMessage({
+      propertyId,
+      buyerUserId: user.id,
+      ownerUserId: property.ownerUserId,
+      senderUserId: user.id,
+      body: message,
+    });
 
     revalidatePath('/dashboard/inquiries');
+    revalidatePath('/dashboard/messages');
 
     return {
       status: 'success',
