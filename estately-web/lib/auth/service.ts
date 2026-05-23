@@ -17,6 +17,7 @@ function toAuthUser(user: typeof users.$inferSelect): AuthUser {
     id: user.id,
     email: user.email,
     fullName: user.fullName,
+    avatarUrl: user.avatarUrl,
     role: parseUserRole(user.role),
   };
 }
