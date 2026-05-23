@@ -18,6 +18,9 @@ export interface AdminProperty {
   price: string;
   propertyType: string;
   listingType: string;
+  bedrooms: number;
+  bathrooms: number;
+  areaSqm: number;
   imageCoverUrl: string;
   isPublished: boolean;
   moderationStatus: ModerationStatus;
@@ -151,6 +154,9 @@ export async function getAdminProperties(
             price: properties.price,
             propertyType: properties.propertyType,
             listingType: properties.listingType,
+            bedrooms: properties.bedrooms,
+            bathrooms: properties.bathrooms,
+            areaSqm: properties.areaSqm,
             imageCoverUrl: properties.imageCoverUrl,
             isPublished: properties.isPublished,
             moderationStatus: properties.moderationStatus,
@@ -176,6 +182,9 @@ export async function getAdminProperties(
       price: row.price,
       propertyType: row.propertyType,
       listingType: row.listingType,
+      bedrooms: row.bedrooms,
+      bathrooms: row.bathrooms,
+      areaSqm: row.areaSqm,
       imageCoverUrl: row.imageCoverUrl,
       isPublished: row.isPublished,
       moderationStatus: moderationStatus(row.moderationStatus) || 'pending',

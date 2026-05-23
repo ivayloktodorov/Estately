@@ -49,6 +49,35 @@ function StatusBadge({ status }: { status: ModerationStatus }) {
   );
 }
 
+function AdminTabs() {
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <Link
+        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-emerald-800 px-9 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-900"
+        href="/admin/properties"
+      >
+        <span aria-hidden="true">⌂</span>
+        Properties
+      </Link>
+      <Link
+        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-9 text-sm font-semibold text-slate-950 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
+        href="/admin/users"
+      >
+        <span aria-hidden="true">♙</span>
+        Users
+      </Link>
+    </div>
+  );
+}
+
+function TinyIcon({ children }: { children: string }) {
+  return (
+    <span aria-hidden="true" className="text-sm leading-none">
+      {children}
+    </span>
+  );
+}
+
 function propertiesHref(
   search: string,
   status: string,
@@ -69,17 +98,21 @@ function propertiesHref(
 }
 
 function ModerationActionForm({ property, status }: { property: AdminProperty; status: ModerationStatus }) {
+  const disabled = property.moderationStatus === status;
+
   return (
     <form action={moderatePropertyAction}>
       <input name="propertyId" type="hidden" value={property.id} />
       <input name="status" type="hidden" value={status} />
       <button
+        disabled={disabled}
         className={
           status === 'approved'
-            ? 'inline-flex h-8 items-center justify-center rounded-md bg-emerald-700 px-3 text-xs font-semibold text-white transition hover:bg-emerald-800'
-            : 'inline-flex h-8 items-center justify-center rounded-md bg-red-600 px-3 text-xs font-semibold text-white transition hover:bg-red-700'
+            ? 'inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-emerald-800 px-3 text-xs font-semibold text-white transition hover:bg-emerald-900 disabled:border disabled:border-slate-200 disabled:bg-white disabled:text-slate-400'
+            : 'inline-flex h-9 w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-3 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-white'
         }
       >
+        <TinyIcon>{status === 'approved' ? '○' : '×'}</TinyIcon>
         {status === 'approved' ? 'Approve' : 'Reject'}
       </button>
     </form>
@@ -88,28 +121,71 @@ function ModerationActionForm({ property, status }: { property: AdminProperty; s
 
 function PropertyActions({ property }: { property: AdminProperty }) {
   return (
-    <div className="grid w-56 gap-2">
-      <div className="flex flex-wrap gap-2">
+    <div className="grid w-40 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <Link
-          className="inline-flex h-8 items-center justify-center rounded-md border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
           href={`/properties/${property.id}`}
         >
+          <TinyIcon>◉</TinyIcon>
           View
         </Link>
         <Link
-          className="inline-flex h-8 items-center justify-center rounded-md border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
           href={`/dashboard/properties/${property.id}/edit`}
         >
+          <TinyIcon>✎</TinyIcon>
           Edit
         </Link>
-        <ModerationActionForm property={property} status="approved" />
+      </div>
+      <ModerationActionForm property={property} status="approved" />
+      {property.moderationStatus === 'pending' ? (
         <ModerationActionForm property={property} status="rejected" />
+      ) : (
         <form action={deletePropertyAction}>
           <input name="propertyId" type="hidden" value={property.id} />
           <DeletePropertyButton title={property.title} />
         </form>
-      </div>
+      )}
     </div>
+  );
+}
+
+function ModerationGuide() {
+  const items = [
+    { icon: '✓', title: 'Approve', copy: 'Listing becomes visible to the public.', tone: 'emerald' },
+    { icon: '×', title: 'Reject', copy: 'Listing is hidden and owner can edit and resubmit.', tone: 'red' },
+    { icon: '⌫', title: 'Delete', copy: 'Listing is permanently removed.', tone: 'red' },
+  ];
+
+  return (
+    <section className="mt-6 rounded-lg border border-emerald-100 bg-emerald-50/30 p-5 shadow-sm">
+      <div className="flex items-center gap-3 text-sm font-semibold text-emerald-900">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-300 text-emerald-700">
+          i
+        </span>
+        Moderation guide
+      </div>
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        {items.map((item) => (
+          <div className="flex gap-3" key={item.title}>
+            <span
+              className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold ${
+                item.tone === 'emerald'
+                  ? 'border-emerald-300 text-emerald-700'
+                  : 'border-red-300 text-red-600'
+              }`}
+            >
+              {item.icon}
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+              <p className="mt-1 max-w-56 text-xs leading-5 text-slate-600">{item.copy}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -177,14 +253,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           <Link className="text-xl font-semibold text-slate-950" href="/admin">
             Estately Admin
           </Link>
-          <div className="flex items-center gap-3 text-sm">
-            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/admin/users">
-              Users
-            </Link>
-            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/dashboard">
-              Dashboard
-            </Link>
-          </div>
+          <AdminTabs />
         </nav>
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -202,13 +271,18 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           </div>
 
           <form action="/admin/properties" className="mt-6 grid gap-3 lg:grid-cols-[1fr_repeat(3,180px)_auto_auto]">
-            <input
-              className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 outline-none placeholder:text-slate-400 focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
-              defaultValue={result.search}
-              name="search"
-              placeholder="Search by title, city, or owner"
-              type="search"
-            />
+            <label className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 focus-within:border-emerald-700 focus-within:ring-2 focus-within:ring-emerald-700/10">
+              <span aria-hidden="true" className="text-slate-500">
+                ⌕
+              </span>
+              <input
+                className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-slate-400"
+                defaultValue={result.search}
+                name="search"
+                placeholder="Search by title, city, or owner"
+                type="search"
+              />
+            </label>
             <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" defaultValue={result.status} name="status">
               <option value="">All statuses</option>
               <option value="pending">Pending</option>
@@ -244,14 +318,15 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           <>
             <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <form action={bulkModeratePropertiesAction} className="flex flex-col gap-3 lg:flex-row lg:items-center" id="bulk-property-form">
-                <select className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="bulkAction">
+                <select className="h-12 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="bulkAction">
+                  <option value="approve">Bulk actions</option>
                   <option value="approve">Approve selected</option>
                   <option value="reject">Reject selected</option>
                   <option value="delete">Delete selected</option>
                 </select>
-                <input className="h-10 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="moderationNotes" placeholder="Bulk moderation notes, optional" />
-                <button className="h-10 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700">
-                  Apply bulk action
+                <input className="h-12 flex-1 rounded-md border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="moderationNotes" placeholder="Add moderation notes (optional)" />
+                <button className="h-12 rounded-md bg-emerald-800/40 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                  Apply to selected
                 </button>
               </form>
             </section>
@@ -261,41 +336,47 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                 <table className="min-w-full table-fixed divide-y divide-slate-200 text-left text-sm">
                   <thead className="bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-600">
                     <tr>
-                      <th className="w-20 px-4 py-3">Select</th>
-                      <th className="w-[24%] px-4 py-3">Property</th>
+                      <th className="w-16 px-4 py-3">
+                        <input aria-label="Select all visible properties" className="h-4 w-4 rounded border-slate-300 text-emerald-700" type="checkbox" />
+                      </th>
+                      <th className="w-[26%] px-4 py-3">Property</th>
                       <th className="w-[8%] px-4 py-3">City</th>
                       <th className="w-[8%] px-4 py-3">Type</th>
                       <th className="w-[7%] px-4 py-3">Listing</th>
                       <th className="w-[8%] px-4 py-3">Price</th>
-                      <th className="w-[18%] px-4 py-3">Owner/User</th>
+                      <th className="w-[17%] px-4 py-3">Owner / User</th>
                       <th className="w-[9%] px-4 py-3">Created</th>
                       <th className="w-[9%] px-4 py-3">Status</th>
-                      <th className="w-60 px-4 py-3">Actions</th>
+                      <th className="w-44 px-4 py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 bg-white">
                     {result.properties.map((property) => (
-                      <tr className="align-top" key={property.id}>
-                        <td className="px-4 py-4">
+                      <tr className="align-middle" key={property.id}>
+                        <td className="px-4 py-6">
                           <input aria-label={`Select ${property.title}`} className="h-4 w-4 rounded border-slate-300 text-emerald-700" form="bulk-property-form" name="propertyIds" type="checkbox" value={property.id} />
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-6">
                           <div className="flex min-w-0 gap-3">
-                            <img alt="" className="h-14 w-20 rounded-md object-cover" src={propertyImageUrl(property.imageCoverUrl)} />
+                            <img alt="" className="h-20 w-20 rounded-md object-cover" src={propertyImageUrl(property.imageCoverUrl)} />
                             <div className="min-w-0">
                               <p className="font-mono text-xs text-slate-500">#{property.id}</p>
                               <p className="truncate font-semibold text-slate-950">{property.title}</p>
+                              <p className="mt-1 text-xs text-slate-600">
+                                {property.bedrooms} bed · {property.bathrooms} bath
+                              </p>
+                              <p className="mt-1 text-xs text-slate-600">{property.areaSqm} m²</p>
                               {property.moderationNotes ? (
                                 <p className="mt-1 truncate text-xs text-slate-500">{property.moderationNotes}</p>
                               ) : null}
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-slate-700">{property.city}</td>
-                        <td className="px-4 py-4 text-slate-700">{readableLabel(property.propertyType)}</td>
-                        <td className="px-4 py-4 text-slate-700">{readableLabel(property.listingType)}</td>
-                        <td className="px-4 py-4 font-semibold text-slate-950">{formatPrice(property.price)}</td>
-                        <td className="px-4 py-4 text-slate-700">
+                        <td className="px-4 py-6 text-slate-700">{property.city}</td>
+                        <td className="px-4 py-6 text-slate-700">{readableLabel(property.propertyType)}</td>
+                        <td className="px-4 py-6 text-slate-700">{readableLabel(property.listingType)}</td>
+                        <td className="px-4 py-6 font-semibold text-slate-950">{formatPrice(property.price)}</td>
+                        <td className="px-4 py-6 text-slate-700">
                           {property.owner ? (
                             <>
                               <p className="truncate font-semibold text-slate-950">{property.owner.fullName}</p>
@@ -305,11 +386,11 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                             'Owner unavailable'
                           )}
                         </td>
-                        <td className="px-4 py-4 text-slate-700">{formatDate(property.createdAt)}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-6 text-slate-700">{formatDate(property.createdAt)}</td>
+                        <td className="px-4 py-6">
                           <StatusBadge status={property.moderationStatus} />
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-6">
                           <PropertyActions property={property} />
                         </td>
                       </tr>
@@ -333,6 +414,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
             totalPages={result.totalPages}
           />
         ) : null}
+        <ModerationGuide />
       </div>
     </main>
   );
