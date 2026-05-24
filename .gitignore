@@ -60,3 +60,6 @@ out/
 # React Native / Expo
 node_modules/
 .expo-shared/
+
+# Local Netlify folder
+.netlify

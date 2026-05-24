@@ -161,7 +161,7 @@ export function NotificationDropdown({
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Open notifications"
-        className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 hover:text-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:h-12 sm:w-12"
+        className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 hover:text-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
         onClick={() => {
           setIsOpen((current) => !current);
           if (!isOpen) refreshNotifications();

@@ -89,8 +89,8 @@ const reviewerFlow = [
 const deploymentUrls = [
   { label: 'Local web review', value: 'http://localhost:3000/softuni-exam' },
   { label: 'Local mobile API', value: 'http://localhost:3000/api/mobile' },
-  { label: 'Production web URL', value: 'Add final deployment URL after hosting is connected.' },
-  { label: 'Production mobile URL', value: 'Add Expo web/native preview URL after deployment.' },
+  { label: 'Production web URL', value: 'https://estatelybg.netlify.app' },
+  { label: 'Production mobile URL', value: 'https://estatelybg-mobile.netlify.app' },
 ];
 
 function StatusCard({ label }: { label: string }) {

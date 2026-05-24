@@ -32,16 +32,16 @@ export async function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-cream-50 shadow-sm">
       <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
-        <div className="flex min-h-20 items-center justify-between gap-2 sm:gap-3">
+        <div className="flex min-h-20 items-center justify-between gap-3 sm:gap-4">
           {/* Logo */}
           <Link
             aria-label="Estately home"
-            className="min-w-0 shrink transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50 sm:shrink-0"
+            className="min-w-0 shrink-0 transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50"
             href="/"
           >
             <Image
               alt="Estately"
-              className="h-auto w-28 object-contain sm:w-40 md:w-[190px]"
+              className="h-auto w-28 object-contain sm:w-40 xl:w-[190px]"
               height={96}
               priority
               src="/branding/logo-full.png?v=2"
@@ -51,7 +51,7 @@ export async function Header({ user }: HeaderProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav aria-label="Primary navigation" className="hidden flex-1 items-center justify-center lg:flex gap-1">
+          <nav aria-label="Primary navigation" className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
             {publicLinks.map((link) => (
               <Link
                 className="px-4 py-2 text-sm font-medium text-stone-600 transition hover:text-estate-700 rounded-md hover:bg-estate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700"
@@ -64,10 +64,10 @@ export async function Header({ user }: HeaderProps) {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden shrink-0 items-center lg:flex">
+          <div className="hidden min-w-0 shrink-0 items-center lg:flex">
             {user ? (
-              <div className="flex flex-nowrap items-center gap-2">
-                <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
+              <div className="flex min-w-0 flex-nowrap items-center gap-2">
+                <ButtonLink className="hidden h-11 min-h-0 whitespace-nowrap rounded-lg bg-estate-700 px-3.5 py-2 text-white shadow-sm hover:bg-estate-800 xl:inline-flex" href="/softuni-exam" variant="secondary">
                   {t.softUniExam}
                 </ButtonLink>
                 <LanguageSwitcher />
@@ -75,15 +75,15 @@ export async function Header({ user }: HeaderProps) {
                 <ProfileDropdown user={user} />
               </div>
             ) : (
-              <div className="flex flex-nowrap items-center gap-2">
-                <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
+              <div className="flex min-w-0 flex-nowrap items-center gap-2">
+                <ButtonLink className="hidden h-11 min-h-0 whitespace-nowrap rounded-lg bg-estate-700 px-3.5 py-2 text-white shadow-sm hover:bg-estate-800 xl:inline-flex" href="/softuni-exam" variant="secondary">
                   {t.softUniExam}
                 </ButtonLink>
                 <LanguageSwitcher />
-                <ButtonLink href="/login" variant="ghost">
+                <ButtonLink className="h-11 min-h-0 rounded-lg px-3.5 py-2" href="/login" variant="ghost">
                   {t.login}
                 </ButtonLink>
-                <ButtonLink href="/register">{t.register}</ButtonLink>
+                <ButtonLink className="h-11 min-h-0 rounded-lg px-4 py-2" href="/register">{t.register}</ButtonLink>
               </div>
             )}
           </div>

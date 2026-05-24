@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { PropertyCard } from '@/components/property/property-card';
+import { ApiErrorState } from '@/components/ui/api-error-state';
 import { Button } from '@/components/ui/button';
 import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
 import { t } from '@/lib/i18n';
@@ -188,12 +189,11 @@ export default function SearchScreen() {
               <Text className="text-base text-slate-600">{t('loadingSearchResults')}</Text>
             </View>
           ) : searchQuery.isError ? (
-            <View className="gap-4">
-              <Text className="text-center text-base font-medium text-red-600">
-                {t('unableToLoadSearchResults')}
-              </Text>
-              <Button label={t('tryAgain')} onPress={() => searchQuery.refetch()} variant="secondary" />
-            </View>
+            <ApiErrorState
+              error={searchQuery.error}
+              message={t('unableToLoadSearchResults')}
+              onRetry={() => searchQuery.refetch()}
+            />
           ) : (
             <View className="gap-2">
               <Text className="text-center text-2xl font-bold text-slate-950">{t('noPropertiesFound')}</Text>

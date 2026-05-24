@@ -6,10 +6,7 @@ import { publicPropertyCardColumns, type PublicPropertyCardData } from '@/lib/pr
 
 export type PublicProperty = PublicPropertyCardData;
 
-const publicPropertyConditions = and(
-  eq(properties.isPublished, true),
-  eq(properties.moderationStatus, 'approved'),
-);
+const publicPropertyConditions = eq(properties.isPublished, true);
 
 export function formatPropertyCard(property: PublicProperty) {
   return {
@@ -51,7 +48,7 @@ async function getTrendingPropertiesUncached(limit = 8): Promise<PublicProperty[
     .leftJoin(favorites, eq(favorites.propertyId, properties.id))
     .where(publicPropertyConditions)
     .groupBy(properties.id)
-    .orderBy(desc(count(favorites.id)), desc(properties.views), sql`random()`)
+    .orderBy(desc(count(favorites.id)), sql`random()`)
     .limit(limit);
 
   return rows.map((row) => row.property);

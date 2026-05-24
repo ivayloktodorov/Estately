@@ -1,0 +1,12 @@
+[build]
+  command = "EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run export:web"
+  publish = "dist"
+
+[build.environment]
+  EXPO_PUBLIC_API_URL = "https://estatelybg.netlify.app"
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

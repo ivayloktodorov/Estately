@@ -21,7 +21,17 @@ Core project areas:
 
 ## 2. Live Demo / Local Demo
 
-Final production deployment can be completed after project review. For local review:
+Production URLs:
+
+```text
+Web app / backend:
+https://estatelybg.netlify.app
+
+Mobile web app:
+https://estatelybg-mobile.netlify.app
+```
+
+For local review:
 
 ```bash
 npm install
@@ -280,7 +290,7 @@ Required web/backend variables:
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
-NEXT_PUBLIC_APP_URL=https://your-estately-web.example.com
+NEXT_PUBLIC_APP_URL=https://estatelybg.netlify.app
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
@@ -338,7 +348,7 @@ Required production web/backend variables:
 
 Required production mobile variable:
 
-- `EXPO_PUBLIC_API_URL`
+- `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`
 
 Production notes:
 
@@ -346,6 +356,7 @@ Production notes:
 - Run Drizzle migrations against the production Neon database.
 - Configure Cloudflare R2 credentials in the hosting provider.
 - Set `EXPO_PUBLIC_API_URL` to the deployed backend origin for mobile builds.
+- Deploy `apps/mobile` as a separate Netlify static site with base directory `apps/mobile`, build command `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run export:web`, and publish directory `dist`.
 - Verify image uploads with the R2 smoke test.
 
 Deployment guide:

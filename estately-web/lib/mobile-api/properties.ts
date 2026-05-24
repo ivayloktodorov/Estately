@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties, propertyImages } from '@/src/db/schema';
 import type { MobilePropertyFilters } from './validation';
@@ -6,10 +6,7 @@ import type { MobilePropertyFilters } from './validation';
 type PropertySort = MobilePropertyFilters['sort'];
 
 function buildMobilePropertyConditions(filters: MobilePropertyFilters): SQL[] {
-  const conditions: SQL[] = [
-    eq(properties.moderationStatus, 'approved'),
-    eq(properties.isPublished, true),
-  ];
+  const conditions: SQL[] = [eq(properties.isPublished, true)];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;
@@ -68,8 +65,8 @@ const mobilePropertyListColumns = {
   bathrooms: properties.bathrooms,
   areaSqm: properties.areaSqm,
   imageCoverUrl: properties.imageCoverUrl,
-  isFeatured: properties.isFeatured,
-  views: properties.views,
+  isFeatured: sql<boolean>`false`,
+  views: sql<number>`0`,
   createdAt: properties.createdAt,
   updatedAt: properties.updatedAt,
 };

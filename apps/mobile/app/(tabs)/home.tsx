@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { PropertyCard } from '@/components/property/property-card';
 import { Button } from '@/components/ui/button';
+import { ApiErrorState } from '@/components/ui/api-error-state';
 import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
 import { t } from '@/lib/i18n';
 import { getProperties } from '@/services/property.service';
@@ -48,12 +49,11 @@ export default function HomeScreen() {
               <Text className="text-base text-slate-600">{t('loadingProperties')}</Text>
             </View>
           ) : propertiesQuery.isError ? (
-            <View className="gap-4">
-              <Text className="text-center text-base font-medium text-red-600">
-                {t('unableToLoadProperties')}
-              </Text>
-              <Button label={t('tryAgain')} onPress={() => propertiesQuery.refetch()} variant="secondary" />
-            </View>
+            <ApiErrorState
+              error={propertiesQuery.error}
+              message={t('unableToLoadProperties')}
+              onRetry={() => propertiesQuery.refetch()}
+            />
           ) : (
             <Text className="text-center text-base text-slate-600">{t('noPropertiesFound')}</Text>
           )}

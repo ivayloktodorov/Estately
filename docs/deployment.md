@@ -13,6 +13,16 @@ Estately has three production infrastructure pieces:
 
 The mobile app communicates with the deployed Next.js backend through `/api/mobile` endpoints.
 
+Current review URLs:
+
+```text
+Web app / backend:
+https://estatelybg.netlify.app
+
+Mobile web app:
+https://estatelybg-mobile.netlify.app
+```
+
 ## 2. Web App Deployment
 
 Deploy `estately-web` to Netlify, Vercel, or another hosting platform that supports Next.js.
@@ -84,7 +94,7 @@ Required production variables for the Next.js web/backend app:
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
-NEXT_PUBLIC_APP_URL=https://your-deployed-estately-web-url.com
+NEXT_PUBLIC_APP_URL=https://estatelybg.netlify.app
 
 R2_ACCOUNT_ID=your-cloudflare-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
@@ -147,13 +157,13 @@ The mobile app is deployed separately as a static Expo Web export.
 Set the mobile app API URL to the deployed web/backend origin:
 
 ```env
-EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com
+EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app
 ```
 
 Run the export:
 
 ```bash
-EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com npm run mobile:export-web
+EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run mobile:export-web
 ```
 
 The generated output is:
@@ -169,9 +179,9 @@ Deploy that folder to Netlify or another static hosting platform.
 If deploying from the monorepo:
 
 - Base directory: `apps/mobile`
-- Build command: `npm run export:web`
+- Build command: `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run export:web`
 - Publish directory: `dist`
-- Environment variable: `EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com`
+- Environment variable: `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`
 
 Do not export mobile web without `EXPO_PUBLIC_API_URL`; production builds intentionally fail if this value is missing so localhost is not baked into the static output.
 
@@ -186,7 +196,7 @@ EXPO_PUBLIC_API_URL=http://localhost:3000
 Production:
 
 ```env
-EXPO_PUBLIC_API_URL=https://your-deployed-estately-web-url.com
+EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app
 ```
 
 The mobile app appends `/api/mobile` automatically, so the value should normally be the backend origin.

@@ -138,13 +138,13 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className="inline-flex h-12 w-full min-w-0 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-stone-200 bg-white py-1 pl-1.5 pr-3 text-sm font-semibold text-charcoal-950 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:w-auto"
+        className="inline-flex h-11 w-full min-w-0 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-stone-200 bg-white py-1 pl-1 pr-2.5 text-sm font-semibold text-charcoal-950 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:w-auto"
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
         <UserAvatar user={user} />
         <span className="hidden max-w-36 truncate sm:inline lg:hidden">{shortDisplayName(user)}</span>
-        <span className="hidden max-w-44 truncate lg:inline">{name}</span>
+        <span className="hidden max-w-32 truncate xl:inline">{name}</span>
         <span aria-hidden="true" className={`text-xs text-stone-500 transition ${isOpen ? 'rotate-180' : ''}`}>
           ▾
         </span>

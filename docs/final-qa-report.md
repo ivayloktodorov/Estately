@@ -4,6 +4,12 @@ Date: 2026-05-24
 
 ## SoftUni Review Readiness
 
+### Reviewer URLs
+
+- Web app / backend: `https://estatelybg.netlify.app`
+- Mobile web app: `https://estatelybg-mobile.netlify.app`
+- Mobile API base compiled into Expo web: `https://estatelybg.netlify.app/api/mobile`
+
 ### Reviewer Accounts
 
 - User: `softuni_user@estately.com` / `pass123`
@@ -48,7 +54,7 @@ Recommended 5-10 minute review path:
 
 ### Known Limitations
 
-- Final production web/mobile URLs still need to be replaced with the deployed URLs after hosting is connected.
+- The existing `https://estatelybg.netlify.app` Netlify backend currently returns a database query error from `GET /api/mobile/properties`; the local configured database verifies successfully, so the deployed web/backend site must be checked for a stale or incorrect `DATABASE_URL`.
 - Live R2 upload and mobile-device QA should be repeated in the final deployed environment with production credentials.
 - The seed script is intended for review/demo databases; do not run it against production data unless the target database is disposable.
 
