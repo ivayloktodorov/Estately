@@ -11,6 +11,7 @@ export interface ConversationListItem {
   propertyId: number;
   propertyTitle: string;
   propertyCity: string;
+  propertyType: string;
   propertyImageCoverUrl: string;
   otherParticipantName: string;
   otherParticipantAvatarUrl: string | null;
@@ -49,6 +50,7 @@ export interface ConversationDetails {
     id: number;
     title: string;
     city: string;
+    propertyType: string;
     price: string;
     imageCoverUrl: string;
   };
@@ -187,6 +189,7 @@ export async function getUserConversations(userId: number): Promise<Conversation
       propertyId: conversations.propertyId,
       propertyTitle: properties.title,
       propertyCity: properties.city,
+      propertyType: properties.propertyType,
       propertyImageCoverUrl: properties.imageCoverUrl,
       buyerName: buyer.fullName,
       buyerAvatarUrl: buyer.avatarUrl,
@@ -261,6 +264,7 @@ export async function getUserConversations(userId: number): Promise<Conversation
       propertyId: conversation.propertyId,
       propertyTitle: conversation.propertyTitle,
       propertyCity: conversation.propertyCity,
+      propertyType: conversation.propertyType,
       propertyImageCoverUrl: conversation.propertyImageCoverUrl,
       otherParticipantName:
         conversation.buyerUserId === userId ? conversation.ownerName : conversation.buyerName,
@@ -287,6 +291,7 @@ export async function getConversationForUser(
       propertyId: properties.id,
       propertyTitle: properties.title,
       propertyCity: properties.city,
+      propertyType: properties.propertyType,
       propertyPrice: properties.price,
       propertyImageCoverUrl: properties.imageCoverUrl,
       buyerId: buyer.id,
@@ -380,6 +385,7 @@ export async function getConversationForUser(
       id: conversation.propertyId,
       title: conversation.propertyTitle,
       city: conversation.propertyCity,
+      propertyType: conversation.propertyType,
       price: conversation.propertyPrice,
       imageCoverUrl: conversation.propertyImageCoverUrl,
     },

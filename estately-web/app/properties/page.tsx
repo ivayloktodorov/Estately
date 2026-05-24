@@ -80,7 +80,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     bathrooms: prop.bathrooms,
     areaSqm: prop.areaSqm,
     propertyType: prop.propertyType,
-    imageUrl: propertyImageUrl(prop.imageCoverUrl),
+    imageUrl: propertyImageUrl(prop.imageCoverUrl, prop.propertyType),
     latitude: prop.latitude ? Number(prop.latitude) : null,
     longitude: prop.longitude ? Number(prop.longitude) : null,
     listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',

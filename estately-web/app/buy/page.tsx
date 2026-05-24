@@ -29,7 +29,7 @@ export default async function BuyPage({ searchParams }: BuyPageProps) {
   );
   const formattedProperties = result.properties.map((property) => ({
     id: property.id,
-    imageUrl: propertyImageUrl(property.imageCoverUrl),
+    imageUrl: propertyImageUrl(property.imageCoverUrl, property.propertyType),
     price: `$${Number(property.price).toLocaleString()}`,
     title: property.title,
     city: property.city,
@@ -59,6 +59,7 @@ export default async function BuyPage({ searchParams }: BuyPageProps) {
 
         {!isEmpty ? (
           <PropertyPagination
+            basePath="/buy"
             currentPage={result.currentPage}
             totalPages={result.totalPages}
             hasPreviousPage={result.hasPreviousPage}

@@ -83,7 +83,7 @@ export default async function MessagesPage() {
                         alt=""
                         className="aspect-video w-full rounded-lg object-cover sm:h-24 sm:w-24"
                         height={96}
-                        src={propertyImageUrl(conversation.propertyImageCoverUrl)}
+                        src={propertyImageUrl(conversation.propertyImageCoverUrl, conversation.propertyType)}
                         width={96}
                         sizes="(min-width: 640px) 96px, 100vw"
                       />

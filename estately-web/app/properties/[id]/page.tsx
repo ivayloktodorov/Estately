@@ -59,7 +59,7 @@ async function getProperty(id: number, user: AuthUser | null) {
 
     return {
       property,
-      images: uploadedImages.length > 0 ? uploadedImages : [propertyImageUrl(property.imageCoverUrl)],
+      images: uploadedImages.length > 0 ? uploadedImages : [propertyImageUrl(property.imageCoverUrl, property.propertyType)],
     };
   } catch (error) {
     console.error('Error fetching property:', error);
@@ -92,7 +92,7 @@ export async function generateMetadata(
 
   const { property } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
-  const coverImageUrl = propertyImageUrl(property.imageCoverUrl);
+  const coverImageUrl = propertyImageUrl(property.imageCoverUrl, property.propertyType);
 
   return {
     title: `${property.title} - ${price} | Estately`,
@@ -132,7 +132,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   const { property, images } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
-  const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl);
+  const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl, property.propertyType);
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
 

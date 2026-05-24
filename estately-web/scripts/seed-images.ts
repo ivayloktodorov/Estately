@@ -55,7 +55,7 @@ async function seedPropertyImages() {
     .where(
       or(
         eq(properties.imageCoverUrl, ''),
-        sql`lower(trim(${properties.imageCoverUrl})) in ('null', 'undefined', '/images/property-placeholder.jpg')`,
+        sql`lower(trim(${properties.imageCoverUrl})) in ('null', 'undefined', '/images/property-placeholder.jpg', '/images/property-placeholders/default.jpg')`,
       ),
     )
     .orderBy(properties.id)

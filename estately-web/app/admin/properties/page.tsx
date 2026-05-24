@@ -336,7 +336,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                               alt=""
                               className="h-20 w-20 rounded-md object-cover"
                               height={80}
-                              src={propertyImageUrl(property.imageCoverUrl)}
+                              src={propertyImageUrl(property.imageCoverUrl, property.propertyType)}
                               width={80}
                             />
                             <div className="min-w-0">
@@ -396,7 +396,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                       alt=""
                       className="h-20 w-20 shrink-0 rounded-md object-cover"
                       height={80}
-                      src={propertyImageUrl(property.imageCoverUrl)}
+                      src={propertyImageUrl(property.imageCoverUrl, property.propertyType)}
                       width={80}
                     />
                     <div className="min-w-0 flex-1">

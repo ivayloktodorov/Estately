@@ -101,7 +101,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
               alt=""
               className="aspect-video w-full rounded-lg object-cover md:h-28 md:w-36"
               height={112}
-              src={propertyImageUrl(conversation.property.imageCoverUrl)}
+              src={propertyImageUrl(conversation.property.imageCoverUrl, conversation.property.propertyType)}
               width={144}
               sizes="(min-width: 768px) 144px, 100vw"
             />

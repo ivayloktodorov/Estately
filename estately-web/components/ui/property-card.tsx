@@ -36,7 +36,7 @@ export function PropertyCard({
   isAuthenticated = false,
   showFavoriteButton = false,
 }: PropertyCardProps) {
-  const coverImageUrl = propertyImageUrl(imageUrl);
+  const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">

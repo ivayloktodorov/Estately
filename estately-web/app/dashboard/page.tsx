@@ -15,6 +15,7 @@ interface ManageableProperty {
   title: string;
   city: string;
   address: string;
+  propertyType: string;
   imageCoverUrl: string | null;
 }
 
@@ -48,6 +49,7 @@ async function getManageableProperties(user: Awaited<ReturnType<typeof requireAu
       title: properties.title,
       city: properties.city,
       address: properties.address,
+      propertyType: properties.propertyType,
       imageCoverUrl: properties.imageCoverUrl,
     };
 
@@ -204,7 +206,7 @@ export default async function DashboardPage() {
                     alt={property.title}
                     className="aspect-video w-full rounded-lg object-cover md:aspect-square"
                     height={180}
-                    src={propertyImageUrl(property.imageCoverUrl)}
+                    src={propertyImageUrl(property.imageCoverUrl, property.propertyType)}
                     width={180}
                     sizes="(min-width: 768px) 180px, 100vw"
                   />

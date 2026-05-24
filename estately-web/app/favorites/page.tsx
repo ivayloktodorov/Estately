@@ -20,7 +20,7 @@ export default async function FavoritesPage() {
     bathrooms: prop.bathrooms,
     areaSqm: prop.areaSqm,
     propertyType: prop.propertyType,
-    imageUrl: propertyImageUrl(prop.imageCoverUrl),
+    imageUrl: propertyImageUrl(prop.imageCoverUrl, prop.propertyType),
     listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',
   }));
 
