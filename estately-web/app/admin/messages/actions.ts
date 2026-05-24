@@ -16,24 +16,38 @@ function positiveId(formData: FormData, field: string): number {
 
 export async function deleteMessageAction(formData: FormData): Promise<void> {
   await requireAdmin();
-  const messageId = positiveId(formData, 'messageId');
-  const conversationId = await deleteAdminMessage(messageId);
 
-  revalidatePath('/admin/messages');
+  try {
+    const messageId = positiveId(formData, 'messageId');
+    const conversationId = await deleteAdminMessage(messageId);
 
-  if (conversationId) {
-    revalidatePath(`/admin/messages/${conversationId}`);
+    revalidatePath('/admin/messages');
+
+    if (conversationId) {
+      revalidatePath(`/admin/messages/${conversationId}`);
+    }
+  } catch (error) {
+    console.error('Admin message deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 }
 
 export async function deleteAttachmentAction(formData: FormData): Promise<void> {
   await requireAdmin();
-  const attachmentId = positiveId(formData, 'attachmentId');
-  const conversationId = await deleteAdminAttachment(attachmentId);
 
-  revalidatePath('/admin/messages');
+  try {
+    const attachmentId = positiveId(formData, 'attachmentId');
+    const conversationId = await deleteAdminAttachment(attachmentId);
 
-  if (conversationId) {
-    revalidatePath(`/admin/messages/${conversationId}`);
+    revalidatePath('/admin/messages');
+
+    if (conversationId) {
+      revalidatePath(`/admin/messages/${conversationId}`);
+    }
+  } catch (error) {
+    console.error('Admin attachment deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 }

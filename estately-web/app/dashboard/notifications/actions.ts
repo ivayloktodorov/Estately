@@ -27,27 +27,55 @@ function revalidateNotifications() {
 export async function markNotificationReadAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
 
-  await markNotificationAsRead(user.id, notificationId(formData));
-  revalidateNotifications();
+  try {
+    await markNotificationAsRead(user.id, notificationId(formData));
+    revalidateNotifications();
+  } catch (error) {
+    console.error('Notification read update failed', {
+      userId: user.id,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function markNotificationUnreadAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
 
-  await markNotificationAsUnread(user.id, notificationId(formData));
-  revalidateNotifications();
+  try {
+    await markNotificationAsUnread(user.id, notificationId(formData));
+    revalidateNotifications();
+  } catch (error) {
+    console.error('Notification unread update failed', {
+      userId: user.id,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function markAllNotificationsReadAction(): Promise<void> {
   const user = await requireAuth();
 
-  await markAllNotificationsAsRead(user.id);
-  revalidateNotifications();
+  try {
+    await markAllNotificationsAsRead(user.id);
+    revalidateNotifications();
+  } catch (error) {
+    console.error('Mark all notifications read failed', {
+      userId: user.id,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function deleteNotificationAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
 
-  await deleteNotification(user.id, notificationId(formData));
-  revalidateNotifications();
+  try {
+    await deleteNotification(user.id, notificationId(formData));
+    revalidateNotifications();
+  } catch (error) {
+    console.error('Notification deletion failed', {
+      userId: user.id,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }

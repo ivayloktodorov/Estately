@@ -38,7 +38,6 @@ export function ReplyForm({ conversationId }: { conversationId: number }) {
     <form
       action={action}
       className="rounded-lg border border-stone-200 bg-white p-3 shadow-estate-soft sm:p-4"
-      encType="multipart/form-data"
       ref={formRef}
     >
       <input name="conversationId" type="hidden" value={conversationId} />

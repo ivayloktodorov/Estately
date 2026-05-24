@@ -34,6 +34,21 @@ const docsLinks = [
 
 const testedModules: QaSection[] = [
   {
+    title: 'Production Bug Fix Pass',
+    summary: 'Targeted reliability pass for known production crash paths, mutation actions, uploads, redirects, and admin/profile workflows without changing architecture or adding features.',
+    items: [
+      { label: 'Admin user avatar/profile edit', status: 'Fixed', notes: 'Raised the Server Action body limit for documented 5MB avatar uploads, added admin avatar client validation, kept server-side MIME/size validation, preserved avatarUrl, and return friendly errors for R2/config/update failures.' },
+      { label: 'Server Action multipart form crash', status: 'Fixed', notes: 'Removed explicit multipart encType from Server Action forms in message replies and property creation; React now supplies encoding automatically and no longer throws at render time.' },
+      { label: 'Profile avatar update', status: 'Fixed', notes: 'Added the same JPG/PNG/WEBP and 5MB client validation to the user profile form, plus safer server logging and friendly upload configuration errors.' },
+      { label: 'Message attachment failures', status: 'Fixed', notes: 'Message replies now log safe server context and return friendly validation/upload errors instead of exposing raw R2/env exceptions to the user.' },
+      { label: 'Admin and dashboard direct actions', status: 'Fixed', notes: 'Moderation, delete, role/status, admin message deletion, offer status, saved search, notification, and owner property delete actions now contain DB/service failures to avoid full page crashes while preserving auth redirects.' },
+      { label: 'Login and redirect flow', status: 'Passed', notes: 'Login/register forms preserve safe same-site redirect targets and reject external or protocol-relative redirects back to the dashboard fallback.' },
+      { label: 'Inquiry and offer flow', status: 'Passed', notes: 'Guest CTA links preserve property return URLs, authenticated inquiries/offers validate ownership and property availability, and successful actions still create owner notifications/messages.' },
+      { label: 'Remaining known issues', status: 'Known Warning', notes: 'This local checkout is not linked to a Netlify site, so live production function logs could not be pulled from the CLI; only local build/lint/static inspection was performed here.' },
+      { label: 'Files changed in this pass', status: 'Fixed', notes: 'Touched next.config.ts, R2 storage, admin user/profile/message/property actions, dashboard notification/property actions, saved-search and offer/message actions, avatar forms, reply/property forms, and this QA report.' },
+    ],
+  },
+  {
     title: 'Final Pre-Deployment Checklist',
     summary: 'Deployment readiness verification for web, mobile, REST API, database, storage, security, environment documentation, docs, and build checks.',
     items: [
@@ -153,6 +168,11 @@ const testedModules: QaSection[] = [
 ];
 
 const fixesApplied = [
+  'Raised Next Server Action body size to 6MB so documented 5MB avatar uploads do not fail before server-side validation can run.',
+  'Removed manual multipart encType from Server Action forms because React supplies it automatically for file inputs.',
+  'Added client-side avatar type and size validation for admin user editing and self-service profile editing.',
+  'Hardened avatar and attachment upload errors so R2 configuration or upload failures log safely and return friendly user messages.',
+  'Wrapped direct admin/dashboard mutation service calls so stale records or transient DB failures do not crash the page.',
   'Added explicit inquiry notifications and activity records for web and mobile inquiry submissions so notification-center and activity filters reflect contact-owner events.',
   'Blocked owners from submitting inquiries to their own properties on web and mobile to prevent self-conversations and misleading notifications.',
   'Aligned property image uploads with documented R2_* environment variable names while preserving legacy CLOUDFLARE_R2_* aliases.',
@@ -163,8 +183,9 @@ const fixesApplied = [
 ];
 
 const verificationCommands = [
-  'npm run build',
-  'npm run lint',
+  'npm run web:build',
+  'npm run lint --workspace=estately-web',
+  'npm run typecheck --workspace=estately-web (not available; package has no typecheck script)',
   'npm run typecheck --workspace=@estately/mobile',
   'npm run lint --workspace=@estately/mobile',
   'npm run --workspace=estately-web db:verify',
@@ -281,7 +302,7 @@ export default function FinalQaReportPage() {
               ))}
             </div>
             <p className="mt-5 text-sm leading-6 text-slate-600">
-              All commands passed. Lint reports existing warnings only for raw image elements and unused seed-script variables.
+              Web build and web lint passed in this production bug-fix pass. The web package has no standalone typecheck script; Next build completed TypeScript successfully. Lint reports existing warnings only for raw image elements and unused seed-script variables.
             </p>
           </article>
         </Container>

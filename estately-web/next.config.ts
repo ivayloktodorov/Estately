@@ -6,6 +6,11 @@ loadEnv({ path: path.resolve(__dirname, '../.env'), quiet: true });
 loadEnv({ path: path.resolve(__dirname, '../.env.local'), quiet: true, override: false });
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '6mb',
+    },
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31_536_000,

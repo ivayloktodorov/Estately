@@ -54,35 +54,83 @@ function fileFromFormData(formData: FormData): File | null {
   return file instanceof File && file.size > 0 ? file : null;
 }
 
-export async function updateUserRoleAction(formData: FormData): Promise<void> {
-  const admin = await requireAdmin();
-  const userId = parseUserId(formData);
-  const role = parseRole(formData);
-  const permission = await canChangeUserRole(admin.id, userId, role);
+function isR2ConfigurationError(error: Error): boolean {
+  return error.message.includes('R2_') || error.message.includes('CLOUDFLARE_R2_');
+}
 
-  if (!permission.allowed) {
-    throw new Error(permission.message);
+function logAdminUserUpdateError(error: unknown, context: { adminId?: number; userId?: number }) {
+  console.error('Admin user update failed', {
+    adminId: context.adminId,
+    userId: context.userId,
+    message: error instanceof Error ? error.message : 'Unknown error',
+  });
+}
+
+function updateErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return 'Unable to update user profile. Please try again.';
   }
 
-  await db
-    .update(users)
-    .set({
-      role,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, userId));
+  if (isR2ConfigurationError(error)) {
+    return 'Avatar uploads are not configured. Please contact an administrator.';
+  }
 
-  revalidatePath('/admin/users');
-  revalidatePath(`/admin/users/${userId}`);
+  if (
+    error.message === 'Image must be 5MB or smaller.' ||
+    error.message === 'Only JPG, JPEG, PNG, and WEBP images are allowed.' ||
+    error.message === 'Please choose an image file to upload.' ||
+    error.message === 'First name is required.' ||
+    error.message === 'Last name is required.' ||
+    error.message === 'Enter a valid email address.' ||
+    error.message === 'Another account already uses this email address.' ||
+    error.message === 'Invalid user ID.' ||
+    error.message === 'Invalid user role.'
+  ) {
+    return error.message;
+  }
+
+  return 'Unable to update user profile. Please try again.';
+}
+
+export async function updateUserRoleAction(formData: FormData): Promise<void> {
+  const admin = await requireAdmin();
+
+  try {
+    const userId = parseUserId(formData);
+    const role = parseRole(formData);
+    const permission = await canChangeUserRole(admin.id, userId, role);
+
+    if (!permission.allowed) {
+      throw new Error(permission.message);
+    }
+
+    await db
+      .update(users)
+      .set({
+        role,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}`);
+  } catch (error) {
+    console.error('Admin user role update failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function updateAdminUserAction(
   _previousState: AdminUserActionState,
   formData: FormData,
 ): Promise<AdminUserActionState> {
+  const admin = await requireAdmin();
+  const adminId = admin.id;
+  let userId: number | undefined;
+
   try {
-    const admin = await requireAdmin();
-    const userId = parseUserId(formData);
+    userId = parseUserId(formData);
     const role = parseRole(formData);
     const status = parseStatus(formData);
     const permission = await canChangeUserRole(admin.id, userId, role);
@@ -133,7 +181,8 @@ export async function updateAdminUserAction(
 
     return state('success', 'User updated successfully.');
   } catch (error) {
-    return state('error', error instanceof Error ? error.message : 'Could not update user.');
+    logAdminUserUpdateError(error, { adminId, userId });
+    return state('error', updateErrorMessage(error));
   }
 }
 
@@ -156,23 +205,37 @@ export async function resetAdminUserPasswordAction(
 
 export async function toggleUserStatusAction(formData: FormData): Promise<void> {
   const admin = await requireAdmin();
-  const userId = parseUserId(formData);
 
-  if (admin.id === userId) {
-    throw new Error('You cannot deactivate your own account.');
+  try {
+    const userId = parseUserId(formData);
+
+    if (admin.id === userId) {
+      throw new Error('You cannot deactivate your own account.');
+    }
+
+    await setAdminUserStatus(userId, parseStatus(formData));
+
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}`);
+  } catch (error) {
+    console.error('Admin user status update failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-
-  await setAdminUserStatus(userId, parseStatus(formData));
-
-  revalidatePath('/admin/users');
-  revalidatePath(`/admin/users/${userId}`);
 }
 
 export async function deleteUserAction(formData: FormData): Promise<void> {
   const admin = await requireAdmin();
-  const userId = parseUserId(formData);
 
-  await deleteAdminUser(admin.id, userId);
+  try {
+    const userId = parseUserId(formData);
 
-  revalidatePath('/admin/users');
+    await deleteAdminUser(admin.id, userId);
+
+    revalidatePath('/admin/users');
+  } catch (error) {
+    console.error('Admin user deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }

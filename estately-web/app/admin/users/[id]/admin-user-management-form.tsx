@@ -15,6 +15,9 @@ const initialState: AdminUserActionState = {
   message: '',
 };
 
+const allowedAvatarTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const maxAvatarSizeBytes = 5 * 1024 * 1024;
+
 function Notice({ state }: { state: AdminUserActionState }) {
   if (state.status === 'idle') {
     return null;
@@ -55,11 +58,20 @@ export function AdminUserManagementForm({
     initialState,
   );
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatarUrl);
+  const [avatarError, setAvatarError] = useState('');
   const isSelf = actingAdminId === user.id;
 
   return (
     <div className="grid gap-6">
-      <form action={editAction} className="grid gap-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <form
+        action={editAction}
+        className="grid gap-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        onSubmit={(event) => {
+          if (avatarError) {
+            event.preventDefault();
+          }
+        }}
+      >
         <input name="userId" type="hidden" value={user.id} />
         <div>
           <h2 className="text-xl font-semibold text-slate-950">Edit User</h2>
@@ -83,10 +95,37 @@ export function AdminUserManagementForm({
               name="avatar"
               onChange={(event) => {
                 const file = event.target.files?.[0];
-                setAvatarPreview(file ? URL.createObjectURL(file) : user.avatarUrl);
+
+                if (!file) {
+                  setAvatarError('');
+                  setAvatarPreview(user.avatarUrl);
+                  return;
+                }
+
+                if (!allowedAvatarTypes.has(file.type)) {
+                  event.target.value = '';
+                  setAvatarError('Only JPG, JPEG, PNG, and WEBP images are allowed.');
+                  setAvatarPreview(user.avatarUrl);
+                  return;
+                }
+
+                if (file.size > maxAvatarSizeBytes) {
+                  event.target.value = '';
+                  setAvatarError('Image must be 5MB or smaller.');
+                  setAvatarPreview(user.avatarUrl);
+                  return;
+                }
+
+                setAvatarError('');
+                setAvatarPreview(URL.createObjectURL(file));
               }}
               type="file"
             />
+            {avatarError ? (
+              <p className="text-sm font-semibold text-red-700">{avatarError}</p>
+            ) : (
+              <p className="text-sm text-slate-500">JPG, PNG, or WEBP. Max 5MB.</p>
+            )}
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <input className="h-4 w-4 rounded border-slate-300 text-estate-700" name="removeAvatar" type="checkbox" />
               Remove current avatar
@@ -132,7 +171,7 @@ export function AdminUserManagementForm({
           </label>
         </div>
 
-        <button className="h-11 rounded-md bg-estate-700 px-5 text-sm font-semibold text-white hover:bg-estate-800 disabled:opacity-60 sm:w-fit" disabled={isEditPending}>
+        <button className="h-11 rounded-md bg-estate-700 px-5 text-sm font-semibold text-white hover:bg-estate-800 disabled:opacity-60 sm:w-fit" disabled={isEditPending || Boolean(avatarError)}>
           {isEditPending ? 'Saving...' : 'Save user'}
         </button>
       </form>

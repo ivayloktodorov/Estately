@@ -9,6 +9,9 @@ const initialState: ProfileActionState = {
   message: '',
 };
 
+const allowedAvatarTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const maxAvatarSizeBytes = 5 * 1024 * 1024;
+
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en', {
     dateStyle: 'medium',
@@ -41,6 +44,7 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
   const [profileState, profileAction, isProfilePending] = useActionState(updateProfileAction, initialState);
   const [passwordState, passwordAction, isPasswordPending] = useActionState(changePasswordAction, initialState);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile.avatarUrl);
+  const [avatarError, setAvatarError] = useState('');
 
   const accountRows = useMemo(
     () => [
@@ -54,7 +58,15 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
 
   return (
     <div className="grid gap-6">
-      <form action={profileAction} className="grid gap-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <form
+        action={profileAction}
+        className="grid gap-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        onSubmit={(event) => {
+          if (avatarError) {
+            event.preventDefault();
+          }
+        }}
+      >
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Personal Information</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-950">Profile</h1>
@@ -84,10 +96,35 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
                 name="avatar"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
-                  setAvatarPreview(file ? URL.createObjectURL(file) : profile.avatarUrl);
+
+                  if (!file) {
+                    setAvatarError('');
+                    setAvatarPreview(profile.avatarUrl);
+                    return;
+                  }
+
+                  if (!allowedAvatarTypes.has(file.type)) {
+                    event.target.value = '';
+                    setAvatarError('Only JPG, JPEG, PNG, and WEBP images are allowed.');
+                    setAvatarPreview(profile.avatarUrl);
+                    return;
+                  }
+
+                  if (file.size > maxAvatarSizeBytes) {
+                    event.target.value = '';
+                    setAvatarError('Image must be 5MB or smaller.');
+                    setAvatarPreview(profile.avatarUrl);
+                    return;
+                  }
+
+                  setAvatarError('');
+                  setAvatarPreview(URL.createObjectURL(file));
                 }}
                 type="file"
               />
+              {avatarError ? (
+                <p className="text-sm font-semibold text-red-700">{avatarError}</p>
+              ) : null}
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <input className="h-4 w-4 rounded border-slate-300 text-estate-700" name="removeAvatar" type="checkbox" />
                 Remove current avatar
@@ -121,7 +158,7 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
 
         <button
           className="h-11 w-full rounded-md bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
-          disabled={isProfilePending}
+          disabled={isProfilePending || Boolean(avatarError)}
         >
           {isProfilePending ? 'Saving...' : 'Save profile'}
         </button>

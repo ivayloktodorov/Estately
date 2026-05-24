@@ -146,28 +146,35 @@ export async function updatePropertyAction(
 
 export async function deleteOwnPropertyAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
-  const propertyId = propertyIdValue(formData);
-  const property = await db
-    .select({ title: properties.title })
-    .from(properties)
-    .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)))
-    .then((rows) => rows[0]);
 
-  await db
-    .delete(properties)
-    .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)));
+  try {
+    const propertyId = propertyIdValue(formData);
+    const property = await db
+      .select({ title: properties.title })
+      .from(properties)
+      .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)))
+      .then((rows) => rows[0]);
 
-  if (property) {
-    await createActivity({
-      userId: user.id,
-      type: 'property_deleted',
-      title: 'Property deleted',
-      description: `You deleted "${property.title}".`,
-      entityType: 'property',
-      entityId: propertyId,
+    await db
+      .delete(properties)
+      .where(and(eq(properties.id, propertyId), eq(properties.createdByUserId, user.id)));
+
+    if (property) {
+      await createActivity({
+        userId: user.id,
+        type: 'property_deleted',
+        title: 'Property deleted',
+        description: `You deleted "${property.title}".`,
+        entityType: 'property',
+        entityId: propertyId,
+      });
+    }
+
+    revalidatePath('/dashboard/properties');
+    revalidatePath('/properties');
+  } catch (error) {
+    console.error('Owner property deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
-
-  revalidatePath('/dashboard/properties');
-  revalidatePath('/properties');
 }

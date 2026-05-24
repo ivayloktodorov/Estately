@@ -21,23 +21,43 @@ function savedSearchId(formData: FormData): number {
 
 export async function createSavedSearchAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
-  const input = savedSearchFromFormData(formData);
 
-  await createSavedSearch(user.id, input);
-  revalidatePath('/dashboard/saved-searches');
+  try {
+    const input = savedSearchFromFormData(formData);
+
+    await createSavedSearch(user.id, input);
+    revalidatePath('/dashboard/saved-searches');
+  } catch (error) {
+    console.error('Saved search creation failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function updateSavedSearchAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
-  const input = savedSearchFromFormData(formData);
 
-  await updateSavedSearch(user.id, savedSearchId(formData), input);
-  revalidatePath('/dashboard/saved-searches');
+  try {
+    const input = savedSearchFromFormData(formData);
+
+    await updateSavedSearch(user.id, savedSearchId(formData), input);
+    revalidatePath('/dashboard/saved-searches');
+  } catch (error) {
+    console.error('Saved search update failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }
 
 export async function deleteSavedSearchAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
 
-  await deleteSavedSearch(user.id, savedSearchId(formData));
-  revalidatePath('/dashboard/saved-searches');
+  try {
+    await deleteSavedSearch(user.id, savedSearchId(formData));
+    revalidatePath('/dashboard/saved-searches');
+  } catch (error) {
+    console.error('Saved search deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 }

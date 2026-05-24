@@ -138,7 +138,7 @@ export function PropertyForm() {
   const [state, formAction, pending] = useActionState(createPropertyAction, initialState);
 
   return (
-    <form action={formAction} className="space-y-8" encType="multipart/form-data">
+    <form action={formAction} className="space-y-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="md:col-span-2">
           <FormField error={state.errors?.title} label="Property title" name="title">

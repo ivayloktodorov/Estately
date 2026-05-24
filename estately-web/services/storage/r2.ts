@@ -58,13 +58,13 @@ function requiredEnv(...names: string[]): string {
 }
 
 function getR2Endpoint(): string {
-  const explicitEndpoint = optionalEnv('R2_URL');
+  const explicitEndpoint = optionalEnv('R2_URL', 'CLOUDFLARE_R2_URL');
 
   if (explicitEndpoint) {
     return explicitEndpoint.replace(/\/$/, '');
   }
 
-  const accountId = requiredEnv('R2_ACCOUNT_ID');
+  const accountId = requiredEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID');
 
   return `https://${accountId}.r2.cloudflarestorage.com`;
 }
@@ -74,8 +74,8 @@ function getR2Client(): S3Client {
     region: 'auto',
     endpoint: getR2Endpoint(),
     credentials: {
-      accessKeyId: requiredEnv('R2_ACCESS_KEY_ID'),
-      secretAccessKey: requiredEnv('R2_SECRET_ACCESS_KEY'),
+      accessKeyId: requiredEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID'),
+      secretAccessKey: requiredEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY'),
     },
   });
 }
@@ -140,13 +140,13 @@ function createAttachmentObjectKey(file: File, conversationId: number): string {
 }
 
 export async function getR2PublicUrl(key: string): Promise<string> {
-  const publicUrl = optionalEnv('R2_PUBLIC_URL');
+  const publicUrl = optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL');
 
   if (publicUrl) {
     return `${publicUrl.replace(/\/$/, '')}/${key}`;
   }
 
-  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET');
+  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET');
 
   return getSignedUrl(
     getR2Client(),
@@ -165,7 +165,7 @@ export async function uploadR2Image(file: File, folder?: string): Promise<R2Uplo
     throw new Error(validationError);
   }
 
-  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET');
+  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET');
   const key = createObjectKey(file, folder);
   const body = Buffer.from(await file.arrayBuffer());
 
@@ -194,7 +194,7 @@ export async function uploadR2MessageAttachment(
     throw new Error(validationError);
   }
 
-  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET');
+  const bucketName = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET');
   const key = createAttachmentObjectKey(file, conversationId);
   const body = Buffer.from(await file.arrayBuffer());
 

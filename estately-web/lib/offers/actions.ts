@@ -79,13 +79,20 @@ export async function submitPropertyOfferAction(
 
 export async function updatePropertyOfferStatusAction(formData: FormData): Promise<void> {
   const user = await requireAuth();
-  const offerId = Number(textValue(formData, 'offerId'));
-  const status = textValue(formData, 'status');
 
-  if (!Number.isInteger(offerId) || offerId <= 0 || (status !== 'accepted' && status !== 'rejected')) {
-    throw new Error('Invalid offer action.');
+  try {
+    const offerId = Number(textValue(formData, 'offerId'));
+    const status = textValue(formData, 'status');
+
+    if (!Number.isInteger(offerId) || offerId <= 0 || (status !== 'accepted' && status !== 'rejected')) {
+      throw new Error('Invalid offer action.');
+    }
+
+    await updateOfferStatus({ offerId, ownerUserId: user.id, status });
+    revalidatePath('/dashboard/offers');
+  } catch (error) {
+    console.error('Offer status update failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-
-  await updateOfferStatus({ offerId, ownerUserId: user.id, status });
-  revalidatePath('/dashboard/offers');
 }

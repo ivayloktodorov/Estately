@@ -25,14 +25,43 @@ function fileFromFormData(formData: FormData): File | null {
   return file instanceof File && file.size > 0 ? file : null;
 }
 
+function isR2ConfigurationError(error: Error): boolean {
+  return error.message.includes('R2_') || error.message.includes('CLOUDFLARE_R2_');
+}
+
+function profileErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return 'Unable to update profile. Please try again.';
+  }
+
+  if (isR2ConfigurationError(error)) {
+    return 'Avatar uploads are not configured. Please contact support.';
+  }
+
+  if (
+    error.message === 'Image must be 5MB or smaller.' ||
+    error.message === 'Only JPG, JPEG, PNG, and WEBP images are allowed.' ||
+    error.message === 'Please choose an image file to upload.' ||
+    error.message === 'First name is required.' ||
+    error.message === 'Last name is required.' ||
+    error.message === 'Enter a valid email address.' ||
+    error.message === 'Another account already uses this email address.'
+  ) {
+    return error.message;
+  }
+
+  return 'Unable to update profile. Please try again.';
+}
+
 export async function updateProfileAction(
   previousState: ProfileActionState = initialState,
   formData: FormData,
 ): Promise<ProfileActionState> {
   void previousState;
 
+  const user = await requireAuth();
+
   try {
-    const user = await requireAuth();
     const currentProfile = await getUserProfile(user.id);
 
     if (!currentProfile) {
@@ -76,7 +105,10 @@ export async function updateProfileAction(
 
     return state('success', 'Profile updated successfully.');
   } catch (error) {
-    return state('error', error instanceof Error ? error.message : 'Could not update profile.');
+    console.error('Profile update failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return state('error', profileErrorMessage(error));
   }
 }
 

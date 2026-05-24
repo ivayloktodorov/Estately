@@ -35,85 +35,106 @@ function notesValue(formData: FormData): string | null {
 
 export async function moderatePropertyAction(formData: FormData): Promise<void> {
   await requireAdmin();
-  const propertyId = propertyIdValue(formData);
-  const property = await db
-    .select({ title: properties.title, ownerId: properties.createdByUserId })
-    .from(properties)
-    .where(eq(properties.id, propertyId))
-    .then((rows) => rows[0]);
-  const status = formData.get('status') === 'rejected' ? 'rejected' : 'approved';
 
-  await updatePropertyModeration([propertyId], status, notesValue(formData));
-  await notifyPropertyOwnersOfModeration([propertyId], status);
-  if (property) {
-    await createActivity({
-      userId: property.ownerId,
-      type: status === 'approved' ? 'property_approved' : 'property_rejected',
-      title: status === 'approved' ? 'Property approved' : 'Property rejected',
-      description:
-        status === 'approved'
-          ? `"${property.title}" was approved and is visible publicly.`
-          : `"${property.title}" was rejected and hidden from public pages.`,
-      entityType: 'property',
-      entityId: propertyId,
+  try {
+    const propertyId = propertyIdValue(formData);
+    const property = await db
+      .select({ title: properties.title, ownerId: properties.createdByUserId })
+      .from(properties)
+      .where(eq(properties.id, propertyId))
+      .then((rows) => rows[0]);
+    const status = formData.get('status') === 'rejected' ? 'rejected' : 'approved';
+
+    await updatePropertyModeration([propertyId], status, notesValue(formData));
+    await notifyPropertyOwnersOfModeration([propertyId], status);
+    if (property) {
+      await createActivity({
+        userId: property.ownerId,
+        type: status === 'approved' ? 'property_approved' : 'property_rejected',
+        title: status === 'approved' ? 'Property approved' : 'Property rejected',
+        description:
+          status === 'approved'
+            ? `"${property.title}" was approved and is visible publicly.`
+            : `"${property.title}" was rejected and hidden from public pages.`,
+        entityType: 'property',
+        entityId: propertyId,
+      });
+    }
+    if (status === 'approved') {
+      await notifySavedSearchMatchesForProperty(propertyId);
+    }
+
+    revalidatePath('/admin/properties');
+    revalidatePath(`/properties/${propertyId}`);
+  } catch (error) {
+    console.error('Admin property moderation failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
-  if (status === 'approved') {
-    await notifySavedSearchMatchesForProperty(propertyId);
-  }
-
-  revalidatePath('/admin/properties');
-  revalidatePath(`/properties/${propertyId}`);
 }
 
 export async function deletePropertyAction(formData: FormData): Promise<void> {
   await requireAdmin();
-  const propertyId = propertyIdValue(formData);
-  const property = await db
-    .select({ title: properties.title, ownerId: properties.createdByUserId })
-    .from(properties)
-    .where(eq(properties.id, propertyId))
-    .then((rows) => rows[0]);
 
-  await db.delete(properties).where(eq(properties.id, propertyId));
-  if (property) {
-    await createActivity({
-      userId: property.ownerId,
-      type: 'property_deleted',
-      title: 'Property deleted',
-      description: `An administrator deleted "${property.title}".`,
-      entityType: 'property',
-      entityId: propertyId,
+  try {
+    const propertyId = propertyIdValue(formData);
+    const property = await db
+      .select({ title: properties.title, ownerId: properties.createdByUserId })
+      .from(properties)
+      .where(eq(properties.id, propertyId))
+      .then((rows) => rows[0]);
+
+    await db.delete(properties).where(eq(properties.id, propertyId));
+    if (property) {
+      await createActivity({
+        userId: property.ownerId,
+        type: 'property_deleted',
+        title: 'Property deleted',
+        description: `An administrator deleted "${property.title}".`,
+        entityType: 'property',
+        entityId: propertyId,
+      });
+    }
+
+    revalidatePath('/admin/properties');
+    revalidatePath('/properties');
+  } catch (error) {
+    console.error('Admin property deletion failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
-
-  revalidatePath('/admin/properties');
-  revalidatePath('/properties');
 }
 
 export async function bulkModeratePropertiesAction(formData: FormData): Promise<void> {
   await requireAdmin();
-  const propertyIds = selectedPropertyIds(formData);
-  const action = formData.get('bulkAction');
 
-  if (propertyIds.length === 0) {
-    return;
-  }
+  try {
+    const propertyIds = selectedPropertyIds(formData);
+    const action = formData.get('bulkAction');
 
-  if (action === 'delete') {
-    await db.delete(properties).where(inArray(properties.id, propertyIds));
-  } else {
-    const status: ModerationStatus = action === 'reject' ? 'rejected' : 'approved';
-    await updatePropertyModeration(propertyIds, status, notesValue(formData));
-    await notifyPropertyOwnersOfModeration(propertyIds, status);
-    if (status === 'approved') {
-      await Promise.all(propertyIds.map((propertyId) => notifySavedSearchMatchesForProperty(propertyId)));
+    if (propertyIds.length === 0) {
+      return;
     }
-  }
 
-  revalidatePath('/admin/properties');
-  revalidatePath('/properties');
-  for (const propertyId of propertyIds) {
-    revalidatePath(`/properties/${propertyId}`);
+    if (action === 'delete') {
+      await db.delete(properties).where(inArray(properties.id, propertyIds));
+    } else {
+      const status: ModerationStatus = action === 'reject' ? 'rejected' : 'approved';
+      await updatePropertyModeration(propertyIds, status, notesValue(formData));
+      await notifyPropertyOwnersOfModeration(propertyIds, status);
+      if (status === 'approved') {
+        await Promise.all(propertyIds.map((propertyId) => notifySavedSearchMatchesForProperty(propertyId)));
+      }
+    }
+
+    revalidatePath('/admin/properties');
+    revalidatePath('/properties');
+    for (const propertyId of propertyIds) {
+      revalidatePath(`/properties/${propertyId}`);
+    }
+  } catch (error) {
+    console.error('Admin bulk property action failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 }
