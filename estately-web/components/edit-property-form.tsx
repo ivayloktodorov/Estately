@@ -241,7 +241,7 @@ export function EditPropertyForm({ property }: EditPropertyFormProps) {
       ) : null}
 
       <button
-        className="h-12 w-full rounded-lg bg-charcoal-950 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400 md:w-auto"
+        className="h-12 w-full rounded-lg bg-estate-700 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400 md:w-auto"
         disabled={pending}
         type="submit"
       >

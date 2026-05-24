@@ -185,7 +185,7 @@ const scoreCards = [
 function badgeClassName(status: ComplianceStatus): string {
   switch (status) {
     case 'Passed':
-      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+      return 'border-estate-200 bg-estate-50 text-estate-700';
     case 'Missing':
       return 'border-red-200 bg-red-50 text-red-700';
     case 'Pending':
@@ -258,7 +258,7 @@ export default function CompliancePage() {
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-3xl font-bold text-emerald-700">{passedCount}</p>
+              <p className="text-3xl font-bold text-estate-700">{passedCount}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">Passed checks</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

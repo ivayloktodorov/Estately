@@ -31,7 +31,7 @@ export default function ContactPage() {
                 Name
               </label>
               <input
-                className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-estate-100"
                 id="name"
                 name="name"
                 type="text"
@@ -42,7 +42,7 @@ export default function ContactPage() {
                 Email
               </label>
               <input
-                className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4 outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-estate-100"
                 id="email"
                 name="email"
                 type="email"
@@ -54,13 +54,13 @@ export default function ContactPage() {
               Message
             </label>
             <textarea
-              className="mt-2 min-h-36 w-full rounded-md border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              className="mt-2 min-h-36 w-full rounded-md border border-slate-300 px-4 py-3 outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-estate-100"
               id="message"
               name="message"
             />
           </div>
           <button
-            className="mt-5 h-12 rounded-md bg-emerald-700 px-6 font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
+            className="mt-5 h-12 rounded-md bg-estate-700 px-6 font-semibold text-white transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
             type="button"
           >
             Send message

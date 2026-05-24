@@ -130,9 +130,9 @@ export default function PerformanceAuditPage() {
                   <p className="text-sm font-bold uppercase tracking-wide text-amber-800">Issue found</p>
                   <p className="mt-2 text-sm leading-6 text-amber-900">{finding.issue}</p>
                 </div>
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                  <p className="text-sm font-bold uppercase tracking-wide text-emerald-800">Issue fixed</p>
-                  <p className="mt-2 text-sm leading-6 text-emerald-900">{finding.fixed}</p>
+                <div className="rounded-lg border border-estate-200 bg-estate-50 p-4">
+                  <p className="text-sm font-bold uppercase tracking-wide text-estate-800">Issue fixed</p>
+                  <p className="mt-2 text-sm leading-6 text-estate-900">{finding.fixed}</p>
                 </div>
               </div>
             </article>

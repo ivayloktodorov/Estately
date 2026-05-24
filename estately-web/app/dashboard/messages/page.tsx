@@ -72,7 +72,7 @@ export default async function MessagesPage() {
                   <Link
                     className={`block rounded-lg border p-4 shadow-estate-soft transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:p-5 ${
                       isUnread
-                        ? 'border-emerald-200 bg-emerald-50/70 hover:border-emerald-300'
+                        ? 'border-estate-200 bg-estate-50 hover:border-estate-300'
                         : 'border-stone-200 bg-white hover:border-estate-300 hover:shadow-lg'
                     }`}
                     href={`/dashboard/messages/${conversation.id}`}
@@ -99,7 +99,7 @@ export default async function MessagesPage() {
                                 {conversation.propertyTitle}
                               </h2>
                               {isUnread ? (
-                                <span className="inline-flex rounded-full bg-emerald-700 px-2.5 py-1 text-xs font-semibold text-white">
+                                <span className="inline-flex rounded-full bg-estate-700 px-2.5 py-1 text-xs font-semibold text-white">
                                   {conversation.unreadCount} unread
                                 </span>
                               ) : null}

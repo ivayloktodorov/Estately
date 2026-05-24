@@ -20,7 +20,7 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
         aria-controls="mobile-menu"
         aria-expanded={mobileMenuOpen}
         aria-label="Toggle navigation menu"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-charcoal-900 hover:text-charcoal-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 lg:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-stone-300 bg-white text-stone-700 transition hover:border-estate-300 hover:text-estate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 lg:hidden"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         type="button"
       >
@@ -45,7 +45,7 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
             <nav aria-label="Mobile navigation" className="space-y-1">
               {publicLinks.map((link) => (
                 <Link
-                  className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
+                  className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-estate-50 hover:text-estate-700"
                   href={link.href}
                   key={link.href}
                   onClick={() => setMobileMenuOpen(false)}
@@ -57,7 +57,7 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
                 <>
                   <div className="my-3 border-t border-stone-200" />
                   <Link
-                    className="block rounded-md px-3 py-2 text-base font-semibold text-stone-800 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    className="block rounded-md px-3 py-2 text-base font-semibold text-stone-800 transition hover:bg-estate-50 hover:text-estate-700"
                     href="/softuni-exam"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -65,14 +65,14 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
                   </Link>
                   <div className="my-3 border-t border-stone-200" />
                   <Link
-                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-estate-50 hover:text-estate-700"
                     href="/dashboard/notifications"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Notifications
                   </Link>
                   <Link
-                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-cream-100 hover:text-charcoal-950"
+                    className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-estate-50 hover:text-estate-700"
                     href="/profile"
                     onClick={() => setMobileMenuOpen(false)}
                   >

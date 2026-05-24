@@ -173,7 +173,7 @@ const verificationCommands = [
 function badgeClassName(status: QaStatus): string {
   switch (status) {
     case 'Passed':
-      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+      return 'border-estate-200 bg-estate-50 text-estate-700';
     case 'Fixed':
       return 'border-blue-200 bg-blue-50 text-blue-700';
     case 'Manual Verification':
@@ -221,7 +221,7 @@ export default function FinalQaReportPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-3xl font-bold text-emerald-700">{passedCount}</p>
+              <p className="text-3xl font-bold text-estate-700">{passedCount}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">Passed checks</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

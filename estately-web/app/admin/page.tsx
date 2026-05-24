@@ -29,7 +29,7 @@ function RoleBadge({ role }: { role: string }) {
     <span
       className={
         role === 'admin'
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          ? 'inline-flex rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-200'
           : 'inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200'
       }
     >
@@ -41,7 +41,7 @@ function RoleBadge({ role }: { role: string }) {
 function StatusBadge({ status }: { status: string }) {
   const styles =
     status === 'approved'
-      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+      ? 'bg-estate-50 text-estate-700 ring-estate-200'
       : status === 'rejected'
         ? 'bg-red-50 text-red-700 ring-red-200'
         : 'bg-amber-50 text-amber-700 ring-amber-200';
@@ -66,7 +66,7 @@ function RecentUsers({ users }: { users: RecentAdminUser[] }) {
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-slate-950">Recent users</h2>
-        <Link className="text-sm font-semibold text-emerald-700 hover:text-emerald-800" href="/admin/users">
+        <Link className="text-sm font-semibold text-estate-700 hover:text-estate-800" href="/admin/users">
           View all
         </Link>
       </div>
@@ -78,7 +78,7 @@ function RecentUsers({ users }: { users: RecentAdminUser[] }) {
               key={user.id}
             >
               <div>
-                <Link className="font-semibold text-slate-950 hover:text-emerald-700" href={`/admin/users/${user.id}`}>
+                <Link className="font-semibold text-slate-950 hover:text-estate-700" href={`/admin/users/${user.id}`}>
                   {user.fullName}
                 </Link>
                 <p className="mt-1 text-sm text-slate-600">{user.email}</p>
@@ -102,7 +102,7 @@ function RecentProperties({ properties }: { properties: RecentAdminProperty[] })
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-slate-950">Recent properties</h2>
-        <Link className="text-sm font-semibold text-emerald-700 hover:text-emerald-800" href="/admin/properties">
+        <Link className="text-sm font-semibold text-estate-700 hover:text-estate-800" href="/admin/properties">
           View all
         </Link>
       </div>
@@ -114,7 +114,7 @@ function RecentProperties({ properties }: { properties: RecentAdminProperty[] })
               key={property.id}
             >
               <div>
-                <Link className="font-semibold text-slate-950 hover:text-emerald-700" href={`/properties/${property.id}`}>
+                <Link className="font-semibold text-slate-950 hover:text-estate-700" href={`/properties/${property.id}`}>
                   {property.title}
                 </Link>
                 <p className="mt-1 text-sm text-slate-600">
@@ -141,7 +141,7 @@ function RecentInquiries({ inquiries }: { inquiries: RecentAdminInquiry[] }) {
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-slate-950">Recent inquiries</h2>
         <Link
-          className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+          className="text-sm font-semibold text-estate-700 hover:text-estate-800"
           href="/dashboard/inquiries"
         >
           View all
@@ -157,7 +157,7 @@ function RecentInquiries({ inquiries }: { inquiries: RecentAdminInquiry[] }) {
               <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                 <div>
                   <Link
-                    className="font-semibold text-slate-950 hover:text-emerald-700"
+                    className="font-semibold text-slate-950 hover:text-estate-700"
                     href={`/properties/${inquiry.propertyId}`}
                   >
                     {inquiry.propertyTitle}
@@ -198,7 +198,7 @@ export default async function AdminPage() {
         <AdminNavigation active="dashboard" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
             Admin overview
           </p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -209,7 +209,7 @@ export default async function AdminPage() {
               </p>
             </div>
             <Link
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-estate-800"
               href="/admin/properties"
             >
               Manage properties

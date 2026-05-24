@@ -10,12 +10,12 @@ interface ButtonLinkProps extends ComponentPropsWithoutRef<typeof Link> {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-charcoal-950 text-white shadow-estate-soft hover:bg-charcoal-800 focus-visible:ring-charcoal-900',
-  secondary:
     'bg-estate-700 text-white shadow-estate-soft hover:bg-estate-800 focus-visible:ring-estate-700',
+  secondary:
+    'bg-brand-purple text-white shadow-estate-soft hover:bg-estate-600 focus-visible:ring-brand-purple',
   outline:
-    'border border-stone-300 bg-white text-charcoal-900 hover:border-charcoal-900 hover:bg-cream-50 focus-visible:ring-charcoal-900',
-  ghost: 'text-stone-700 hover:bg-cream-100 hover:text-charcoal-950 focus-visible:ring-stone-500',
+    'border border-stone-300 bg-white text-charcoal-900 hover:border-estate-300 hover:bg-estate-50 hover:text-estate-700 focus-visible:ring-estate-700',
+  ghost: 'text-stone-700 hover:bg-estate-50 hover:text-estate-700 focus-visible:ring-estate-700',
 };
 
 export function ButtonLink({

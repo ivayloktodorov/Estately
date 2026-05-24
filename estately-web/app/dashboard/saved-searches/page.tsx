@@ -126,7 +126,7 @@ export default async function SavedSearchesPage() {
                     <div className="mt-4 flex flex-wrap gap-2">
                       {filterBadges(search).length > 0 ? (
                         filterBadges(search).map((badge) => (
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100" key={badge}>
+                          <span className="rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-100" key={badge}>
                             {badge}
                           </span>
                         ))

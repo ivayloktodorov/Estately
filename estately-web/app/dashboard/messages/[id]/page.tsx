@@ -117,7 +117,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
                 {otherParticipant.avatarUrl ? (
                   <Image alt="" className="h-9 w-9 rounded-full object-cover" height={36} src={otherParticipant.avatarUrl} width={36} />
                 ) : (
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-estate-700 ring-1 ring-emerald-100">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-estate-50 text-xs font-bold text-estate-700 ring-1 ring-estate-100">
                     {initials(otherParticipant.fullName)}
                   </span>
                 )}
@@ -164,10 +164,10 @@ export default async function ConversationPage({ params }: ConversationPageProps
                   }`}
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className={`text-xs font-semibold ${isOwn ? 'text-emerald-50' : 'text-slate-600'}`}>
+                    <p className={`text-xs font-semibold ${isOwn ? 'text-estate-50' : 'text-slate-600'}`}>
                       {message.senderName}
                     </p>
-                    <time className={`text-xs ${isOwn ? 'text-emerald-50/80' : 'text-slate-400'}`} dateTime={message.createdAt.toISOString()}>
+                    <time className={`text-xs ${isOwn ? 'text-estate-50/80' : 'text-slate-400'}`} dateTime={message.createdAt.toISOString()}>
                       {formatDate(message.createdAt)}
                     </time>
                   </div>
@@ -214,7 +214,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
                             </span>
                             <span className="min-w-0">
                               <span className="block truncate font-semibold">{attachment.fileName}</span>
-                              <span className={`block text-xs ${isOwn ? 'text-emerald-50/80' : 'text-slate-500'}`}>
+                              <span className={`block text-xs ${isOwn ? 'text-estate-50/80' : 'text-slate-500'}`}>
                                 {formatFileSize(attachment.fileSize)}
                               </span>
                             </span>

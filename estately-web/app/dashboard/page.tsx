@@ -83,7 +83,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="mx-auto max-w-5xl">
         <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
             {user.role} dashboard
           </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">Hi, {user.fullName}</h1>
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
           </p>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-5">
+        <section className="mt-6 grid gap-4 md:grid-cols-3 lg:grid-cols-6">
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/properties"
@@ -109,6 +109,14 @@ export default async function DashboardPage() {
             <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Inbox</p>
             <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Messages</h2>
             <p className="mt-2 text-sm text-slate-600">Read and reply to conversations.</p>
+          </Link>
+          <Link
+            className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
+            href="/dashboard/offers"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Deals</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Offers</h2>
+            <p className="mt-2 text-sm text-slate-600">Manage received and submitted offers.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
@@ -158,7 +166,7 @@ export default async function DashboardPage() {
                   href={activity.href ?? '/dashboard/activity'}
                   key={activity.id}
                 >
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-estate-700">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-estate-50 text-sm font-semibold text-estate-700">
                     {activityIcon(activity.type)}
                   </span>
                   <span className="min-w-0 flex-1">

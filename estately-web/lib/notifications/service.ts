@@ -32,7 +32,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const MIN_PAGE = 1;
 
 const NOTIFICATION_FILTERS = ['all', 'unread', 'read'] as const;
-const NOTIFICATION_GROUPS = ['all', 'listings', 'messages', 'inquiries', 'system'] as const;
+const NOTIFICATION_GROUPS = ['all', 'listings', 'messages', 'inquiries', 'offers', 'system'] as const;
 
 export type NotificationReadFilter = (typeof NOTIFICATION_FILTERS)[number];
 export type NotificationGroupFilter = (typeof NOTIFICATION_GROUPS)[number];
@@ -57,6 +57,9 @@ function notificationType(type: string): NotificationType {
     case 'listing_updated':
     case 'inquiry_received':
     case 'message_received':
+    case 'offer_received':
+    case 'offer_accepted':
+    case 'offer_rejected':
     case 'system':
       return type;
     default:
@@ -102,6 +105,8 @@ function typesForGroup(group: NotificationGroupFilter): NotificationType[] {
       return ['message_received'];
     case 'inquiries':
       return ['inquiry_received'];
+    case 'offers':
+      return ['offer_received', 'offer_accepted', 'offer_rejected'];
     case 'system':
       return ['system'];
     case 'all':

@@ -15,6 +15,12 @@ interface PropertyInquiryFormProps {
   propertyId: number;
 }
 
+function authHref(pathname: '/login' | '/register', propertyId: number): string {
+  const params = new URLSearchParams({ redirect: `/properties/${propertyId}` });
+
+  return `${pathname}?${params.toString()}`;
+}
+
 export function PropertyInquiryForm({ isAuthenticated, propertyId }: PropertyInquiryFormProps) {
   const submitAction = submitPropertyInquiryAction.bind(null, propertyId);
   const [state, formAction, pending] = useActionState(submitAction, initialState);
@@ -25,14 +31,22 @@ export function PropertyInquiryForm({ isAuthenticated, propertyId }: PropertyInq
       <section className="rounded-2xl border border-stone-200 bg-white p-8 shadow-estate-soft">
         <h2 className="text-2xl font-bold text-charcoal-950">Contact about this property</h2>
         <p className="mt-3 text-slate-600">
-          Sign in to send a private inquiry to the listing owner.
+          Login or create an account to contact the owner.
         </p>
-        <Link
-          className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
-          href="/login"
-        >
-          Login to contact agent
-        </Link>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link
+            className="inline-flex h-12 items-center justify-center rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+            href={authHref('/login', propertyId)}
+          >
+            Login
+          </Link>
+          <Link
+            className="inline-flex h-12 items-center justify-center rounded-lg border border-stone-300 bg-white px-5 text-sm font-semibold text-charcoal-950 transition hover:border-estate-300 hover:bg-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+            href={authHref('/register', propertyId)}
+          >
+            Register
+          </Link>
+        </div>
       </section>
     );
   }
@@ -73,7 +87,7 @@ export function PropertyInquiryForm({ isAuthenticated, propertyId }: PropertyInq
           <div
             className={`rounded-lg border px-4 py-3 text-sm ${
               state.status === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                ? 'border-estate-200 bg-estate-50 text-estate-800'
                 : 'border-red-200 bg-red-50 text-red-700'
             }`}
           >
@@ -82,7 +96,7 @@ export function PropertyInquiryForm({ isAuthenticated, propertyId }: PropertyInq
         ) : null}
 
         <button
-          className="h-12 w-full rounded-lg bg-charcoal-950 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400 sm:w-auto"
+          className="h-12 w-full rounded-lg bg-estate-700 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400 sm:w-auto"
           disabled={pending}
           type="submit"
         >

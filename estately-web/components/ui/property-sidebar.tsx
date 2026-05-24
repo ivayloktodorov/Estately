@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 interface PropertySidebarProps {
   price: string;
   bedrooms: number;
@@ -7,6 +9,7 @@ interface PropertySidebarProps {
   areaSqm: number;
   address: string;
   listingType?: 'sale' | 'rent';
+  offerSlot?: ReactNode;
 }
 
 export function PropertySidebar({
@@ -16,9 +19,10 @@ export function PropertySidebar({
   areaSqm,
   address,
   listingType = 'sale',
+  offerSlot,
 }: PropertySidebarProps) {
   return (
-    <div className="sticky top-24 space-y-6">
+    <aside className="space-y-6 lg:sticky lg:top-24">
       {/* Price Card */}
       <div className="bg-white rounded-2xl border border-stone-200 shadow-estate-soft p-6">
         <p className="text-sm text-stone-600 mb-2">Price</p>
@@ -53,15 +57,7 @@ export function PropertySidebar({
         </div>
       </div>
 
-      {/* Contact CTA */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-estate-soft p-6 space-y-4">
-        <button className="w-full bg-estate-700 hover:bg-estate-800 text-white font-semibold py-3 px-4 rounded-xl transition duration-300 shadow-lg hover:shadow-estate">
-          Contact Agent
-        </button>
-        <p className="text-xs text-stone-500 text-center">
-          Get more information about this property or schedule a viewing
-        </p>
-      </div>
+      {offerSlot}
 
       {/* Location Card */}
       <div className="bg-cream-100 rounded-2xl border border-stone-200 p-6">
@@ -70,6 +66,6 @@ export function PropertySidebar({
           {address}
         </p>
       </div>
-    </div>
+    </aside>
   );
 }

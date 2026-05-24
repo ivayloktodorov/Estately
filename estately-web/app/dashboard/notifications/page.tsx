@@ -134,7 +134,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
               <p className="mt-2 text-slate-600">Review account, listing, inquiry, and message updates.</p>
             </div>
             <form action={markAllNotificationsReadAction}>
-              <button className="inline-flex h-10 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-estate-700">
+              <button className="inline-flex h-10 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white transition hover:bg-estate-800">
                 Mark all as read
               </button>
             </form>
@@ -165,7 +165,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
               <option value="inquiries">Inquiries</option>
               <option value="system">System</option>
             </select>
-            <button className="h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-estate-700">
+            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
               Apply type
             </button>
             <Link
@@ -186,7 +186,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
             {result.notifications.map((notification) => (
               <article
                 className={`rounded-lg border p-5 shadow-sm ${
-                  notification.isRead ? 'border-stone-200 bg-white' : 'border-emerald-200 bg-emerald-50/60'
+                  notification.isRead ? 'border-stone-200 bg-white' : 'border-estate-200 bg-estate-50'
                 }`}
                 key={notification.id}
               >
@@ -202,7 +202,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
                           {typeLabel(notification.type)}
                         </span>
                         {!notification.isRead ? (
-                          <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs font-semibold text-white">
+                          <span className="rounded-full bg-estate-700 px-2.5 py-1 text-xs font-semibold text-white">
                             Unread
                           </span>
                         ) : (
@@ -253,7 +253,7 @@ export default async function NotificationsPage({ searchParams }: NotificationsP
           </p>
           {result.hasNextPage ? (
             <Link
-              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-estate-700"
+              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
               href={notificationsHref(result.status, result.type, result.currentPage + 1)}
             >
               Next

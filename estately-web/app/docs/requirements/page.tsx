@@ -188,7 +188,7 @@ const sections: RequirementSection[] = [
 function badgeClassName(status: Status): string {
   switch (status) {
     case 'Completed':
-      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+      return 'border-estate-200 bg-estate-50 text-estate-700';
     case 'In Progress':
       return 'border-amber-200 bg-amber-50 text-amber-700';
     case 'Pending':
@@ -278,7 +278,7 @@ export default function RequirementsPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-3xl font-bold text-emerald-700">{completedSections}</p>
+              <p className="text-3xl font-bold text-estate-700">{completedSections}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">Completed sections</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

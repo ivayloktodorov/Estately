@@ -6,7 +6,18 @@ export const metadata: Metadata = {
   description: 'Create an Estately account to save and manage property searches.',
 };
 
-export default function RegisterPage() {
+interface RegisterPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+export default async function RegisterPage({ searchParams }: RegisterPageProps) {
+  const params = await searchParams;
+  const redirectTo = firstParam(params.redirect) || firstParam(params.next);
+
   return (
     <main className="bg-cream-50">
       <section className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-8">
@@ -22,7 +33,7 @@ export default function RegisterPage() {
             </p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-white p-8 shadow-estate-soft">
-            <RegisterForm />
+            <RegisterForm redirectTo={redirectTo} />
           </div>
         </div>
       </section>

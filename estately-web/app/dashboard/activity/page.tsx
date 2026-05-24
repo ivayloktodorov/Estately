@@ -163,7 +163,7 @@ export default async function ActivityPage({ searchParams }: ActivityPageProps) 
           </p>
           {result.hasNextPage ? (
             <Link
-              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-estate-700"
+              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
               href={activityHref(result.filter, result.currentPage + 1)}
             >
               Next

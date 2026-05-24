@@ -179,7 +179,7 @@ export function PaginationControls({
             name="page"
             type="number"
           />
-          <button className="inline-flex h-10 items-center justify-center rounded-lg bg-charcoal-950 px-4 text-sm font-bold text-white transition hover:bg-estate-700">
+          <button className="inline-flex h-10 items-center justify-center rounded-lg bg-estate-700 px-4 text-sm font-bold text-white transition hover:bg-estate-800">
             Go
           </button>
         </form>

@@ -6,7 +6,18 @@ export const metadata: Metadata = {
   description: 'Sign in to your Estately account.',
 };
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const redirectTo = firstParam(params.redirect) || firstParam(params.next);
+
   return (
     <main className="bg-cream-50">
       <section className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-8">
@@ -21,7 +32,7 @@ export default function LoginPage() {
             </p>
           </div>
           <div className="rounded-xl border border-stone-200 bg-white p-8 shadow-estate-soft">
-            <LoginForm />
+            <LoginForm redirectTo={redirectTo} />
           </div>
         </div>
         <div className="hidden min-h-[560px] rounded-xl bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&auto=format&fit=crop')] bg-cover bg-center shadow-xl shadow-charcoal-950/10 lg:block" />

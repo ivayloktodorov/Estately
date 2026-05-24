@@ -36,7 +36,7 @@ export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonP
   return (
     <>
       <button
-        className="inline-flex h-11 items-center justify-center rounded-lg border border-estate-200 bg-white px-5 text-sm font-semibold text-estate-700 shadow-sm transition hover:border-estate-300 hover:bg-emerald-50"
+        className="inline-flex h-11 items-center justify-center rounded-lg border border-estate-200 bg-white px-5 text-sm font-semibold text-estate-700 shadow-sm transition hover:border-estate-300 hover:bg-estate-50"
         onClick={() => setIsOpen(true)}
         type="button"
       >

@@ -10,11 +10,25 @@ const initialState: AuthActionState = {
   message: '',
 };
 
-export function LoginForm() {
+interface LoginFormProps {
+  redirectTo?: string;
+}
+
+function authHref(pathname: '/login' | '/register', redirectTo?: string): string {
+  if (!redirectTo) {
+    return pathname;
+  }
+
+  const params = new URLSearchParams({ redirect: redirectTo });
+  return `${pathname}?${params.toString()}`;
+}
+
+export function LoginForm({ redirectTo = '' }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
     <form action={formAction} className="w-full space-y-6">
+      <input name="redirect" type="hidden" value={redirectTo} />
       <div>
         <label className="block text-sm font-semibold text-charcoal-950 mb-2" htmlFor="email">
           Email address
@@ -50,7 +64,7 @@ export function LoginForm() {
         </div>
       ) : null}
       <button
-        className="w-full h-11 rounded-lg bg-charcoal-950 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-charcoal-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400"
+        className="w-full h-11 rounded-lg bg-estate-700 px-5 font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-stone-400"
         disabled={pending}
         type="submit"
       >
@@ -58,7 +72,7 @@ export function LoginForm() {
       </button>
       <p className="text-center text-sm text-stone-600">
         New to Estately?{' '}
-        <Link className="font-semibold text-estate-700 hover:text-estate-800 transition" href="/register">
+        <Link className="font-semibold text-estate-700 hover:text-estate-800 transition" href={authHref('/register', redirectTo)}>
           Create an account
         </Link>
       </p>

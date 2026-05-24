@@ -11,12 +11,14 @@ import { PropertySidebar } from '@/components/ui/property-sidebar';
 import { propertyImageUrl } from '@/lib/properties/images';
 import { getCurrentUser } from '@/lib/auth';
 import { PropertyInquiryForm } from '@/components/properties/property-inquiry-form';
+import { MakeOfferCard } from '@/components/offers/make-offer-card';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
   params: Promise<{
     id: string;
   }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 function canViewProperty(
@@ -113,8 +115,13 @@ export async function generateMetadata(
   };
 }
 
-export default async function PropertyPage({ params }: PropertyPageProps) {
+function firstParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+export default async function PropertyPage({ params, searchParams }: PropertyPageProps) {
   const { id } = await params;
+  const query = searchParams ? await searchParams : {};
   const numId = parseInt(id, 10);
 
   // Validate ID format
@@ -135,6 +142,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl, property.propertyType);
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
+  const currentUserIsOwner = user?.id === property.createdByUserId;
+  const shouldOpenOfferForm = firstParam(query.intent) === 'offer';
 
   return (
     <main className="py-12 bg-cream-50">
@@ -220,6 +229,14 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               areaSqm={property.areaSqm}
               address={property.address}
               listingType={listingType}
+              offerSlot={
+                <MakeOfferCard
+                  currentUserIsOwner={currentUserIsOwner}
+                  isAuthenticated={Boolean(user)}
+                  propertyId={property.id}
+                  shouldOpen={shouldOpenOfferForm}
+                />
+              }
             />
           </div>
         </div>

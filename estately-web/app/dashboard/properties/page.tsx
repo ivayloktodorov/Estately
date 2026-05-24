@@ -26,7 +26,7 @@ function readableLabel(value: string): string {
 function StatusBadge({ status }: { status: string }) {
   const styles =
     status === 'approved'
-      ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+      ? 'bg-estate-50 text-estate-700 ring-estate-200'
       : status === 'rejected'
         ? 'bg-red-50 text-red-700 ring-red-200'
         : 'bg-amber-50 text-amber-700 ring-amber-200';
@@ -48,7 +48,7 @@ function PropertyActions({ property }: { property: DashboardProperty }) {
         View
       </Link>
       <Link
-        className="inline-flex h-9 items-center justify-center rounded-md bg-charcoal-950 px-3 text-sm font-semibold text-white transition hover:bg-charcoal-800"
+        className="inline-flex h-9 items-center justify-center rounded-md bg-estate-700 px-3 text-sm font-semibold text-white transition hover:bg-estate-800"
         href={`/dashboard/properties/${property.id}/edit`}
       >
         Edit

@@ -59,7 +59,7 @@ export function PropertyViewToggle({ searchParams, view }: PropertyViewTogglePro
           aria-pressed={view === item.value}
           className={`h-10 flex-1 rounded-lg px-4 text-sm font-bold transition sm:flex-none ${
             view === item.value
-              ? 'bg-charcoal-950 text-white shadow-sm'
+              ? 'bg-estate-700 text-white shadow-sm'
               : 'text-charcoal-950 hover:bg-cream-50'
           } disabled:cursor-wait disabled:opacity-70`}
           disabled={isPending}

@@ -8,6 +8,9 @@ export const notificationTypes = [
   'listing_updated',
   'inquiry_received',
   'message_received',
+  'offer_received',
+  'offer_accepted',
+  'offer_rejected',
   'system',
 ] as const;
 

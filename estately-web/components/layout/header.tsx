@@ -12,7 +12,6 @@ interface HeaderProps {
 }
 
 const publicLinks = [
-  { href: '/', label: 'Home' },
   { href: '/buy', label: 'Buy' },
   { href: '/rent', label: 'Rent' },
   { href: '/about', label: 'About' },
@@ -53,7 +52,7 @@ export async function Header({ user }: HeaderProps) {
           <nav aria-label="Primary navigation" className="hidden flex-1 items-center justify-center lg:flex gap-1">
             {publicLinks.map((link) => (
               <Link
-                className="px-4 py-2 text-sm font-medium text-stone-600 transition hover:text-charcoal-950 rounded-md hover:bg-cream-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700"
+                className="px-4 py-2 text-sm font-medium text-stone-600 transition hover:text-estate-700 rounded-md hover:bg-estate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700"
                 href={link.href}
                 key={link.href}
               >

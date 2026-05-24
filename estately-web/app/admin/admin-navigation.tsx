@@ -29,8 +29,8 @@ export function AdminNavigation({ active }: AdminNavigationProps) {
                 aria-current={isActive ? 'page' : undefined}
                 className={`inline-flex h-12 items-center justify-center rounded-lg border px-6 text-sm font-semibold shadow-sm transition ${
                   isActive
-                    ? 'border-emerald-800 bg-emerald-800 text-white hover:bg-emerald-900'
-                    : 'border-slate-200 bg-white text-slate-950 hover:border-emerald-300 hover:text-emerald-700'
+                    ? 'border-estate-800 bg-estate-800 text-white hover:bg-estate-900'
+                    : 'border-slate-200 bg-white text-slate-950 hover:border-estate-300 hover:text-estate-700'
                 }`}
                 href={link.href}
                 key={link.href}

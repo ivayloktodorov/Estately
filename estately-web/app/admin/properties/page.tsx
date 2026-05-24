@@ -38,7 +38,7 @@ function readableLabel(value: string): string {
 function StatusBadge({ status }: { status: ModerationStatus }) {
   const styles = {
     pending: 'bg-amber-50 text-amber-700 ring-amber-200',
-    approved: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    approved: 'bg-estate-50 text-estate-700 ring-estate-200',
     rejected: 'bg-red-50 text-red-700 ring-red-200',
   };
 
@@ -87,7 +87,7 @@ function ModerationActionForm({ property, status }: { property: AdminProperty; s
         disabled={disabled}
         className={
           status === 'approved'
-            ? 'inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-emerald-800 px-3 text-xs font-semibold text-white transition hover:bg-emerald-900 disabled:border disabled:border-slate-200 disabled:bg-white disabled:text-slate-400'
+            ? 'inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-estate-800 px-3 text-xs font-semibold text-white transition hover:bg-estate-900 disabled:border disabled:border-slate-200 disabled:bg-white disabled:text-slate-400'
             : 'inline-flex h-9 w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-3 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-white'
         }
       >
@@ -103,14 +103,14 @@ function PropertyActions({ property }: { property: AdminProperty }) {
     <div className="grid w-full gap-2 sm:w-40">
       <div className="grid grid-cols-2 gap-2">
         <Link
-          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
           href={`/properties/${property.id}`}
         >
           <TinyIcon>◉</TinyIcon>
           View
         </Link>
         <Link
-          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
           href={`/dashboard/properties/${property.id}/edit`}
         >
           <TinyIcon>✎</TinyIcon>
@@ -132,15 +132,15 @@ function PropertyActions({ property }: { property: AdminProperty }) {
 
 function ModerationGuide() {
   const items = [
-    { icon: '✓', title: 'Approve', copy: 'Listing becomes visible to the public.', tone: 'emerald' },
+    { icon: '✓', title: 'Approve', copy: 'Listing becomes visible to the public.', tone: 'brand' },
     { icon: '×', title: 'Reject', copy: 'Listing is hidden and owner can edit and resubmit.', tone: 'red' },
     { icon: '⌫', title: 'Delete', copy: 'Listing is permanently removed.', tone: 'red' },
   ];
 
   return (
-    <section className="mt-6 rounded-lg border border-emerald-100 bg-emerald-50/30 p-5 shadow-sm">
-      <div className="flex items-center gap-3 text-sm font-semibold text-emerald-900">
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-300 text-emerald-700">
+    <section className="mt-6 rounded-lg border border-estate-100 bg-estate-50/30 p-5 shadow-sm">
+      <div className="flex items-center gap-3 text-sm font-semibold text-estate-900">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-estate-300 text-estate-700">
           i
         </span>
         Moderation guide
@@ -150,8 +150,8 @@ function ModerationGuide() {
           <div className="flex gap-3" key={item.title}>
             <span
               className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold ${
-                item.tone === 'emerald'
-                  ? 'border-emerald-300 text-emerald-700'
+                item.tone === 'brand'
+                  ? 'border-estate-300 text-estate-700'
                   : 'border-red-300 text-red-600'
               }`}
             >
@@ -191,7 +191,7 @@ function Pagination({
     <nav className="mt-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:flex-row">
       {hasPreviousPage ? (
         <Link
-          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-estate-300 hover:text-estate-700"
           href={propertiesHref(search, status, listing, sort, currentPage - 1)}
         >
           Previous
@@ -207,7 +207,7 @@ function Pagination({
       </p>
       {hasNextPage ? (
         <Link
-          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
           href={propertiesHref(search, status, listing, sort, currentPage + 1)}
         >
           Next
@@ -231,7 +231,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
         <AdminNavigation active="properties" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Listing moderation</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Listing moderation</p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <h1 className="text-3xl font-semibold text-slate-950">Properties</h1>
@@ -245,7 +245,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           </div>
 
           <form action="/admin/properties" className="mt-6 grid gap-3 lg:grid-cols-[1fr_repeat(3,180px)_auto_auto]">
-            <label className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 focus-within:border-emerald-700 focus-within:ring-2 focus-within:ring-emerald-700/10">
+            <label className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 focus-within:border-estate-700 focus-within:ring-2 focus-within:ring-estate-700/10">
               <span aria-hidden="true" className="text-slate-500">
                 ⌕
               </span>
@@ -257,18 +257,18 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                 type="search"
               />
             </label>
-            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" defaultValue={result.status} name="status">
+            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.status} name="status">
               <option value="">All statuses</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
-            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" defaultValue={result.listing} name="listing">
+            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.listing} name="listing">
               <option value="">Sale and rent</option>
               <option value="sale">Sale</option>
               <option value="rent">Rent</option>
             </select>
-            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" defaultValue={result.sort} name="sort">
+            <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.sort} name="sort">
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
               <option value="price_asc">Price low-high</option>
@@ -277,8 +277,8 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
               <option value="city">City A-Z</option>
               <option value="status">Status</option>
             </select>
-            <button className="h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">Apply</button>
-            <Link className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700" href="/admin/properties">
+            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">Apply</button>
+            <Link className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700" href="/admin/properties">
               Clear
             </Link>
           </form>
@@ -292,14 +292,14 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
           <>
             <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <form action={bulkModeratePropertiesAction} className="flex flex-col gap-3 lg:flex-row lg:items-center" id="bulk-property-form">
-                <select className="h-12 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="bulkAction">
+                <select className="h-12 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" name="bulkAction">
                   <option value="approve">Bulk actions</option>
                   <option value="approve">Approve selected</option>
                   <option value="reject">Reject selected</option>
                   <option value="delete">Delete selected</option>
                 </select>
-                <input className="h-12 flex-1 rounded-md border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10" name="moderationNotes" placeholder="Add moderation notes (optional)" />
-                <button className="h-12 rounded-md bg-emerald-800/40 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                <input className="h-12 flex-1 rounded-md border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" name="moderationNotes" placeholder="Add moderation notes (optional)" />
+                <button className="h-12 rounded-md bg-estate-800/40 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
                   Apply to selected
                 </button>
               </form>
@@ -311,7 +311,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                   <thead className="bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-600">
                     <tr>
                       <th className="w-16 px-4 py-3">
-                        <input aria-label="Select all visible properties" className="h-4 w-4 rounded border-slate-300 text-emerald-700" type="checkbox" />
+                        <input aria-label="Select all visible properties" className="h-4 w-4 rounded border-slate-300 text-estate-700" type="checkbox" />
                       </th>
                       <th className="w-[26%] px-4 py-3">Property</th>
                       <th className="w-[8%] px-4 py-3">City</th>
@@ -328,7 +328,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                     {result.properties.map((property) => (
                       <tr className="align-middle" key={property.id}>
                         <td className="px-4 py-6">
-                          <input aria-label={`Select ${property.title}`} className="h-4 w-4 rounded border-slate-300 text-emerald-700" form="bulk-property-form" name="propertyIds" type="checkbox" value={property.id} />
+                          <input aria-label={`Select ${property.title}`} className="h-4 w-4 rounded border-slate-300 text-estate-700" form="bulk-property-form" name="propertyIds" type="checkbox" value={property.id} />
                         </td>
                         <td className="px-4 py-6">
                           <div className="flex min-w-0 gap-3">
@@ -386,7 +386,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                   <div className="flex items-start gap-3">
                     <input
                       aria-label={`Select ${property.title}`}
-                      className="mt-8 h-4 w-4 shrink-0 rounded border-slate-300 text-emerald-700"
+                      className="mt-8 h-4 w-4 shrink-0 rounded border-slate-300 text-estate-700"
                       form="bulk-property-form"
                       name="propertyIds"
                       type="checkbox"

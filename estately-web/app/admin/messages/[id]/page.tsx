@@ -58,7 +58,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
         <AdminNavigation active="messages" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
             Conversation #{conversation.id}
           </p>
           <div className="mt-2 flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
@@ -69,7 +69,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
               </p>
             </div>
             <Link
-              className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+              className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
               href={`/properties/${conversation.property.id}`}
             >
               View listing
@@ -144,7 +144,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
                       key={attachment.id}
                     >
                       <a
-                        className="flex min-w-0 items-center gap-3 text-sm text-slate-700 transition hover:text-emerald-700"
+                        className="flex min-w-0 items-center gap-3 text-sm text-slate-700 transition hover:text-estate-700"
                         href={attachmentHref(attachment.id)}
                         rel="noreferrer"
                         target="_blank"
@@ -157,7 +157,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
                             src={attachmentHref(attachment.id)}
                           />
                         ) : (
-                          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-emerald-700">
+                          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-estate-700">
                             FILE
                           </span>
                         )}

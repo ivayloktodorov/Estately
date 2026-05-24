@@ -24,7 +24,7 @@ function Notice({ state }: { state: ProfileActionState }) {
     <p
       className={`rounded-md px-4 py-3 text-sm font-semibold ${
         state.status === 'success'
-          ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+          ? 'bg-estate-50 text-estate-700 ring-1 ring-estate-200'
           : 'bg-red-50 text-red-700 ring-1 ring-red-200'
       }`}
     >
@@ -80,7 +80,7 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
             <div className="grid gap-3">
               <input
                 accept="image/jpeg,image/png,image/webp"
-                className="block w-full text-sm text-slate-700 file:mr-4 file:h-10 file:rounded-md file:border-0 file:bg-slate-950 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-estate-700"
+                className="block w-full text-sm text-slate-700 file:mr-4 file:h-10 file:rounded-md file:border-0 file:bg-estate-700 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-estate-800"
                 name="avatar"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
@@ -120,7 +120,7 @@ export function ProfileManagementForm({ profile }: { profile: UserProfile }) {
         </section>
 
         <button
-          className="h-11 w-full rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-estate-700 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+          className="h-11 w-full rounded-md bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
           disabled={isProfilePending}
         >
           {isProfilePending ? 'Saving...' : 'Save profile'}

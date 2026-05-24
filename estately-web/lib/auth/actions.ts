@@ -8,6 +8,7 @@ import { clearAuthSession, createAuthSession } from './session';
 import type { AuthActionState } from './types';
 
 const genericError = 'Something went wrong. Please try again.';
+const defaultRedirectPath = '/dashboard';
 
 function formValue(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -22,6 +23,16 @@ function errorState(error: unknown, fields?: AuthActionState['fields']): AuthAct
   return { status: 'error', message: genericError, fields };
 }
 
+function redirectPath(formData: FormData): string {
+  const value = formValue(formData, 'redirect') || formValue(formData, 'next');
+
+  if (!value.startsWith('/') || value.startsWith('//')) {
+    return defaultRedirectPath;
+  }
+
+  return value;
+}
+
 export async function registerAction(
   _prevState: AuthActionState,
   formData: FormData,
@@ -30,6 +41,8 @@ export async function registerAction(
     email: formValue(formData, 'email'),
     fullName: formValue(formData, 'fullName'),
   };
+
+  const targetPath = redirectPath(formData);
 
   try {
     const user = await authService.register({
@@ -42,7 +55,7 @@ export async function registerAction(
     return errorState(error, fields);
   }
 
-  redirect('/dashboard');
+  redirect(targetPath);
 }
 
 export async function loginAction(
@@ -54,6 +67,8 @@ export async function loginAction(
     email: formValue(formData, 'email'),
   };
   timer.mark('form-parsed');
+
+  const targetPath = redirectPath(formData);
 
   try {
     const user = await authService.login({
@@ -70,7 +85,7 @@ export async function loginAction(
   }
 
   timer.end();
-  redirect('/dashboard');
+  redirect(targetPath);
 }
 
 export async function logoutAction(): Promise<void> {

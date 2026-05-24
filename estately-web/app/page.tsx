@@ -180,7 +180,7 @@ export default async function HomePage() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
             <ButtonLink
-              className="border border-charcoal-950 bg-charcoal-950 text-white shadow-lg shadow-charcoal-950/20 hover:bg-charcoal-800 focus-visible:ring-white"
+              className="border border-estate-700 bg-estate-700 text-white shadow-lg shadow-estate-900/20 hover:bg-estate-800 focus-visible:ring-white"
               href="/buy"
             >
               Browse Properties

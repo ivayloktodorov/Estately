@@ -31,7 +31,7 @@ function RoleBadge({ role }: { role: string }) {
     <span
       className={
         role === 'admin'
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          ? 'inline-flex rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-200'
           : 'inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200'
       }
     >
@@ -45,7 +45,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={
         status === 'active'
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          ? 'inline-flex rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-200'
           : 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200'
       }
     >
@@ -69,14 +69,14 @@ function RoleForm({ user }: { user: AdminUserListItem }) {
     <form action={updateUserRoleAction} className="flex flex-wrap gap-2">
       <input name="userId" type="hidden" value={user.id} />
       <select
-        className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
+        className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10"
         defaultValue={user.role}
         name="role"
       >
         <option value="user">User</option>
         <option value="admin">Admin</option>
       </select>
-      <button className="inline-flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+      <button className="inline-flex h-9 items-center justify-center rounded-md bg-estate-700 px-3 text-sm font-semibold text-white transition hover:bg-estate-800">
         Save
       </button>
     </form>
@@ -124,7 +124,7 @@ function Pagination({
     >
       {hasPreviousPage ? (
         <Link
-          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
+          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-estate-300 hover:text-estate-700"
           href={usersHref(search, currentPage - 1, sort)}
         >
           Previous
@@ -140,7 +140,7 @@ function Pagination({
       </p>
       {hasNextPage ? (
         <Link
-          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
           href={usersHref(search, currentPage + 1, sort)}
         >
           Next
@@ -165,7 +165,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
         <AdminNavigation active="users" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
             User management
           </p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -185,7 +185,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               Search users by name or email
             </label>
             <input
-              className="h-11 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
+              className="h-11 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10"
               defaultValue={result.search}
               id="user-search"
               name="search"
@@ -193,7 +193,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               type="search"
             />
             <select
-              className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
+              className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none transition focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10"
               defaultValue={result.sort}
               name="sort"
             >
@@ -203,12 +203,12 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               <option value="email">Email A-Z</option>
               <option value="role">Role</option>
             </select>
-            <button className="h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
               Search
             </button>
             {result.search ? (
               <Link
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                 href="/admin/users"
               >
                 Clear
@@ -258,7 +258,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                         <td className="px-4 py-4">
                           <div className="flex flex-wrap gap-2">
                             <Link
-                              className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                              className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                               href={`/admin/users/${user.id}`}
                             >
                               Edit
@@ -293,7 +293,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                   <p className="mt-4 text-sm text-slate-600">Created {formatDate(user.createdAt)}</p>
                   <div className="mt-5 flex flex-wrap gap-2">
                     <Link
-                      className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                      className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                       href={`/admin/users/${user.id}`}
                     >
                       Edit

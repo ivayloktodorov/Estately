@@ -18,6 +18,7 @@ const profileLinks = [
   { href: '/dashboard/properties/new', label: 'Add Property' },
   { href: '/dashboard/inquiries', label: 'Inquiries' },
   { href: '/dashboard/messages', label: 'Messages' },
+  { href: '/dashboard/offers', label: 'Offers' },
   { href: '/dashboard/activity', label: 'Activity' },
   { href: '/dashboard/saved-searches', label: 'Saved Searches' },
   { href: '/profile', label: 'Profile' },
@@ -77,7 +78,7 @@ function UserAvatar({ user }: { user: AuthUser }) {
   return (
     <span
       aria-label={label}
-      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-sm font-bold text-emerald-800 shadow-sm"
+      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-estate-100 bg-estate-50 text-sm font-bold text-estate-800 shadow-sm"
       role="img"
     >
       {userInitials(user)}
@@ -109,7 +110,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className="inline-flex h-12 w-full min-w-0 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-stone-200 bg-white py-1 pl-1.5 pr-3 text-sm font-semibold text-charcoal-950 shadow-sm transition hover:border-emerald-300 hover:bg-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:w-auto"
+        className="inline-flex h-12 w-full min-w-0 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-stone-200 bg-white py-1 pl-1.5 pr-3 text-sm font-semibold text-charcoal-950 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:w-auto"
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
@@ -158,7 +159,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
             <div className="border-t border-stone-100 py-2">
               {adminLinks.map((link) => (
                 <Link
-                  className="block px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-cream-50 hover:text-emerald-800"
+                  className="block px-4 py-2.5 text-sm font-semibold text-estate-700 transition hover:bg-cream-50 hover:text-estate-800"
                   href={link.href}
                   key={link.href}
                   onClick={() => setIsOpen(false)}

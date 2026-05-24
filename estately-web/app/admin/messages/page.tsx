@@ -39,7 +39,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
         <AdminNavigation active="messages" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Messaging oversight</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Messaging oversight</p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <h1 className="text-3xl font-semibold text-slate-950">Messages</h1>
@@ -53,7 +53,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
           </div>
 
           <form action="/admin/messages" className="mt-6 grid gap-3 lg:grid-cols-[1fr_180px_auto_auto]">
-            <label className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 focus-within:border-emerald-700 focus-within:ring-2 focus-within:ring-emerald-700/10">
+            <label className="flex h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-950 focus-within:border-estate-700 focus-within:ring-2 focus-within:ring-estate-700/10">
               <span aria-hidden="true" className="text-slate-500">
                 ⌕
               </span>
@@ -66,18 +66,18 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
               />
             </label>
             <select
-              className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/10"
+              className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10"
               defaultValue={result.sort}
               name="sort"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
             </select>
-            <button className="h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
               Apply
             </button>
             <Link
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
               href="/admin/messages"
             >
               Clear
@@ -110,7 +110,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                       <td className="px-4 py-5 font-mono text-xs text-slate-500">#{conversation.id}</td>
                       <td className="px-4 py-5">
                         <Link
-                          className="font-semibold text-slate-950 transition hover:text-emerald-700"
+                          className="font-semibold text-slate-950 transition hover:text-estate-700"
                           href={`/admin/messages/${conversation.id}`}
                         >
                           {conversation.propertyTitle}
@@ -143,7 +143,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                       </td>
                       <td className="px-4 py-5">
                         <Link
-                          className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                          className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                           href={`/admin/messages/${conversation.id}`}
                         >
                           Review
@@ -161,7 +161,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                     <div className="min-w-0">
                       <p className="font-mono text-xs text-slate-500">Conversation #{conversation.id}</p>
                       <Link
-                        className="mt-1 block truncate font-semibold text-slate-950 transition hover:text-emerald-700"
+                        className="mt-1 block truncate font-semibold text-slate-950 transition hover:text-estate-700"
                         href={`/admin/messages/${conversation.id}`}
                       >
                         {conversation.propertyTitle}
@@ -169,7 +169,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                       <p className="mt-1 font-mono text-xs text-slate-500">Property #{conversation.propertyId}</p>
                     </div>
                     <Link
-                      className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                      className="inline-flex h-9 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                       href={`/admin/messages/${conversation.id}`}
                     >
                       Review
@@ -222,7 +222,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
         <nav className="mt-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:flex-row">
           {result.hasPreviousPage ? (
             <Link
-              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
+              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-estate-300 hover:text-estate-700"
               href={messagesHref(result.search, result.sort, result.currentPage - 1)}
             >
               Previous
@@ -238,7 +238,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
           </p>
           {result.hasNextPage ? (
             <Link
-              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white hover:bg-emerald-700"
+              className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
               href={messagesHref(result.search, result.sort, result.currentPage + 1)}
             >
               Next

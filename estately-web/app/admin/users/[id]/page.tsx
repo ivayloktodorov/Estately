@@ -33,7 +33,7 @@ function RoleBadge({ role }: { role: string }) {
     <span
       className={
         role === 'admin'
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          ? 'inline-flex rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-200'
           : 'inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200'
       }
     >
@@ -47,7 +47,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={
         status === 'active'
-          ? 'inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
+          ? 'inline-flex rounded-full bg-estate-50 px-2.5 py-1 text-xs font-semibold text-estate-700 ring-1 ring-estate-200'
           : 'inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200'
       }
     >

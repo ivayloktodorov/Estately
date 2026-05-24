@@ -98,7 +98,7 @@ export function PropertyImageUpload({ propertyId }: PropertyImageUploadProps) {
       {message ? <p className="text-sm font-medium text-estate-700">{message}</p> : null}
 
       <button
-        className="h-11 rounded-lg bg-charcoal-950 px-5 text-sm font-semibold text-white shadow-estate-soft transition hover:bg-charcoal-800 disabled:cursor-wait disabled:bg-stone-400"
+        className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-estate-soft transition hover:bg-estate-800 disabled:cursor-wait disabled:bg-stone-400"
         disabled={isUploading}
         type="submit"
       >

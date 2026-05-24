@@ -10,3 +10,4 @@ export * from './messages';
 export * from './message-attachments';
 export * from './user-activity';
 export * from './saved-searches';
+export * from './property-offers';
