@@ -107,8 +107,8 @@ export default async function HomePage() {
             </ButtonLink>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {newestCards.map((property) => (
-              <PropertyCard key={property.id} {...property} />
+            {newestCards.map((property, index) => (
+              <PropertyCard key={property.id} {...property} imagePriority={index < 2} />
             ))}
           </div>
         </Container>

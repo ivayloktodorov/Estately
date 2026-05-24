@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { formatPrice, formatPropertyLabel } from '@/components/property/property-format';
+import { t } from '@/lib/i18n';
 import type { Property } from '@/types/property';
 
 interface PropertyCardProps {
@@ -30,13 +31,13 @@ export function PropertyCard({
             />
           ) : (
             <View className="h-48 w-full items-center justify-center bg-slate-200">
-              <Text className="text-sm font-medium text-slate-500">No image</Text>
+              <Text className="text-sm font-medium text-slate-500">{t('noImage')}</Text>
             </View>
           )}
         </Pressable>
 
         <Pressable
-          accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+          accessibilityLabel={isFavorite ? t('removeFromFavorites') : t('saveToFavorites')}
           accessibilityRole="button"
           className="absolute right-3 top-3 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow"
           disabled={isFavoriteLoading}
@@ -66,13 +67,13 @@ export function PropertyCard({
 
         <View className="flex-row flex-wrap gap-2">
           <Text className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-            {property.bedrooms} bed
+            {property.bedrooms} {t('bedShort')}
           </Text>
           <Text className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-            {property.bathrooms} bath
+            {property.bathrooms} {t('bathShort')}
           </Text>
           <Text className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-            {property.areaSqm} sqm
+            {property.areaSqm} {t('sqmShort')}
           </Text>
           <Text className="rounded-md bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700">
             {formatPropertyLabel(property.listingType)}

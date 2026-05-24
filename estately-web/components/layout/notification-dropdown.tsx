@@ -7,6 +7,7 @@ import {
   markAllNotificationsAsReadAction,
   markNotificationAsReadAction,
 } from '@/lib/notifications/actions';
+import { useLanguage } from '@/components/i18n/language-provider';
 import type { NotificationListItem, NotificationType } from '@/lib/notifications/service';
 
 interface NotificationDropdownProps {
@@ -53,6 +54,20 @@ function relativeTime(date: Date): string {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
+function notificationTitle(title: string, t: ReturnType<typeof useLanguage>['t']): string {
+  const titles: Record<string, string> = {
+    'Property approved': t('propertyApproved'),
+    'Property rejected': t('propertyRejected'),
+    'Property deleted': t('propertyDeleted'),
+    'Property updated': t('propertyUpdated'),
+    'Offer sent': t('offerSent'),
+    'Message received': t('messageReceived'),
+    'Profile updated': t('profileUpdated'),
+  };
+
+  return titles[title] ?? title;
+}
+
 function BellIcon() {
   return (
     <svg
@@ -83,6 +98,7 @@ export function NotificationDropdown({
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const hasLoadedRef = useRef(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
@@ -167,7 +183,7 @@ export function NotificationDropdown({
         >
           <div className="flex items-start justify-between gap-4 border-b border-stone-100 px-4 py-4">
             <div>
-              <h2 className="text-base font-semibold text-charcoal-950">Notifications</h2>
+              <h2 className="text-base font-semibold text-charcoal-950">{t('notifications')}</h2>
               <p className="mt-0.5 text-sm text-stone-500">Recent updates</p>
             </div>
             <button
@@ -201,7 +217,7 @@ export function NotificationDropdown({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-sm font-semibold text-charcoal-950">{notification.title}</h3>
+                      <h3 className="text-sm font-semibold text-charcoal-950">{notificationTitle(notification.title, t)}</h3>
                       {!notification.isRead ? (
                         <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-purple" />
                       ) : null}
@@ -260,7 +276,7 @@ export function NotificationDropdown({
               href="/dashboard/notifications"
               onClick={() => setIsOpen(false)}
             >
-              View all notifications
+              {t('viewAll')}
             </Link>
           </div>
         </div>

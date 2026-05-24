@@ -67,7 +67,9 @@ function notificationType(type: string): NotificationType {
   }
 }
 
-function toListItem(row: typeof notifications.$inferSelect): NotificationListItem {
+type NotificationRow = Omit<typeof notifications.$inferSelect, 'userId'>;
+
+function toListItem(row: NotificationRow): NotificationListItem {
   return {
     id: row.id,
     type: notificationType(row.type),
@@ -80,6 +82,18 @@ function toListItem(row: typeof notifications.$inferSelect): NotificationListIte
     createdAt: row.createdAt,
   };
 }
+
+const notificationListColumns = {
+  id: notifications.id,
+  type: notifications.type,
+  title: notifications.title,
+  message: notifications.message,
+  entityType: notifications.entityType,
+  entityId: notifications.entityId,
+  href: notifications.href,
+  isRead: notifications.isRead,
+  createdAt: notifications.createdAt,
+};
 
 function firstParam(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -180,7 +194,7 @@ export async function createNotifications(inputs: CreateNotificationInput[]): Pr
 
 export async function getUserNotifications(userId: number, limit = DEFAULT_LIMIT): Promise<NotificationListItem[]> {
   const rows = await db
-    .select()
+    .select(notificationListColumns)
     .from(notifications)
     .where(eq(notifications.userId, userId))
     .orderBy(desc(notifications.createdAt), desc(notifications.id))
@@ -206,7 +220,7 @@ export async function getUserNotificationsPage(
   const rows =
     totalCount > 0
       ? await db
-          .select()
+          .select(notificationListColumns)
           .from(notifications)
           .where(whereClause)
           .orderBy(desc(notifications.createdAt), desc(notifications.id))

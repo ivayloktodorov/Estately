@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import { formatPropertyLabel } from '@/components/property/property-format';
+import { t } from '@/lib/i18n';
 import type { PropertyDetails } from '@/types/property';
 
 interface PropertySummaryProps {
@@ -23,10 +24,10 @@ function SummaryItem({ label, value }: SummaryItemProps) {
 export function PropertySummary({ property }: PropertySummaryProps) {
   return (
     <View className="flex-row flex-wrap gap-3">
-      <SummaryItem label="Bedrooms" value={String(property.bedrooms)} />
-      <SummaryItem label="Bathrooms" value={String(property.bathrooms)} />
-      <SummaryItem label="Square meters" value={String(property.areaSqm)} />
-      <SummaryItem label="Type" value={formatPropertyLabel(property.propertyType)} />
+      <SummaryItem label={t('bedrooms')} value={String(property.bedrooms)} />
+      <SummaryItem label={t('bathrooms')} value={String(property.bathrooms)} />
+      <SummaryItem label={t('squareMeters')} value={String(property.areaSqm)} />
+      <SummaryItem label={t('type')} value={formatPropertyLabel(property.propertyType)} />
     </View>
   );
 }

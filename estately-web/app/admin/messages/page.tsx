@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminConversations, type AdminMessagesSearchParams } from '@/lib/admin/messages';
+import { getTranslations } from '@/lib/i18n';
 import { AdminNavigation } from '../admin-navigation';
 
 interface AdminMessagesPageProps {
@@ -31,6 +32,7 @@ function messagesHref(search: string, sort: string, page: number): string {
 
 export default async function AdminMessagesPage({ searchParams }: AdminMessagesPageProps) {
   await requireAdmin();
+  const t = await getTranslations();
   const result = await getAdminConversations((await searchParams) ?? {});
 
   return (
@@ -42,7 +44,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
           <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Messaging oversight</p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1 className="text-3xl font-semibold text-slate-950">Messages</h1>
+              <h1 className="text-3xl font-semibold text-slate-950">{t.messages}</h1>
               <p className="mt-2 text-slate-600">
                 Review property conversations, inspect attachments, and remove unsafe message content.
               </p>
@@ -61,7 +63,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                 className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-slate-400"
                 defaultValue={result.search}
                 name="search"
-                placeholder="Search property, buyer, owner, or email"
+                placeholder={t.searchMessagesPlaceholder}
                 type="search"
               />
             </label>
@@ -70,24 +72,24 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
               defaultValue={result.sort}
               name="sort"
             >
-              <option value="newest">Newest first</option>
+              <option value="newest">{t.newestFirst}</option>
               <option value="oldest">Oldest first</option>
             </select>
             <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
-              Apply
+              {t.apply}
             </button>
             <Link
               className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
               href="/admin/messages"
             >
-              Clear
+              {t.clear}
             </Link>
           </form>
         </section>
 
         {result.conversations.length === 0 ? (
           <section className="mt-6 rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-950">No conversations found.</h2>
+            <h2 className="text-xl font-semibold text-slate-950">{t.noConversationsFound}</h2>
           </section>
         ) : (
           <section className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -96,9 +98,9 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
                 <thead className="bg-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-600">
                   <tr>
                     <th className="w-24 px-4 py-3">ID</th>
-                    <th className="w-[24%] px-4 py-3">Property</th>
-                    <th className="w-[20%] px-4 py-3">Buyer</th>
-                    <th className="w-[20%] px-4 py-3">Owner</th>
+                    <th className="w-[24%] px-4 py-3">{t.property}</th>
+                    <th className="w-[20%] px-4 py-3">{t.buyer}</th>
+                    <th className="w-[20%] px-4 py-3">{t.owner}</th>
                     <th className="w-[24%] px-4 py-3">Last message</th>
                     <th className="w-32 px-4 py-3">Counts</th>
                     <th className="w-28 px-4 py-3">Action</th>
@@ -178,12 +180,12 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
 
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                     <div className="min-w-0">
-                      <dt className="text-slate-500">Buyer</dt>
+                      <dt className="text-slate-500">{t.buyer}</dt>
                       <dd className="font-semibold text-slate-950">{conversation.buyer.fullName}</dd>
                       <dd className="truncate text-xs text-slate-500">{conversation.buyer.email}</dd>
                     </div>
                     <div className="min-w-0">
-                      <dt className="text-slate-500">Owner</dt>
+                      <dt className="text-slate-500">{t.owner}</dt>
                       <dd className="font-semibold text-slate-950">{conversation.owner.fullName}</dd>
                       <dd className="truncate text-xs text-slate-500">{conversation.owner.email}</dd>
                     </div>
@@ -225,15 +227,15 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
               className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-estate-300 hover:text-estate-700"
               href={messagesHref(result.search, result.sort, result.currentPage - 1)}
             >
-              Previous
+              {t.previous}
             </Link>
           ) : (
             <span className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-              Previous
+              {t.previous}
             </span>
           )}
           <p className="text-sm font-semibold text-slate-600">
-            Page <span className="text-slate-950">{result.currentPage}</span> of{' '}
+            {t.page} <span className="text-slate-950">{result.currentPage}</span> {t.of}{' '}
             <span className="text-slate-950">{result.totalPages}</span>
           </p>
           {result.hasNextPage ? (
@@ -241,11 +243,11 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
               className="inline-flex h-10 min-w-24 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-semibold text-white hover:bg-estate-800"
               href={messagesHref(result.search, result.sort, result.currentPage + 1)}
             >
-              Next
+              {t.next}
             </Link>
           ) : (
             <span className="inline-flex h-10 min-w-24 items-center justify-center rounded-md border border-slate-200 bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-              Next
+              {t.next}
             </span>
           )}
         </nav>

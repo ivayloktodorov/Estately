@@ -69,8 +69,8 @@ export default async function RentPage({ searchParams }: RentPageProps) {
     return Array.isArray(value) ? value.some(Boolean) : Boolean(value);
   });
   const emptyDescription = hasActiveFilters
-    ? 'Clear filters or widen your search to see more rentals.'
-    : 'No rental properties are available yet.';
+    ? t.clearFiltersMoreRent
+    : t.noRentAvailable;
   const returnTo = propertyResultsHref('/rent', resolvedSearchParams);
 
   return (
@@ -94,11 +94,12 @@ export default async function RentPage({ searchParams }: RentPageProps) {
         </div>
         <div className="mt-8">
           <PropertyGrid isEmpty={isEmpty} emptyTitle={t.noPropertiesFound} emptyDescription={emptyDescription}>
-            {formattedProperties.map((property) => (
+            {formattedProperties.map((property, index) => (
               <PropertyCard
                 key={property.id}
                 {...property}
                 detailsHref={propertyDetailsHref(property.id, returnTo)}
+                imagePriority={index < 2}
               />
             ))}
           </PropertyGrid>

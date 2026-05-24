@@ -320,9 +320,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-charcoal-950 sm:text-3xl">{t.similarProperties}</h2>
-                <p className="mt-2 max-w-2xl text-stone-600">
-                  More {listingType === 'rent' ? 'rentals' : 'homes for sale'} like this in and around {property.city}.
-                </p>
+                <p className="mt-2 max-w-2xl text-stone-600">{t.moreSimilarProperties}</p>
               </div>
               <Link
                 href={similarSearchHref}

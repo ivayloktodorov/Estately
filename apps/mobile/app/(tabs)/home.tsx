@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { PropertyCard } from '@/components/property/property-card';
 import { Button } from '@/components/ui/button';
 import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
+import { t } from '@/lib/i18n';
 import { getProperties } from '@/services/property.service';
 import type { Property } from '@/types/property';
 
@@ -44,17 +45,17 @@ export default function HomeScreen() {
           {propertiesQuery.isPending ? (
             <View className="items-center gap-3">
               <ActivityIndicator color="#16a34a" />
-              <Text className="text-base text-slate-600">Loading properties...</Text>
+              <Text className="text-base text-slate-600">{t('loadingProperties')}</Text>
             </View>
           ) : propertiesQuery.isError ? (
             <View className="gap-4">
               <Text className="text-center text-base font-medium text-red-600">
-                Unable to load properties. Please try again.
+                {t('unableToLoadProperties')}
               </Text>
-              <Button label="Try again" onPress={() => propertiesQuery.refetch()} variant="secondary" />
+              <Button label={t('tryAgain')} onPress={() => propertiesQuery.refetch()} variant="secondary" />
             </View>
           ) : (
-            <Text className="text-center text-base text-slate-600">No properties found.</Text>
+            <Text className="text-center text-base text-slate-600">{t('noPropertiesFound')}</Text>
           )}
         </View>
       }
@@ -64,12 +65,12 @@ export default function HomeScreen() {
             {propertiesQuery.hasNextPage ? (
               <Button
                 disabled={propertiesQuery.isFetchingNextPage}
-                label={propertiesQuery.isFetchingNextPage ? 'Loading...' : 'Load more'}
+                label={propertiesQuery.isFetchingNextPage ? t('loading') : t('loadMore')}
                 onPress={handleLoadMore}
                 variant="secondary"
               />
             ) : (
-              <Text className="text-center text-sm text-slate-500">You have reached the end.</Text>
+              <Text className="text-center text-sm text-slate-500">{t('endOfResults')}</Text>
             )}
           </View>
         ) : null
@@ -77,7 +78,7 @@ export default function HomeScreen() {
       ListHeaderComponent={
         <View className="gap-2">
           <Text className="text-4xl font-bold text-slate-950">Estately</Text>
-          <Text className="text-base text-slate-600">Find your next home</Text>
+          <Text className="text-base text-slate-600">{t('findYourNextHome')}</Text>
         </View>
       }
       renderItem={({ item }) => (

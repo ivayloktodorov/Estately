@@ -7,9 +7,11 @@ import { ButtonLink } from '@/components/ui/button-link';
 import { propertyImageUrl } from '@/lib/properties/image-url';
 import { formatCurrencyEUR } from '@/lib/format/currency';
 import { propertyDetailsHref } from '@/lib/properties/search';
+import { getTranslations } from '@/lib/i18n';
 
 export default async function FavoritesPage() {
   const user = await requireAuth();
+  const t = await getTranslations();
   const favoriteProperties = await getFavoriteProperties(user.id);
 
   const formattedProperties = favoriteProperties.map((prop) => ({
@@ -58,7 +60,7 @@ export default async function FavoritesPage() {
         <PropertyGrid
           isEmpty={isEmpty}
           emptyTitle="No favorite properties yet"
-          emptyDescription="Save properties from the listings page and they will appear here."
+          emptyDescription={t.favoritesEmptyDescription}
         >
           {formattedProperties.map((property) => (
             <PropertyCard

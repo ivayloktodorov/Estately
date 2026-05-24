@@ -69,8 +69,8 @@ export default async function SalePage({ searchParams }: SalePageProps) {
     return Array.isArray(value) ? value.some(Boolean) : Boolean(value);
   });
   const emptyDescription = hasActiveFilters
-    ? 'Clear filters or widen your search to see more homes for sale.'
-    : 'No homes for sale are available yet.';
+    ? t.clearFiltersMoreSale
+    : t.noSaleAvailable;
   const returnTo = propertyResultsHref('/sale', resolvedSearchParams);
 
   return (
@@ -94,11 +94,12 @@ export default async function SalePage({ searchParams }: SalePageProps) {
         </div>
         <div className="mt-8">
           <PropertyGrid isEmpty={isEmpty} emptyTitle={t.noPropertiesFound} emptyDescription={emptyDescription}>
-            {formattedProperties.map((property) => (
+            {formattedProperties.map((property, index) => (
               <PropertyCard
                 key={property.id}
                 {...property}
                 detailsHref={propertyDetailsHref(property.id, returnTo)}
+                imagePriority={index < 2}
               />
             ))}
           </PropertyGrid>

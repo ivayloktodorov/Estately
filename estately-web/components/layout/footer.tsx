@@ -1,11 +1,5 @@
 import Link from 'next/link';
-
-const exploreLinks = [
-  { href: '/sale', label: 'Sale' },
-  { href: '/rent', label: 'Rent' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-];
+import { getTranslations } from '@/lib/i18n';
 
 const socialLinks = ['Instagram', 'LinkedIn', 'X'];
 
@@ -43,7 +37,15 @@ function FooterNavColumn({
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  const t = await getTranslations();
+  const exploreLinks = [
+    { href: '/sale', label: t.sale },
+    { href: '/rent', label: t.rent },
+    { href: '/about', label: t.about },
+    { href: '/contact', label: t.contact },
+  ];
+
   return (
     <footer className="border-t border-estate-600 bg-estate-700 text-white">
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
@@ -57,12 +59,9 @@ export function Footer() {
               >
                 Estately
               </Link>
-                <p className="mt-4 max-w-md text-sm leading-6 text-estate-100">
-                A modern real estate platform for discovering homes, saving favorites, and managing
-                your property search with confidence.
-              </p>
+              <p className="mt-4 max-w-md text-sm leading-6 text-estate-100">{t.footerDescription}</p>
             </div>
-            <FooterNavColumn ariaLabel="Explore navigation" links={exploreLinks} title="Explore" />
+            <FooterNavColumn ariaLabel="Explore navigation" links={exploreLinks} title={t.search} />
             <div>
               <h2 className="text-xs font-semibold uppercase tracking-widest text-estate-200">
                 Social

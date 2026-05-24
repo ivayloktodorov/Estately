@@ -102,6 +102,18 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
       Profile: t('profile'),
       Favorites: t('favorites'),
       Notifications: t('notifications'),
+      Inquiries: t('inquiries'),
+      Offers: t('offers'),
+      Activity: t('activity'),
+    };
+
+    return { ...link, label: labels[link.label] ?? link.label };
+  });
+  const translatedAdminLinks = adminLinks.map((link) => {
+    const labels: Record<string, string> = {
+      'Admin Dashboard': t('adminDashboard'),
+      'Listing Moderation': t('listingModeration'),
+      'User Management': t('userManagement'),
     };
 
     return { ...link, label: labels[link.label] ?? link.label };
@@ -173,7 +185,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
           </div>
           {user.role === 'admin' ? (
             <div className="border-t border-stone-100 py-2">
-              {adminLinks.map((link) => (
+              {translatedAdminLinks.map((link) => (
                 <Link
                   className="block px-4 py-2.5 text-sm font-semibold text-estate-700 transition hover:bg-cream-50 hover:text-estate-800"
                   href={link.href}

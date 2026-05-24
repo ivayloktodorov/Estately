@@ -8,6 +8,7 @@ import { PropertySummary } from '@/components/property/property-summary';
 import { Screen } from '@/components/layout/screen';
 import { Button } from '@/components/ui/button';
 import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
+import { t } from '@/lib/i18n';
 import { getPropertyById } from '@/services/property.service';
 
 function parsePropertyId(id: string | string[] | undefined): number | null {
@@ -34,13 +35,13 @@ export default function PropertyDetailsScreen() {
       <Screen>
         <View className="flex-1 justify-center gap-5">
           <View className="gap-2">
-            <Text className="text-center text-3xl font-bold text-slate-950">Property not found.</Text>
+            <Text className="text-center text-3xl font-bold text-slate-950">{t('propertyNotFound')}</Text>
             <Text className="text-center text-base text-slate-600">
-              This listing may no longer be available.
+              {t('propertyUnavailable')}
             </Text>
           </View>
 
-          <Button label="Back to listings" onPress={() => router.replace('/(tabs)/home')} variant="secondary" />
+          <Button label={t('backToListings')} onPress={() => router.replace('/(tabs)/home')} variant="secondary" />
         </View>
       </Screen>
     );
@@ -51,7 +52,7 @@ export default function PropertyDetailsScreen() {
       <Screen>
         <View className="flex-1 items-center justify-center gap-3">
           <ActivityIndicator color="#16a34a" />
-          <Text className="text-base text-slate-600">Loading property...</Text>
+          <Text className="text-base text-slate-600">{t('loadingProperty')}</Text>
         </View>
       </Screen>
     );

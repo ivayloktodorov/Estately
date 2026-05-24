@@ -7,6 +7,7 @@ import {
   type SavedSearchListItem,
 } from '@/lib/saved-searches/service';
 import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getTranslations } from '@/lib/i18n';
 import { deleteSavedSearchAction, updateSavedSearchAction } from '@/lib/saved-searches/actions';
 
 function formatDate(date: Date): string {
@@ -96,14 +97,15 @@ function EditSavedSearchForm({ search }: { search: SavedSearchListItem }) {
 
 export default async function SavedSearchesPage() {
   const user = await requireAuth();
+  const t = await getTranslations();
   const searches = await getUserSavedSearches(user.id);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <section className="rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
-          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Property alerts</p>
-          <h1 className="mt-2 text-3xl font-semibold text-charcoal-950">Saved searches</h1>
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.propertyAlerts}</p>
+          <h1 className="mt-2 text-3xl font-semibold text-charcoal-950">{t.savedSearchesTitle}</h1>
           <p className="mt-2 max-w-2xl text-slate-600">
             Manage searches and get notified when newly approved properties match your criteria.
           </p>

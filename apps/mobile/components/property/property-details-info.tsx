@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { formatPrice, formatPropertyLabel } from '@/components/property/property-format';
+import { t } from '@/lib/i18n';
 import type { PropertyDetails } from '@/types/property';
 
 interface PropertyDetailsInfoProps {
@@ -35,7 +36,7 @@ export function PropertyDetailsInfo({
           </View>
 
           <Pressable
-            accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+            accessibilityLabel={isFavorite ? t('removeFromFavorites') : t('saveToFavorites')}
             accessibilityRole="button"
             className="h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white"
             disabled={isFavoriteLoading}
@@ -56,7 +57,7 @@ export function PropertyDetailsInfo({
       </View>
 
       <View className="gap-2">
-        <Text className="text-xl font-bold text-slate-950">Description</Text>
+        <Text className="text-xl font-bold text-slate-950">{t('description')}</Text>
         <Text className="text-base leading-7 text-slate-700">{property.description}</Text>
       </View>
     </View>

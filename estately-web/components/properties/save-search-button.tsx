@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createSavedSearchAction } from '@/lib/saved-searches/actions';
 import type { PropertySearchFilters } from '@/lib/properties/search';
 import { formatCurrencyEUR } from '@/lib/format/currency';
+import { useLanguage } from '@/components/i18n/language-provider';
 
 interface SaveSearchButtonProps {
   isAuthenticated: boolean;
@@ -22,6 +23,7 @@ function defaultTitle(filters: PropertySearchFilters): string {
 
 export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
 
   if (!isAuthenticated) {
     return (
@@ -29,7 +31,7 @@ export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonP
         className="inline-flex h-11 items-center justify-center rounded-lg border border-stone-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-estate-300 hover:text-estate-700"
         href="/login"
       >
-        Sign in to save search
+        {t('signInToSaveSearch')}
       </a>
     );
   }
@@ -41,7 +43,7 @@ export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonP
         onClick={() => setIsOpen(true)}
         type="button"
       >
-        Save current search
+        {t('saveCurrentSearch')}
       </button>
       {isOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4">
@@ -54,7 +56,7 @@ export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonP
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-charcoal-950">Save search</h2>
+                <h2 className="text-xl font-semibold text-charcoal-950">{t('saveSearch')}</h2>
                 <p className="mt-1 text-sm text-slate-600">Name this search to receive matching property alerts.</p>
               </div>
               <button
@@ -89,10 +91,10 @@ export function SaveSearchButton({ filters, isAuthenticated }: SaveSearchButtonP
                 onClick={() => setIsOpen(false)}
                 type="button"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white hover:bg-estate-800">
-                Save search
+                {t('saveSearch')}
               </button>
             </div>
           </form>

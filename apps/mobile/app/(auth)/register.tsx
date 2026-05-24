@@ -5,21 +5,22 @@ import { Screen } from '@/components/layout/screen';
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/text-field';
 import { useAuthSession, useRegister } from '@/hooks/use-auth';
+import { t } from '@/lib/i18n';
 import { ApiError } from '@/types/api';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validateRegister(fullName: string, email: string, password: string): string | null {
   if (!fullName.trim()) {
-    return 'Full name is required.';
+    return t('fullNameRequired');
   }
 
   if (!emailPattern.test(email.trim())) {
-    return 'Enter a valid email address.';
+    return t('validEmailRequired');
   }
 
   if (password.length < 6) {
-    return 'Password must be at least 6 characters.';
+    return t('passwordMinLength');
   }
 
   return null;
@@ -57,7 +58,7 @@ export default function RegisterScreen() {
       });
       router.replace('/(tabs)/profile');
     } catch (mutationError) {
-      setError(mutationError instanceof ApiError ? mutationError.message : 'Unable to register. Please try again.');
+      setError(mutationError instanceof ApiError ? mutationError.message : t('unableToRegister'));
     }
   }
 
@@ -67,44 +68,44 @@ export default function RegisterScreen() {
     <Screen>
       <View className="flex-1 justify-center gap-8">
         <View className="gap-2">
-          <Text className="text-3xl font-bold text-slate-950">Create account</Text>
-          <Text className="text-base text-slate-600">Start browsing homes with your Estately profile.</Text>
+          <Text className="text-3xl font-bold text-slate-950">{t('createAccountTitle')}</Text>
+          <Text className="text-base text-slate-600">{t('registerSubtitle')}</Text>
         </View>
 
         <View className="gap-4">
           <TextField
-            label="Full name"
+            label={t('fullName')}
             autoComplete="name"
             editable={!isSubmitting}
             onChangeText={setFullName}
-            placeholder="Alex Morgan"
+            placeholder={t('fullNamePlaceholder')}
             value={fullName}
           />
           <TextField
-            label="Email"
+            label={t('email')}
             autoCapitalize="none"
             autoComplete="email"
             editable={!isSubmitting}
             keyboardType="email-address"
             onChangeText={setEmail}
-            placeholder="you@example.com"
+            placeholder={t('emailPlaceholder')}
             value={email}
           />
           <TextField
-            label="Password"
+            label={t('password')}
             editable={!isSubmitting}
             onChangeText={setPassword}
             onSubmitEditing={handleSubmit}
-            placeholder="Password"
+            placeholder={t('password')}
             secureTextEntry
             value={password}
           />
           {error ? <Text className="text-sm font-medium text-red-600">{error}</Text> : null}
-          <Button disabled={isSubmitting} label={isSubmitting ? 'Registering...' : 'Register'} onPress={handleSubmit} />
+          <Button disabled={isSubmitting} label={isSubmitting ? t('registering') : t('register')} onPress={handleSubmit} />
         </View>
 
         <Link href="/(auth)/login" className="text-center text-base font-semibold text-brand-700">
-          Already have an account?
+          {t('alreadyHaveAccount')}
         </Link>
       </View>
     </Screen>

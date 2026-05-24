@@ -1,9 +1,7 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { useLanguage } from '@/components/i18n/language-provider';
 import { FavoriteButton } from '@/components/favorites/favorite-button';
+import { getTranslations } from '@/lib/i18n';
 import { propertyImageUrl } from '@/lib/properties/image-url';
 
 interface PropertyCardProps {
@@ -22,6 +20,7 @@ interface PropertyCardProps {
   isFavorited?: boolean;
   isAuthenticated?: boolean;
   showFavoriteButton?: boolean;
+  imagePriority?: boolean;
   createdAt?: Date;
   views?: number;
   isFeatured?: boolean;
@@ -38,7 +37,8 @@ function propertyBadges(createdAt?: Date, views = 0, isFeatured = false): string
   }
 
   if (createdAt) {
-    const ageMs = Date.now() - createdAt.getTime();
+    const createdDate = new Date(createdAt);
+    const ageMs = Date.now() - createdDate.getTime();
     const newListingMs = NEW_LISTING_DAYS * 24 * 60 * 60 * 1000;
 
     if (ageMs >= 0 && ageMs <= newListingMs) {
@@ -53,7 +53,7 @@ function propertyBadges(createdAt?: Date, views = 0, isFeatured = false): string
   return badges;
 }
 
-export function PropertyCard({
+export async function PropertyCard({
   id,
   imageUrl,
   price,
@@ -69,6 +69,7 @@ export function PropertyCard({
   isFavorited = false,
   isAuthenticated = false,
   showFavoriteButton = false,
+  imagePriority = false,
   createdAt,
   views = 0,
   isFeatured = false,
@@ -76,7 +77,7 @@ export function PropertyCard({
   const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
   const propertyHref = detailsHref ?? `/properties/${id}`;
   const badges = propertyBadges(createdAt, views, isFeatured);
-  const { t } = useLanguage();
+  const t = await getTranslations();
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">
@@ -95,12 +96,14 @@ export function PropertyCard({
             src={coverImageUrl}
             alt={title}
             fill
+            loading={imagePriority ? 'eager' : 'lazy'}
+            priority={imagePriority}
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
           />
           {/* Badge */}
           <div className="absolute top-3 right-3 bg-estate-700 text-white px-3 py-1 rounded-full text-sm font-semibold">
-            {listingType === 'sale' ? t('forSale') : t('forRent')}
+            {listingType === 'sale' ? t.forSale : t.forRent}
           </div>
           {badges.length > 0 ? (
             <div className="absolute left-3 top-3 flex flex-wrap gap-2">
@@ -145,11 +148,11 @@ export function PropertyCard({
           <div className="mt-4 grid grid-cols-3 gap-3">
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{bedrooms}</p>
-              <p className="text-xs text-stone-600">{t('beds')}</p>
+              <p className="text-xs text-stone-600">{t.beds}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{bathrooms}</p>
-              <p className="text-xs text-stone-600">{t('baths')}</p>
+              <p className="text-xs text-stone-600">{t.baths}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{areaSqm}</p>
@@ -158,7 +161,7 @@ export function PropertyCard({
           </div>
 
           <span className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-bold text-white transition group-hover:bg-estate-800">
-            {t('viewDetails')}
+            {t.viewDetails}
           </span>
         </div>
       </Link>

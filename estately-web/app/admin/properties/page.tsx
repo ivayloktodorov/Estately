@@ -74,7 +74,7 @@ function propertiesHref(
   return query ? `/admin/properties?${query}` : '/admin/properties';
 }
 
-function ModerationActionForm({ property, status }: { property: AdminProperty; status: ModerationStatus }) {
+function ModerationActionForm({ labels, property, status }: { labels: { approve: string; reject: string }; property: AdminProperty; status: ModerationStatus }) {
   const disabled = property.moderationStatus === status;
 
   return (
@@ -90,13 +90,13 @@ function ModerationActionForm({ property, status }: { property: AdminProperty; s
         }
       >
         <TinyIcon>{status === 'approved' ? '○' : '×'}</TinyIcon>
-        {status === 'approved' ? 'Approve' : 'Reject'}
+        {status === 'approved' ? labels.approve : labels.reject}
       </button>
     </form>
   );
 }
 
-function PropertyActions({ property }: { property: AdminProperty }) {
+function PropertyActions({ labels, property }: { labels: { approve: string; reject: string; view: string; edit: string }; property: AdminProperty }) {
   return (
     <div className="grid w-full gap-2 sm:w-40">
       <div className="grid grid-cols-2 gap-2">
@@ -105,19 +105,19 @@ function PropertyActions({ property }: { property: AdminProperty }) {
           href={`/properties/${property.id}`}
         >
           <TinyIcon>◉</TinyIcon>
-          View
+          {labels.view}
         </Link>
         <Link
           className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
           href={`/dashboard/properties/${property.id}/edit`}
         >
           <TinyIcon>✎</TinyIcon>
-          Edit
+          {labels.edit}
         </Link>
       </div>
-      <ModerationActionForm property={property} status="approved" />
+      <ModerationActionForm labels={labels} property={property} status="approved" />
       {property.moderationStatus === 'pending' ? (
-        <ModerationActionForm property={property} status="rejected" />
+        <ModerationActionForm labels={labels} property={property} status="rejected" />
       ) : (
         <form action={deletePropertyAction}>
           <input name="propertyId" type="hidden" value={property.id} />
@@ -252,15 +252,15 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                 className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-slate-400"
                 defaultValue={result.search}
                 name="search"
-                placeholder="Search by title, city, or owner"
+                placeholder={t.searchByTitleCityOwner}
                 type="search"
               />
             </label>
             <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.status} name="status">
               <option value="">All statuses</option>
               <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="approved">{t.approved}</option>
+              <option value="rejected">{t.rejected}</option>
             </select>
             <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.listing} name="listing">
               <option value="">Sale and rent</option>
@@ -276,7 +276,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
               <option value="city">City A-Z</option>
               <option value="status">Status</option>
             </select>
-            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">Apply</button>
+            <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">{t.apply}</button>
             <Link className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700" href="/admin/properties">
               {t.clear}
             </Link>
@@ -312,15 +312,15 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                       <th className="w-16 px-4 py-3">
                         <input aria-label="Select all visible properties" className="h-4 w-4 rounded border-slate-300 text-estate-700" type="checkbox" />
                       </th>
-                      <th className="w-[26%] px-4 py-3">Property</th>
+                      <th className="w-[26%] px-4 py-3">{t.property}</th>
                       <th className="w-[8%] px-4 py-3">{t.city}</th>
                       <th className="w-[8%] px-4 py-3">{t.type}</th>
                       <th className="w-[7%] px-4 py-3">Listing</th>
                       <th className="w-[8%] px-4 py-3">{t.price}</th>
-                      <th className="w-[17%] px-4 py-3">Owner / User</th>
-                      <th className="w-[9%] px-4 py-3">Created</th>
-                      <th className="w-[9%] px-4 py-3">Status</th>
-                      <th className="w-44 px-4 py-3">Actions</th>
+                      <th className="w-[17%] px-4 py-3">{t.ownerUser}</th>
+                      <th className="w-[9%] px-4 py-3">{t.created}</th>
+                      <th className="w-[9%] px-4 py-3">{t.status}</th>
+                      <th className="w-44 px-4 py-3">{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 bg-white">
@@ -364,7 +364,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                               <p className="truncate text-xs text-slate-500">{property.owner.email}</p>
                             </>
                           ) : (
-                            'Owner unavailable'
+                            t.ownerUnavailable
                           )}
                         </td>
                         <td className="px-4 py-6 text-slate-700">{formatDate(property.createdAt)}</td>
@@ -372,7 +372,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                           <StatusBadge status={property.moderationStatus} />
                         </td>
                         <td className="px-4 py-6">
-                          <PropertyActions property={property} />
+                          <PropertyActions labels={t} property={property} />
                         </td>
                       </tr>
                     ))}
@@ -415,7 +415,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
 
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                     <div>
-                      <dt className="text-slate-500">Owner / User</dt>
+                      <dt className="text-slate-500">{t.ownerUser}</dt>
                       <dd className="min-w-0 font-medium text-slate-900">
                         {property.owner ? (
                           <>
@@ -423,22 +423,22 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                             <span className="block truncate text-xs font-normal text-slate-500">{property.owner.email}</span>
                           </>
                         ) : (
-                          'Owner unavailable'
+                          t.ownerUnavailable
                         )}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Created</dt>
+                      <dt className="text-slate-500">{t.created}</dt>
                       <dd className="font-medium text-slate-900">{formatDate(property.createdAt)}</dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Details</dt>
+                      <dt className="text-slate-500">{t.details}</dt>
                       <dd className="font-medium text-slate-900">
                         {property.bedrooms} bed · {property.bathrooms} bath · {property.areaSqm} m²
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Status</dt>
+                      <dt className="text-slate-500">{t.status}</dt>
                       <dd className="mt-1">
                         <StatusBadge status={property.moderationStatus} />
                       </dd>
@@ -450,7 +450,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                   ) : null}
 
                   <div className="mt-5">
-                    <PropertyActions property={property} />
+                    <PropertyActions labels={t} property={property} />
                   </div>
                 </article>
               ))}

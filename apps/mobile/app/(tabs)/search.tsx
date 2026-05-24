@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'r
 import { PropertyCard } from '@/components/property/property-card';
 import { Button } from '@/components/ui/button';
 import { useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
+import { t } from '@/lib/i18n';
 import { getProperties } from '@/services/property.service';
 import type { Property, PropertyListFilters } from '@/types/property';
 
@@ -14,10 +15,10 @@ const cityOptions = ['Sofia', 'Varna', 'Burgas', 'Plovdiv'] as const;
 const propertyTypeOptions = ['apartment', 'house', 'villa', 'office', 'land'] as const;
 const listingTypeOptions = ['sale', 'rent'] as const;
 const sortOptions = [
-  { label: 'Newest first', value: 'newest' },
-  { label: 'Price low to high', value: 'price_asc' },
-  { label: 'Price high to low', value: 'price_desc' },
-  { label: 'Largest area first', value: 'area_desc' },
+  { labelKey: 'newestFirst', value: 'newest' },
+  { labelKey: 'priceLowHigh', value: 'price_asc' },
+  { labelKey: 'priceHighLow', value: 'price_desc' },
+  { labelKey: 'largestAreaFirst', value: 'area_desc' },
 ] as const;
 
 interface SearchFilters {
@@ -71,10 +72,17 @@ function toPropertyFilters(filters: SearchFilters, page: number): PropertyListFi
 }
 
 function formatFilterLabel(value: string): string {
-  return value
-    .split('_')
-    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
-    .join(' ');
+  const labels: Record<string, string> = {
+    apartment: t('apartment'),
+    house: t('house'),
+    villa: t('villa'),
+    office: t('office'),
+    land: t('land'),
+    sale: t('saleLabel'),
+    rent: t('rentLabel'),
+  };
+
+  return labels[value] ?? value;
 }
 
 interface FilterChipProps {
@@ -177,19 +185,19 @@ export default function SearchScreen() {
           {searchQuery.isPending ? (
             <View className="items-center gap-3">
               <ActivityIndicator color="#16a34a" />
-              <Text className="text-base text-slate-600">Loading search results...</Text>
+              <Text className="text-base text-slate-600">{t('loadingSearchResults')}</Text>
             </View>
           ) : searchQuery.isError ? (
             <View className="gap-4">
               <Text className="text-center text-base font-medium text-red-600">
-                Unable to load search results.
+                {t('unableToLoadSearchResults')}
               </Text>
-              <Button label="Try again" onPress={() => searchQuery.refetch()} variant="secondary" />
+              <Button label={t('tryAgain')} onPress={() => searchQuery.refetch()} variant="secondary" />
             </View>
           ) : (
             <View className="gap-2">
-              <Text className="text-center text-2xl font-bold text-slate-950">No properties found.</Text>
-              <Text className="text-center text-base text-slate-600">Try changing your filters.</Text>
+              <Text className="text-center text-2xl font-bold text-slate-950">{t('noPropertiesFound')}</Text>
+              <Text className="text-center text-base text-slate-600">{t('tryChangingFilters')}</Text>
             </View>
           )}
         </View>
@@ -200,12 +208,12 @@ export default function SearchScreen() {
             {searchQuery.hasNextPage ? (
               <Button
                 disabled={searchQuery.isFetchingNextPage}
-                label={searchQuery.isFetchingNextPage ? 'Loading...' : 'Load more'}
+                label={searchQuery.isFetchingNextPage ? t('loading') : t('loadMore')}
                 onPress={handleLoadMore}
                 variant="secondary"
               />
             ) : (
-              <Text className="text-center text-sm text-slate-500">You have reached the end.</Text>
+              <Text className="text-center text-sm text-slate-500">{t('endOfResults')}</Text>
             )}
           </View>
         ) : null
@@ -213,24 +221,24 @@ export default function SearchScreen() {
       ListHeaderComponent={
         <View className="gap-5">
           <View className="gap-2">
-            <Text className="text-4xl font-bold text-slate-950">Search</Text>
-            <Text className="text-base text-slate-600">Search and filter Estately listings.</Text>
+            <Text className="text-4xl font-bold text-slate-950">{t('search')}</Text>
+            <Text className="text-base text-slate-600">{t('searchAndFilterListings')}</Text>
           </View>
 
           <View className="gap-4 rounded-xl border border-slate-200 bg-white p-5">
             <View className="gap-2">
-              <Text className="text-sm font-semibold text-slate-700">Location or keyword</Text>
+              <Text className="text-sm font-semibold text-slate-700">{t('locationOrKeyword')}</Text>
               <TextInput
                 className="h-12 rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900"
                 onChangeText={(value) => updateFilter('search', value)}
-                placeholder="Title, city, address, or keyword"
+                placeholder={t('searchMobilePlaceholder')}
                 placeholderTextColor="#94a3b8"
                 returnKeyType="search"
                 value={filters.search}
               />
             </View>
 
-            <FilterGroup title="City">
+            <FilterGroup title={t('city')}>
               {cityOptions.map((city) => (
                 <FilterChip
                   key={city}
@@ -241,7 +249,7 @@ export default function SearchScreen() {
               ))}
             </FilterGroup>
 
-            <FilterGroup title="Property type">
+            <FilterGroup title={t('propertyType')}>
               {propertyTypeOptions.map((propertyType) => (
                 <FilterChip
                   key={propertyType}
@@ -252,7 +260,7 @@ export default function SearchScreen() {
               ))}
             </FilterGroup>
 
-            <FilterGroup title="Listing type">
+            <FilterGroup title={t('listingType')}>
               {listingTypeOptions.map((listingType) => (
                 <FilterChip
                   key={listingType}
@@ -265,36 +273,36 @@ export default function SearchScreen() {
 
             <View className="flex-row flex-wrap gap-3">
               <NumericFilter
-                label="Min price"
+                label={t('minPrice')}
                 onChangeText={(value) => updateFilter('minPrice', value)}
-                placeholder="Any"
+                placeholder={t('any')}
                 value={filters.minPrice}
               />
               <NumericFilter
-                label="Max price"
+                label={t('maxPrice')}
                 onChangeText={(value) => updateFilter('maxPrice', value)}
-                placeholder="Any"
+                placeholder={t('any')}
                 value={filters.maxPrice}
               />
               <NumericFilter
-                label="Min bedrooms"
+                label={t('minBedrooms')}
                 onChangeText={(value) => updateFilter('bedrooms', value)}
-                placeholder="Any"
+                placeholder={t('any')}
                 value={filters.bedrooms}
               />
               <NumericFilter
-                label="Min bathrooms"
+                label={t('minBathrooms')}
                 onChangeText={(value) => updateFilter('bathrooms', value)}
-                placeholder="Any"
+                placeholder={t('any')}
                 value={filters.bathrooms}
               />
             </View>
 
-            <FilterGroup title="Sort">
+            <FilterGroup title={t('sort')}>
               {sortOptions.map((sortOption) => (
                 <FilterChip
                   key={sortOption.value}
-                  label={sortOption.label}
+                  label={t(sortOption.labelKey)}
                   onPress={() => updateFilter('sort', sortOption.value)}
                   selected={filters.sort === sortOption.value}
                 />
@@ -303,16 +311,16 @@ export default function SearchScreen() {
 
             <Button
               disabled={!hasActiveFilters}
-              label="Clear filters"
+              label={t('clearFilters')}
               onPress={() => setFilters(defaultFilters)}
               variant="secondary"
             />
           </View>
 
           <View className="flex-row items-center justify-between">
-            <Text className="text-xl font-bold text-slate-950">Results</Text>
+            <Text className="text-xl font-bold text-slate-950">{t('results')}</Text>
             {searchQuery.isFetching && !searchQuery.isFetchingNextPage ? (
-              <Text className="text-sm font-medium text-slate-500">Updating...</Text>
+              <Text className="text-sm font-medium text-slate-500">{t('updating')}</Text>
             ) : null}
           </View>
         </View>

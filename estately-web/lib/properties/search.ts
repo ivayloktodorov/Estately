@@ -1,4 +1,5 @@
 import { and, asc, count, desc, eq, gte, ilike, lte, ne, or, sql, type SQL } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import {
@@ -27,7 +28,7 @@ export interface PropertyPagination {
 }
 
 export interface PaginatedPropertiesResult {
-  properties: (typeof properties.$inferSelect)[];
+  properties: PublicPropertyCardData[];
   totalCount: number;
   currentPage: number;
   pageSize: number;
@@ -43,6 +44,45 @@ export const DEFAULT_PROPERTIES_PAGE_SIZE = 12;
 const MIN_PAGE = 1;
 const MIN_PAGE_SIZE = 1;
 const MAX_PAGE_SIZE = 48;
+
+export const publicPropertyCardColumns = {
+  id: properties.id,
+  title: properties.title,
+  price: properties.price,
+  city: properties.city,
+  address: properties.address,
+  propertyType: properties.propertyType,
+  listingType: properties.listingType,
+  bedrooms: properties.bedrooms,
+  bathrooms: properties.bathrooms,
+  areaSqm: properties.areaSqm,
+  imageCoverUrl: properties.imageCoverUrl,
+  latitude: properties.latitude,
+  longitude: properties.longitude,
+  isFeatured: properties.isFeatured,
+  views: properties.views,
+  createdAt: properties.createdAt,
+};
+
+export type PublicPropertyCardData = Pick<
+  typeof properties.$inferSelect,
+  | 'id'
+  | 'title'
+  | 'price'
+  | 'city'
+  | 'address'
+  | 'propertyType'
+  | 'listingType'
+  | 'bedrooms'
+  | 'bathrooms'
+  | 'areaSqm'
+  | 'imageCoverUrl'
+  | 'latitude'
+  | 'longitude'
+  | 'isFeatured'
+  | 'views'
+  | 'createdAt'
+>;
 
 function firstParam(value: SearchParamValue): string {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -199,7 +239,7 @@ export async function getFilteredProperties(filters: PropertySearchFilters) {
     .orderBy(desc(properties.createdAt), desc(properties.id));
 }
 
-export async function getPaginatedProperties(
+async function getPaginatedPropertiesUncached(
   filters: PropertySearchFilters,
   pagination: PropertyPagination,
   sort: PropertySortValue = 'newest',
@@ -220,7 +260,7 @@ export async function getPaginatedProperties(
   const pageProperties =
     totalCount > 0
       ? await db
-          .select()
+          .select(publicPropertyCardColumns)
           .from(properties)
           .where(whereClause)
           .orderBy(...propertySortOrder(sort))
@@ -238,6 +278,12 @@ export async function getPaginatedProperties(
     hasNextPage: currentPage < totalPages,
   };
 }
+
+export const getPaginatedProperties = unstable_cache(
+  getPaginatedPropertiesUncached,
+  ['public-paginated-properties'],
+  { revalidate: 60 },
+);
 
 export function propertyResultsHref(basePath: string, searchParams: PropertySearchParams): string {
   const params = new URLSearchParams();
@@ -259,7 +305,7 @@ export function propertyDetailsHref(propertyId: number, returnTo: string): strin
   return `/properties/${propertyId}?${params.toString()}`;
 }
 
-export async function getSimilarProperties(
+async function getSimilarPropertiesUncached(
   property: typeof properties.$inferSelect,
   limit = 6,
 ) {
@@ -278,7 +324,7 @@ export async function getSimilarProperties(
   }
 
   return db
-    .select()
+    .select(publicPropertyCardColumns)
     .from(properties)
     .where(and(...conditions))
     .orderBy(
@@ -289,3 +335,9 @@ export async function getSimilarProperties(
     )
     .limit(Math.min(Math.max(limit, 1), 6));
 }
+
+export const getSimilarProperties = unstable_cache(
+  getSimilarPropertiesUncached,
+  ['public-similar-properties'],
+  { revalidate: 300 },
+);

@@ -5,6 +5,7 @@ import { Screen } from '@/components/layout/screen';
 import { Button } from '@/components/ui/button';
 import { useAuthSession } from '@/hooks/use-auth';
 import { useFavorites, useFavoriteIds, useToggleFavorite } from '@/hooks/use-favorites';
+import { t } from '@/lib/i18n';
 
 export default function FavoritesScreen() {
   const sessionQuery = useAuthSession();
@@ -17,15 +18,15 @@ export default function FavoritesScreen() {
       <Screen>
         <View className="flex-1 justify-center gap-5">
           <View className="gap-2">
-            <Text className="text-center text-3xl font-bold text-slate-950">Sign in to save homes</Text>
+            <Text className="text-center text-3xl font-bold text-slate-950">{t('signInToSaveHomes')}</Text>
             <Text className="text-center text-base text-slate-600">
-              Create a shortlist and manage your favorite properties from any device.
+              {t('favoritesSignInDescription')}
             </Text>
           </View>
 
-          <Button label="Log in" onPress={() => router.push('/(auth)/login')} />
+          <Button label={t('logIn')} onPress={() => router.push('/(auth)/login')} />
           <Link href="/(tabs)/search" asChild>
-            <Button label="Browse properties" variant="secondary" />
+            <Button label={t('browseProperties')} variant="secondary" />
           </Link>
         </View>
       </Screen>
@@ -43,28 +44,28 @@ export default function FavoritesScreen() {
           {favoritesQuery.isFetching ? (
             <View className="items-center gap-3">
               <ActivityIndicator color="#16a34a" />
-              <Text className="text-base text-slate-600">Loading favorites...</Text>
+              <Text className="text-base text-slate-600">{t('loadingFavorites')}</Text>
             </View>
           ) : favoritesQuery.isError ? (
             <View className="gap-4">
               <Text className="text-center text-base font-medium text-red-600">
-                Unable to load favorites. Please try again.
+                {t('unableToLoadFavorites')}
               </Text>
-              <Button label="Try again" onPress={() => favoritesQuery.refetch()} variant="secondary" />
+              <Button label={t('tryAgain')} onPress={() => favoritesQuery.refetch()} variant="secondary" />
             </View>
           ) : (
             <View className="gap-4">
               <View className="gap-2">
                 <Text className="text-center text-2xl font-bold text-slate-950">
-                  No saved properties yet.
+                  {t('noSavedProperties')}
                 </Text>
                 <Text className="text-center text-base text-slate-600">
-                  Tap the heart on any property to save it here.
+                  {t('tapHeartToSave')}
                 </Text>
               </View>
 
               <Link href="/(tabs)/search" asChild>
-                <Button label="Browse properties" variant="secondary" />
+                <Button label={t('browseProperties')} variant="secondary" />
               </Link>
             </View>
           )}
@@ -72,8 +73,8 @@ export default function FavoritesScreen() {
       }
       ListHeaderComponent={
         <View className="gap-2">
-          <Text className="text-4xl font-bold text-slate-950">Saved homes</Text>
-          <Text className="text-base text-slate-600">Properties you have saved for later.</Text>
+          <Text className="text-4xl font-bold text-slate-950">{t('savedHomes')}</Text>
+          <Text className="text-base text-slate-600">{t('savedHomesDescription')}</Text>
         </View>
       }
       onRefresh={() => favoritesQuery.refetch()}

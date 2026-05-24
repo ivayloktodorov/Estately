@@ -1,4 +1,5 @@
 import { Image, ScrollView, Text, View } from 'react-native';
+import { t } from '@/lib/i18n';
 import type { PropertyDetails } from '@/types/property';
 
 interface PropertyImageGalleryProps {
@@ -21,7 +22,7 @@ export function PropertyImageGallery({ property }: PropertyImageGalleryProps) {
   if (!heroImageUrl) {
     return (
       <View className="h-72 items-center justify-center rounded-xl bg-slate-200">
-        <Text className="text-base font-medium text-slate-500">No images available</Text>
+        <Text className="text-base font-medium text-slate-500">{t('noImagesAvailable')}</Text>
       </View>
     );
   }

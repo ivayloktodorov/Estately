@@ -5,15 +5,16 @@ import { Screen } from '@/components/layout/screen';
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/text-field';
 import { useAuthSession, useLogin } from '@/hooks/use-auth';
+import { t } from '@/lib/i18n';
 import { ApiError } from '@/types/api';
 
 function validateLogin(email: string, password: string): string | null {
   if (!email.trim()) {
-    return 'Email is required.';
+    return t('emailRequired');
   }
 
   if (!password) {
-    return 'Password is required.';
+    return t('passwordRequired');
   }
 
   return null;
@@ -49,7 +50,7 @@ export default function LoginScreen() {
       });
       router.replace('/(tabs)/profile');
     } catch (mutationError) {
-      setError(mutationError instanceof ApiError ? mutationError.message : 'Unable to log in. Please try again.');
+      setError(mutationError instanceof ApiError ? mutationError.message : t('unableToLogin'));
     }
   }
 
@@ -59,36 +60,36 @@ export default function LoginScreen() {
     <Screen>
       <View className="flex-1 justify-center gap-8">
         <View className="gap-2">
-          <Text className="text-3xl font-bold text-slate-950">Welcome back</Text>
-          <Text className="text-base text-slate-600">Sign in to save listings and contact owners.</Text>
+          <Text className="text-3xl font-bold text-slate-950">{t('welcomeBack')}</Text>
+          <Text className="text-base text-slate-600">{t('loginSubtitle')}</Text>
         </View>
 
         <View className="gap-4">
           <TextField
-            label="Email"
+            label={t('email')}
             autoCapitalize="none"
             autoComplete="email"
             editable={!isSubmitting}
             keyboardType="email-address"
             onChangeText={setEmail}
-            placeholder="you@example.com"
+            placeholder={t('emailPlaceholder')}
             value={email}
           />
           <TextField
-            label="Password"
+            label={t('password')}
             editable={!isSubmitting}
             onChangeText={setPassword}
             onSubmitEditing={handleSubmit}
-            placeholder="Password"
+            placeholder={t('password')}
             secureTextEntry
             value={password}
           />
           {error ? <Text className="text-sm font-medium text-red-600">{error}</Text> : null}
-          <Button disabled={isSubmitting} label={isSubmitting ? 'Logging in...' : 'Log in'} onPress={handleSubmit} />
+          <Button disabled={isSubmitting} label={isSubmitting ? t('loggingIn') : t('logIn')} onPress={handleSubmit} />
         </View>
 
         <Link href="/(auth)/register" className="text-center text-base font-semibold text-brand-700">
-          Create an account
+          {t('createAccount')}
         </Link>
       </View>
     </Screen>

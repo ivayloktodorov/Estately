@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from '@/lib/i18n';
 
 type AdminNavigationSection = 'properties' | 'users' | 'messages' | 'dashboard';
 
@@ -6,14 +7,15 @@ interface AdminNavigationProps {
   active: AdminNavigationSection;
 }
 
-const adminLinks: { href: string; label: string; section: AdminNavigationSection }[] = [
-  { href: '/admin/properties', label: 'Properties', section: 'properties' },
-  { href: '/admin/users', label: 'Users', section: 'users' },
-  { href: '/admin/messages', label: 'Messages', section: 'messages' },
-  { href: '/admin', label: 'Dashboard', section: 'dashboard' },
-];
+export async function AdminNavigation({ active }: AdminNavigationProps) {
+  const t = await getTranslations();
+  const adminLinks: { href: string; label: string; section: AdminNavigationSection }[] = [
+    { href: '/admin/properties', label: t.listingModeration, section: 'properties' },
+    { href: '/admin/users', label: t.userManagement, section: 'users' },
+    { href: '/admin/messages', label: t.messages, section: 'messages' },
+    { href: '/admin', label: t.adminDashboard, section: 'dashboard' },
+  ];
 
-export function AdminNavigation({ active }: AdminNavigationProps) {
   return (
     <nav className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Link className="shrink-0 text-xl font-semibold text-slate-950" href="/admin">

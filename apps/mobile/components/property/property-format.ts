@@ -1,3 +1,5 @@
+import { t } from '@/lib/i18n';
+
 export function formatCurrencyEUR(value: string | number): string {
   const amount = typeof value === 'number' ? value : Number(value);
 
@@ -23,8 +25,15 @@ export function formatPrice(price: string): string {
 }
 
 export function formatPropertyLabel(value: string): string {
-  return value
-    .split('_')
-    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
-    .join(' ');
+  const labels: Record<string, string> = {
+    apartment: t('apartment'),
+    house: t('house'),
+    villa: t('villa'),
+    office: t('office'),
+    land: t('land'),
+    sale: t('saleLabel'),
+    rent: t('rentLabel'),
+  };
+
+  return labels[value] ?? value;
 }

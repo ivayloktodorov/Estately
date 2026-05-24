@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { requireAuth } from '@/lib/auth';
 import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getTranslations } from '@/lib/i18n';
 import { getUserOffers, type OfferListItem } from '@/lib/offers/service';
 import { updatePropertyOfferStatusAction } from '@/lib/offers/actions';
 
@@ -35,21 +36,22 @@ function EmptyState({ children }: { children: ReactNode }) {
 
 export default async function DashboardOffersPage() {
   const user = await requireAuth();
+  const t = await getTranslations();
   const { received, submitted } = await getUserOffers(user.id);
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <section className="rounded-lg border border-stone-200 bg-white p-8 shadow-estate-soft">
-          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Offers</p>
-          <h1 className="mt-3 text-3xl font-semibold text-charcoal-950">Property offers</h1>
+          <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.offers}</p>
+          <h1 className="mt-3 text-3xl font-semibold text-charcoal-950">{t.propertyOffers}</h1>
           <p className="mt-3 max-w-2xl text-slate-600">
             Review offers received for your listings and track the proposals you submitted.
           </p>
         </section>
 
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
-          <h2 className="text-2xl font-semibold text-charcoal-950">Offers received</h2>
+          <h2 className="text-2xl font-semibold text-charcoal-950">{t.offersReceived}</h2>
           <div className="mt-5 grid gap-4">
             {received.length === 0 ? (
               <EmptyState>No offers received yet.</EmptyState>
@@ -87,7 +89,7 @@ export default async function DashboardOffersPage() {
                             <input name="offerId" type="hidden" value={offer.id} />
                             <input name="status" type="hidden" value="rejected" />
                             <button className="h-10 w-full rounded-lg border border-stone-300 bg-white px-4 text-sm font-semibold text-charcoal-950 hover:border-red-300 hover:bg-red-50 hover:text-red-700" type="submit">
-                              Reject
+                              {t.reject}
                             </button>
                           </form>
                         </div>
@@ -101,7 +103,7 @@ export default async function DashboardOffersPage() {
         </section>
 
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
-          <h2 className="text-2xl font-semibold text-charcoal-950">Offers submitted</h2>
+          <h2 className="text-2xl font-semibold text-charcoal-950">{t.offersSubmitted}</h2>
           <div className="mt-5 grid gap-4">
             {submitted.length === 0 ? (
               <EmptyState>No submitted offers yet.</EmptyState>

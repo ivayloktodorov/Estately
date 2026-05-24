@@ -6,7 +6,10 @@ import type { MobilePropertyFilters } from './validation';
 type PropertySort = MobilePropertyFilters['sort'];
 
 function buildMobilePropertyConditions(filters: MobilePropertyFilters): SQL[] {
-  const conditions: SQL[] = [eq(properties.moderationStatus, 'approved')];
+  const conditions: SQL[] = [
+    eq(properties.moderationStatus, 'approved'),
+    eq(properties.isPublished, true),
+  ];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;
@@ -53,6 +56,34 @@ function buildMobilePropertyConditions(filters: MobilePropertyFilters): SQL[] {
   return conditions;
 }
 
+const mobilePropertyListColumns = {
+  id: properties.id,
+  title: properties.title,
+  price: properties.price,
+  city: properties.city,
+  address: properties.address,
+  propertyType: properties.propertyType,
+  listingType: properties.listingType,
+  bedrooms: properties.bedrooms,
+  bathrooms: properties.bathrooms,
+  areaSqm: properties.areaSqm,
+  imageCoverUrl: properties.imageCoverUrl,
+  isFeatured: properties.isFeatured,
+  views: properties.views,
+  createdAt: properties.createdAt,
+  updatedAt: properties.updatedAt,
+};
+
+const mobilePropertyDetailsColumns = {
+  ...mobilePropertyListColumns,
+  description: properties.description,
+  latitude: properties.latitude,
+  longitude: properties.longitude,
+  isPublished: properties.isPublished,
+  moderationStatus: properties.moderationStatus,
+  createdByUserId: properties.createdByUserId,
+};
+
 function mobilePropertySortOrder(sort: PropertySort) {
   switch (sort) {
     case 'oldest':
@@ -82,7 +113,7 @@ export async function getMobilePaginatedProperties(filters: MobilePropertyFilter
   const rows =
     total > 0
       ? await db
-          .select()
+          .select(mobilePropertyListColumns)
           .from(properties)
           .where(whereClause)
           .orderBy(...mobilePropertySortOrder(filters.sort))
@@ -105,7 +136,7 @@ export async function getMobilePaginatedProperties(filters: MobilePropertyFilter
 
 export async function getMobilePropertyDetails(propertyId: number) {
   const property = await db
-    .select()
+    .select(mobilePropertyDetailsColumns)
     .from(properties)
     .where(eq(properties.id, propertyId))
     .then((rows) => rows[0]);

@@ -52,6 +52,33 @@ export const properties = pgTable(
     index('properties_created_by_user_id_idx').on(table.createdByUserId),
     index('properties_created_at_idx').on(table.createdAt),
     index('properties_area_sqm_idx').on(table.areaSqm),
+    index('properties_public_newest_idx').on(
+      table.moderationStatus,
+      table.isPublished,
+      table.createdAt,
+      table.id,
+    ),
+    index('properties_public_listing_newest_idx').on(
+      table.moderationStatus,
+      table.isPublished,
+      table.listingType,
+      table.createdAt,
+      table.id,
+    ),
+    index('properties_public_listing_price_idx').on(
+      table.moderationStatus,
+      table.isPublished,
+      table.listingType,
+      table.price,
+      table.createdAt,
+    ),
+    index('properties_public_listing_area_idx').on(
+      table.moderationStatus,
+      table.isPublished,
+      table.listingType,
+      table.areaSqm,
+      table.createdAt,
+    ),
     foreignKey({
       columns: [table.createdByUserId],
       foreignColumns: [users.id],

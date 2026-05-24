@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUsers, type AdminUserListItem, type AdminUsersSearchParams } from '@/lib/admin/users';
+import { getTranslations } from '@/lib/i18n';
 import { AdminNavigation } from '../admin-navigation';
 import { updateUserRoleAction } from './actions';
 
@@ -156,6 +157,7 @@ function Pagination({
 
 export default async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   await requireAdmin();
+  const t = await getTranslations();
   const resolvedSearchParams = (await searchParams) ?? {};
   const result = await getAdminUsers(resolvedSearchParams);
 
@@ -166,7 +168,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
-            User management
+            {t.userManagement}
           </p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -189,7 +191,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               defaultValue={result.search}
               id="user-search"
               name="search"
-              placeholder="Search by name or email"
+              placeholder={t.searchByNameEmail}
               type="search"
             />
             <select
@@ -197,21 +199,21 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
               defaultValue={result.sort}
               name="sort"
             >
-              <option value="newest">Newest first</option>
+              <option value="newest">{t.newestFirst}</option>
               <option value="oldest">Oldest first</option>
               <option value="name">Name A-Z</option>
               <option value="email">Email A-Z</option>
               <option value="role">Role</option>
             </select>
             <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">
-              Search
+              {t.search}
             </button>
             {result.search ? (
               <Link
                 className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                 href="/admin/users"
               >
-                Clear
+                {t.clear}
               </Link>
             ) : null}
           </form>
@@ -219,7 +221,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
 
         {result.users.length === 0 ? (
           <section className="mt-6 rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-950">No users found.</h2>
+            <h2 className="text-xl font-semibold text-slate-950">{t.noUsersFound}</h2>
           </section>
         ) : (
           <>
@@ -232,9 +234,9 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       <th className="px-4 py-3">User</th>
                       <th className="px-4 py-3">Email</th>
                       <th className="px-4 py-3">Role</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Created At</th>
-                      <th className="px-4 py-3">Actions</th>
+                      <th className="px-4 py-3">{t.status}</th>
+                      <th className="px-4 py-3">{t.createdAt}</th>
+                      <th className="px-4 py-3">{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 bg-white">
@@ -261,7 +263,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                               className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                               href={`/admin/users/${user.id}`}
                             >
-                              Edit
+                              {t.edit}
                             </Link>
                             <RoleForm user={user} />
                           </div>
@@ -296,7 +298,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
                       href={`/admin/users/${user.id}`}
                     >
-                      Edit
+                      {t.edit}
                     </Link>
                     <RoleForm user={user} />
                   </div>

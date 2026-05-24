@@ -7,6 +7,7 @@ import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { propertyImageUrl } from '@/lib/properties/image-url';
 import { getRecentUserActivity, type UserActivityType } from '@/lib/activity/service';
+import { getTranslations } from '@/lib/i18n';
 
 const DASHBOARD_PROPERTY_LIMIT = 5;
 
@@ -71,6 +72,7 @@ async function getManageableProperties(user: Awaited<ReturnType<typeof requireAu
 
 export default async function DashboardPage() {
   const user = await requireAuth();
+  const t = await getTranslations();
   const [manageablePropertiesResult, recentActivityResult] = await Promise.allSettled([
     getManageableProperties(user),
     getRecentUserActivity(user.id),
@@ -84,7 +86,7 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-5xl">
         <section className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">
-            {user.role} dashboard
+            {user.role} {t.dashboard.toLowerCase()}
           </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">Hi, {user.fullName}</h1>
           <p className="mt-3 max-w-2xl text-slate-600">
@@ -98,48 +100,48 @@ export default async function DashboardPage() {
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/properties"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Listings</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">My Properties</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.listingModeration}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.myProperties}</h2>
             <p className="mt-2 text-sm text-slate-600">Manage your property listings.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/messages"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Inbox</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Messages</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.messages}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.messages}</h2>
             <p className="mt-2 text-sm text-slate-600">Read and reply to conversations.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/offers"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Deals</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Offers</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.offers}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.offers}</h2>
             <p className="mt-2 text-sm text-slate-600">Manage received and submitted offers.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/inquiries"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Leads</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Inquiries</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.inquiries}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.inquiries}</h2>
             <p className="mt-2 text-sm text-slate-600">Review property inquiry history.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/notifications"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Updates</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Notifications</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.notifications}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.notifications}</h2>
             <p className="mt-2 text-sm text-slate-600">View and manage account alerts.</p>
           </Link>
           <Link
             className="rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft transition hover:border-estate-300 hover:shadow-lg"
             href="/dashboard/saved-searches"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Alerts</p>
-            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">Saved Searches</h2>
+            <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.propertyAlerts}</p>
+            <h2 className="mt-2 text-xl font-semibold text-charcoal-950">{t.savedSearches}</h2>
             <p className="mt-2 text-sm text-slate-600">Manage property search alerts.</p>
           </Link>
         </section>
@@ -147,11 +149,11 @@ export default async function DashboardPage() {
         <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-estate-soft">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">Recent activity</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-estate-700">{t.activity}</p>
               <h2 className="mt-2 text-2xl font-semibold text-charcoal-950">Latest updates</h2>
             </div>
             <Link className="text-sm font-semibold text-estate-700 hover:text-estate-800" href="/dashboard/activity">
-              View all activity
+              {t.viewAll}
             </Link>
           </div>
           {recentActivity.length === 0 ? (
@@ -199,7 +201,7 @@ export default async function DashboardPage() {
               className="inline-flex h-11 items-center justify-center rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-estate-soft hover:bg-estate-800"
               href="/dashboard/properties/new"
             >
-              Add Property
+              {t.addProperty}
             </Link>
           </div>
 
@@ -230,7 +232,7 @@ export default async function DashboardPage() {
                         className="text-sm font-semibold text-estate-700 hover:text-estate-800"
                         href={`/properties/${property.id}`}
                       >
-                        View listing
+                        {t.viewListing}
                       </Link>
                     </div>
                     <PropertyImageUpload propertyId={property.id} />

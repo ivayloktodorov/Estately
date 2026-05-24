@@ -19,7 +19,7 @@ export function PropertySearchBar({ className = '', value, onChange }: PropertyS
         name="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Search by title, city, address..."
+        placeholder={t('searchPlaceholder')}
         className="h-11 w-full rounded-md border border-stone-200 bg-white px-3 text-sm font-medium text-charcoal-950 shadow-sm outline-none transition placeholder:text-stone-400 focus:border-estate-700 focus:ring-4 focus:ring-estate-700/10"
       />
     </label>

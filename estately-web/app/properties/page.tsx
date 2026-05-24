@@ -141,13 +141,14 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
           <PropertiesMapViewDynamic properties={formattedProperties} />
         ) : (
           <PropertyGrid isEmpty={isEmpty}>
-            {formattedProperties.map((property) => (
+            {formattedProperties.map((property, index) => (
               <PropertyCard
                 key={property.id}
                 {...property}
                 detailsHref={propertyDetailsHref(property.id, returnTo)}
                 isAuthenticated={Boolean(user)}
                 isFavorited={favoritePropertyIds.has(property.id)}
+                imagePriority={index < 2}
                 showFavoriteButton
               />
             ))}

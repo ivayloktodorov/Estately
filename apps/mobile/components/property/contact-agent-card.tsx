@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { useAuthSession } from '@/hooks/use-auth';
+import { t } from '@/lib/i18n';
 import { sendPropertyInquiry } from '@/services/inquiry.service';
 import { ApiError } from '@/types/api';
 
@@ -17,15 +18,15 @@ function validateMessage(message: string): string | null {
   const trimmedMessage = message.trim();
 
   if (!trimmedMessage) {
-    return 'Message is required.';
+    return t('messageRequired');
   }
 
   if (trimmedMessage.length < MIN_MESSAGE_LENGTH) {
-    return 'Message must be at least 10 characters.';
+    return t('messageMinLength');
   }
 
   if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
-    return 'Message must be 1000 characters or fewer.';
+    return t('messageMaxLength');
   }
 
   return null;
@@ -55,14 +56,14 @@ export function ContactAgentCard({ propertyId }: ContactAgentCardProps) {
     try {
       await sendPropertyInquiry(propertyId, message.trim());
       setMessage('');
-      setSuccessMessage('Your inquiry was sent successfully.');
+      setSuccessMessage(t('inquirySent'));
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
         router.replace('/(auth)/login');
         return;
       }
 
-      setSubmitError('Unable to send inquiry. Please try again.');
+      setSubmitError(t('unableToSendInquiry'));
     } finally {
       setIsSending(false);
     }
@@ -72,13 +73,13 @@ export function ContactAgentCard({ propertyId }: ContactAgentCardProps) {
     return (
       <View className="gap-4 rounded-xl border border-slate-200 bg-white p-5">
         <View className="gap-1">
-          <Text className="text-xl font-bold text-slate-950">Contact agent</Text>
+          <Text className="text-xl font-bold text-slate-950">{t('contactAgent')}</Text>
           <Text className="text-base leading-6 text-slate-600">
-            Login to contact agent and send a message about this property.
+            {t('loginToContactAgent')}
           </Text>
         </View>
 
-        <Button label="Login" onPress={() => router.push('/(auth)/login')} />
+        <Button label={t('login')} onPress={() => router.push('/(auth)/login')} />
       </View>
     );
   }
@@ -86,9 +87,9 @@ export function ContactAgentCard({ propertyId }: ContactAgentCardProps) {
   return (
     <View className="gap-4 rounded-xl border border-slate-200 bg-white p-5">
       <View className="gap-1">
-        <Text className="text-xl font-bold text-slate-950">Contact agent</Text>
+        <Text className="text-xl font-bold text-slate-950">{t('contactAgent')}</Text>
         <Text className="text-base leading-6 text-slate-600">
-          Send a quick note to ask about availability, viewings, or details that matter to you.
+          {t('contactAgentPrompt')}
         </Text>
       </View>
 
@@ -104,7 +105,7 @@ export function ContactAgentCard({ propertyId }: ContactAgentCardProps) {
             setSubmitError(null);
             setSuccessMessage(null);
           }}
-          placeholder="Write your message about this property..."
+          placeholder={t('writePropertyMessage')}
           placeholderTextColor="#94a3b8"
           textAlignVertical="top"
           value={message}
@@ -120,7 +121,7 @@ export function ContactAgentCard({ propertyId }: ContactAgentCardProps) {
 
       <Button
         disabled={isSending}
-        label={isSending ? 'Sending...' : 'Send inquiry'}
+        label={isSending ? t('sending') : t('sendInquiry')}
         onPress={() => {
           void handleSubmit();
         }}

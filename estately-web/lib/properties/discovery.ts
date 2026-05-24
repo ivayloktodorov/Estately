@@ -1,8 +1,10 @@
 import { and, count, desc, eq, sql } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/src/db/client';
 import { favorites, properties } from '@/src/db/schema';
+import { publicPropertyCardColumns, type PublicPropertyCardData } from '@/lib/properties/search';
 
-export type PublicProperty = typeof properties.$inferSelect;
+export type PublicProperty = PublicPropertyCardData;
 
 const publicPropertyConditions = and(
   eq(properties.isPublished, true),
@@ -28,19 +30,21 @@ export function formatPropertyCard(property: PublicProperty) {
   };
 }
 
-export async function getNewestProperties(limit = 8): Promise<PublicProperty[]> {
+async function getNewestPropertiesUncached(limit = 8): Promise<PublicProperty[]> {
   return db
-    .select()
+    .select(publicPropertyCardColumns)
     .from(properties)
     .where(publicPropertyConditions)
     .orderBy(desc(properties.createdAt), desc(properties.id))
     .limit(limit);
 }
 
-export async function getTrendingProperties(limit = 8): Promise<PublicProperty[]> {
+async function getTrendingPropertiesUncached(limit = 8): Promise<PublicProperty[]> {
   const rows = await db
     .select({
-      property: properties,
+      property: {
+        ...publicPropertyCardColumns,
+      },
       favoritesCount: count(favorites.id),
     })
     .from(properties)
@@ -53,7 +57,19 @@ export async function getTrendingProperties(limit = 8): Promise<PublicProperty[]
   return rows.map((row) => row.property);
 }
 
-export async function getSitemapProperties(): Promise<Pick<PublicProperty, 'id' | 'updatedAt'>[]> {
+export const getNewestProperties = unstable_cache(
+  getNewestPropertiesUncached,
+  ['public-newest-properties'],
+  { revalidate: 60 },
+);
+
+export const getTrendingProperties = unstable_cache(
+  getTrendingPropertiesUncached,
+  ['public-trending-properties'],
+  { revalidate: 300 },
+);
+
+export async function getSitemapProperties(): Promise<Pick<typeof properties.$inferSelect, 'id' | 'updatedAt'>[]> {
   return db
     .select({
       id: properties.id,
