@@ -1,7 +1,11 @@
 export const PROPERTY_IMAGE_PLACEHOLDER_URL =
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop';
+  '/images/property-placeholder.jpg';
+
+const INVALID_IMAGE_VALUES = new Set(['', 'null', 'undefined']);
 
 export function propertyImageUrl(imageUrl: string | null | undefined): string {
   const trimmedUrl = imageUrl?.trim();
-  return trimmedUrl ? trimmedUrl : PROPERTY_IMAGE_PLACEHOLDER_URL;
+  return trimmedUrl && !INVALID_IMAGE_VALUES.has(trimmedUrl.toLowerCase())
+    ? trimmedUrl
+    : PROPERTY_IMAGE_PLACEHOLDER_URL;
 }

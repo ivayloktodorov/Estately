@@ -118,7 +118,10 @@ export function parsePropertyPaginationParams(
 }
 
 function buildPropertyConditions(filters: PropertySearchFilters): SQL[] {
-  const conditions: SQL[] = [eq(properties.moderationStatus, 'approved')];
+  const conditions: SQL[] = [
+    eq(properties.moderationStatus, 'approved'),
+    eq(properties.isPublished, true),
+  ];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;

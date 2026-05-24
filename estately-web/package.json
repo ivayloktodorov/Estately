@@ -11,6 +11,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
+    "db:seed-images": "tsx scripts/seed-images.ts",
     "db:verify": "tsx scripts/verify.ts",
     "db:load-test": "tsx scripts/load-test-data.ts"
   },

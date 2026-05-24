@@ -1,71 +1,71 @@
 import type { Metadata } from 'next';
 import { Container } from '@/components/ui/container';
 import { PropertyCard } from '@/components/ui/property-card';
+import { PropertyGrid } from '@/components/ui/property-grid';
 import { SectionHeader } from '@/components/ui/section-header';
+import { PropertyPagination } from '@/components/properties/property-pagination';
+import { propertyImageUrl } from '@/lib/properties/images';
+import {
+  getPaginatedProperties,
+  parsePropertyPaginationParams,
+  type PropertySearchParams,
+} from '@/lib/properties/search';
 
 export const metadata: Metadata = {
   title: 'Buy',
   description: 'Browse homes for sale on Estately.',
 };
 
-const homesForSale = [
-  {
-    id: 1,
-    imageUrl:
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=900&auto=format&fit=crop',
-    price: '$735,000',
-    title: 'Garden District Home',
-    city: 'Portland',
-    address: 'Portland, OR',
-    bedrooms: 4,
-    bathrooms: 3,
-    areaSqm: 2860,
-    propertyType: 'house',
-    listingType: 'sale' as const,
-  },
-  {
-    id: 2,
-    imageUrl:
-      'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=900&auto=format&fit=crop',
-    price: '$980,000',
-    title: 'Contemporary Courtyard House',
-    city: 'Denver',
-    address: 'Denver, CO',
-    bedrooms: 5,
-    bathrooms: 4,
-    areaSqm: 3740,
-    propertyType: 'house',
-    listingType: 'sale' as const,
-  },
-  {
-    id: 3,
-    imageUrl:
-      'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=900&auto=format&fit=crop',
-    price: '$549,000',
-    title: 'Bright Suburban Classic',
-    city: 'Raleigh',
-    address: 'Raleigh, NC',
-    bedrooms: 3,
-    bathrooms: 2,
-    areaSqm: 2120,
-    propertyType: 'house',
-    listingType: 'sale' as const,
-  },
-];
+interface BuyPageProps {
+  searchParams?: Promise<PropertySearchParams>;
+}
 
-export default function BuyPage() {
+export default async function BuyPage({ searchParams }: BuyPageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const pagination = parsePropertyPaginationParams(resolvedSearchParams);
+  const result = await getPaginatedProperties(
+    { listing: 'sale' },
+    { ...pagination, pageSize: Math.min(pagination.pageSize, 20) },
+  );
+  const formattedProperties = result.properties.map((property) => ({
+    id: property.id,
+    imageUrl: propertyImageUrl(property.imageCoverUrl),
+    price: `$${Number(property.price).toLocaleString()}`,
+    title: property.title,
+    city: property.city,
+    address: property.address,
+    bedrooms: property.bedrooms,
+    bathrooms: property.bathrooms,
+    areaSqm: property.areaSqm,
+    propertyType: property.propertyType,
+    listingType: 'sale' as const,
+  }));
+  const isEmpty = formattedProperties.length === 0;
+
   return (
     <main className="bg-white py-20">
       <Container>
         <SectionHeader
-          description="Preview homes for sale while the full listing search experience comes together."
+          description="Browse published homes for sale from the Estately marketplace."
           title="Homes for sale"
         />
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {homesForSale.map((property) => (
-            <PropertyCard key={property.id} {...property} />
-          ))}
+        <div className="mt-10">
+          <PropertyGrid isEmpty={isEmpty} emptyTitle="No properties found." emptyDescription="Check back soon for new homes for sale.">
+            {formattedProperties.map((property) => (
+              <PropertyCard key={property.id} {...property} />
+            ))}
+          </PropertyGrid>
         </div>
+
+        {!isEmpty ? (
+          <PropertyPagination
+            currentPage={result.currentPage}
+            totalPages={result.totalPages}
+            hasPreviousPage={result.hasPreviousPage}
+            hasNextPage={result.hasNextPage}
+            searchParams={resolvedSearchParams}
+          />
+        ) : null}
       </Container>
     </main>
   );

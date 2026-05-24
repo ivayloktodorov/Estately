@@ -23,7 +23,11 @@ function canViewProperty(
   property: typeof properties.$inferSelect,
   user: AuthUser | null,
 ): boolean {
-  return property.moderationStatus === 'approved' || user?.role === 'admin' || user?.id === property.createdByUserId;
+  return (
+    (property.moderationStatus === 'approved' && property.isPublished) ||
+    user?.role === 'admin' ||
+    user?.id === property.createdByUserId
+  );
 }
 
 async function getProperty(id: number, user: AuthUser | null) {
