@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/components/i18n/language-provider';
 import { ButtonLink } from '@/components/ui/button-link';
 import type { AuthUser } from '@/lib/auth/types';
 
@@ -13,6 +14,7 @@ interface MobileMenuToggleProps {
 export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
@@ -71,7 +73,7 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
                 href="/softuni-exam"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                SoftUni Exam
+                {t('softUniExam')}
               </Link>
               {user ? (
                 <>
@@ -81,14 +83,14 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
                     href="/dashboard/notifications"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Notifications
+                    {t('notifications')}
                   </Link>
                   <Link
                     className="block rounded-md px-3 py-2 text-base font-medium text-stone-700 transition hover:bg-estate-50 hover:text-estate-700"
                     href="/profile"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Profile
+                    {t('profile')}
                   </Link>
                 </>
               ) : null}
@@ -98,10 +100,10 @@ export function HeaderMobileMenu({ user, publicLinks }: MobileMenuToggleProps) {
               <div className="mt-4 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:flex-nowrap">
                 <>
                   <ButtonLink className="flex-1" href="/login" onClick={() => setMobileMenuOpen(false)} variant="outline">
-                    Login
+                    {t('login')}
                   </ButtonLink>
                   <ButtonLink className="flex-1" href="/register" onClick={() => setMobileMenuOpen(false)}>
-                    Register
+                    {t('register')}
                   </ButtonLink>
                 </>
               </div>

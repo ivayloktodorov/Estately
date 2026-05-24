@@ -1,13 +1,11 @@
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth';
 import { getUserProperties, type DashboardProperty } from '@/lib/dashboard/properties';
+import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getTranslations } from '@/lib/i18n';
 import { propertyDetailsHref } from '@/lib/properties/search';
 import { deleteOwnPropertyAction } from './actions';
 import { DeletePropertyButton } from './delete-property-button';
-
-function formatPrice(price: string): string {
-  return `$${Number(price).toLocaleString()}`;
-}
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en', {
@@ -64,6 +62,7 @@ function PropertyActions({ property }: { property: DashboardProperty }) {
 
 export default async function DashboardPropertiesPage() {
   const user = await requireAuth();
+  const t = await getTranslations();
   const userProperties = await getUserProperties(user.id);
 
   return (
@@ -75,7 +74,7 @@ export default async function DashboardPropertiesPage() {
           </p>
           <div className="mt-2 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <h1 className="text-3xl font-semibold text-charcoal-950">My Properties</h1>
+              <h1 className="text-3xl font-semibold text-charcoal-950">{t.myProperties}</h1>
               <p className="mt-2 text-slate-600">
                 Manage the properties you have added to Estately.
               </p>
@@ -84,7 +83,7 @@ export default async function DashboardPropertiesPage() {
               className="inline-flex h-11 items-center justify-center rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white shadow-estate-soft transition hover:bg-estate-800"
               href="/dashboard/properties/new"
             >
-              Add Property
+              {t.addProperty}
             </Link>
           </div>
         </section>
@@ -109,9 +108,9 @@ export default async function DashboardPropertiesPage() {
                   <thead className="bg-cream-50 text-xs font-semibold uppercase tracking-wide text-stone-600">
                     <tr>
                       <th className="px-4 py-3">Title</th>
-                      <th className="px-4 py-3">City</th>
-                      <th className="px-4 py-3">Price</th>
-                      <th className="px-4 py-3">Type</th>
+                      <th className="px-4 py-3">{t.city}</th>
+                      <th className="px-4 py-3">{t.price}</th>
+                      <th className="px-4 py-3">{t.type}</th>
                       <th className="px-4 py-3">Listing</th>
                       <th className="px-4 py-3">Status</th>
                       <th className="px-4 py-3">Created At</th>
@@ -123,7 +122,7 @@ export default async function DashboardPropertiesPage() {
                       <tr className="align-top" key={property.id}>
                         <td className="px-4 py-4 font-semibold text-charcoal-950">{property.title}</td>
                         <td className="px-4 py-4 text-slate-700">{property.city}</td>
-                        <td className="px-4 py-4 font-semibold text-charcoal-950">{formatPrice(property.price)}</td>
+                        <td className="px-4 py-4 font-semibold text-charcoal-950">{formatCurrencyEUR(property.price)}</td>
                         <td className="px-4 py-4 text-slate-700">{readableLabel(property.propertyType)}</td>
                         <td className="px-4 py-4 text-slate-700">{readableLabel(property.listingType)}</td>
                         <td className="px-4 py-4">
@@ -150,7 +149,7 @@ export default async function DashboardPropertiesPage() {
                     <div>
                       <h2 className="text-lg font-semibold text-charcoal-950">{property.title}</h2>
                       <p className="mt-1 text-sm text-slate-600">
-                        {property.city} · {formatPrice(property.price)}
+                        {property.city} · {formatCurrencyEUR(property.price)}
                       </p>
                     </div>
                     <StatusBadge status={property.moderationStatus} />

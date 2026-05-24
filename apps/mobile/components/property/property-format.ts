@@ -1,3 +1,17 @@
+export function formatCurrencyEUR(value: string | number): string {
+  const amount = typeof value === 'number' ? value : Number(value);
+
+  if (!Number.isFinite(amount)) {
+    return String(value);
+  }
+
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export function formatPrice(price: string): string {
   const value = Number(price);
 
@@ -5,11 +19,7 @@ export function formatPrice(price: string): string {
     return price;
   }
 
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
+  return formatCurrencyEUR(value);
 }
 
 export function formatPropertyLabel(value: string): string {

@@ -10,7 +10,8 @@ import { PropertyViewToggle } from '@/components/properties/property-view-toggle
 import { SaveSearchButton } from '@/components/properties/save-search-button';
 import { getCurrentUser } from '@/lib/auth';
 import { getFavoritePropertyIds } from '@/lib/favorites/actions';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { createSeoMetadata } from '@/lib/seo';
 import {
   getPaginatedProperties,
@@ -73,7 +74,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
   const formattedProperties = paginatedProperties.properties.map((prop) => ({
     id: prop.id,
     title: prop.title,
-    price: `$${Number(prop.price).toLocaleString()}`,
+    price: formatCurrencyEUR(prop.price),
     city: prop.city,
     address: prop.address,
     bedrooms: prop.bedrooms,

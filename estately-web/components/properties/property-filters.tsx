@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { FormEvent, useMemo, useState, useTransition } from 'react';
+import { useLanguage } from '@/components/i18n/language-provider';
 import { LISTING_TYPES, PROPERTY_TYPES } from '@/lib/properties/constants';
 import type { PropertySearchFilters } from '@/lib/properties/search';
 import { FilterSelect } from './filter-select';
@@ -52,6 +53,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [formState, setFormState] = useState<FilterFormState>(() => initialState(filters, fixedListing));
+  const { t } = useLanguage();
 
   const cityOptions = useMemo(
     () => cities.map((city) => ({ label: city, value: city })),
@@ -64,7 +66,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
   }));
 
   const listingTypeOptions = LISTING_TYPES.map((type) => ({
-    label: type === 'sale' ? 'For sale' : 'For rent',
+    label: type === 'sale' ? t('forSale') : t('forRent'),
     value: type,
   }));
 
@@ -128,7 +130,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
       />
       <FilterSelect
         className="lg:col-span-2 xl:col-span-1"
-        label="City"
+        label={t('city')}
         name="city"
         value={formState.city}
         placeholder="Any city"
@@ -137,7 +139,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
       />
       <FilterSelect
         className="lg:col-span-2 xl:col-span-1"
-        label="Type"
+        label={t('type')}
         name="type"
         value={formState.type}
         placeholder="Any type"
@@ -147,7 +149,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
       {fixedListing ? null : (
         <FilterSelect
           className="lg:col-span-2 xl:col-span-1"
-          label="Listing"
+          label={t('type')}
           name="listing"
           value={formState.listing}
           placeholder="Sale or rent"
@@ -163,7 +165,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
       />
       <FilterSelect
         className="lg:col-span-1 xl:col-span-1"
-        label="Beds"
+        label={t('beds')}
         name="bedrooms"
         value={formState.bedrooms}
         placeholder="Any beds"
@@ -172,7 +174,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
       />
       <FilterSelect
         className="lg:col-span-1 xl:col-span-1"
-        label="Baths"
+        label={t('baths')}
         name="bathrooms"
         value={formState.bathrooms}
         placeholder="Any baths"
@@ -195,7 +197,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
             disabled={isPending}
             className="h-11 flex-1 whitespace-nowrap rounded-md bg-estate-700 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-70"
           >
-            {isPending ? 'Searching...' : 'Search'}
+            {isPending ? t('searching') : t('search')}
           </button>
           <button
             type="button"
@@ -203,7 +205,7 @@ export function PropertyFilters({ filters, cities, fixedListing, sort, view }: P
             disabled={isPending}
             className="h-11 flex-1 whitespace-nowrap rounded-md border border-stone-200 bg-white px-4 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 disabled:cursor-wait disabled:opacity-70"
           >
-            Clear
+            {t('clear')}
           </button>
         </div>
       </form>

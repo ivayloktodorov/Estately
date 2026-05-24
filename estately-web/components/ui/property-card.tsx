@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/components/i18n/language-provider';
 import { FavoriteButton } from '@/components/favorites/favorite-button';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 
 interface PropertyCardProps {
   id: number;
@@ -73,6 +76,7 @@ export function PropertyCard({
   const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
   const propertyHref = detailsHref ?? `/properties/${id}`;
   const badges = propertyBadges(createdAt, views, isFeatured);
+  const { t } = useLanguage();
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">
@@ -96,7 +100,7 @@ export function PropertyCard({
           />
           {/* Badge */}
           <div className="absolute top-3 right-3 bg-estate-700 text-white px-3 py-1 rounded-full text-sm font-semibold">
-            {listingType === 'sale' ? 'For Sale' : 'For Rent'}
+            {listingType === 'sale' ? t('forSale') : t('forRent')}
           </div>
           {badges.length > 0 ? (
             <div className="absolute left-3 top-3 flex flex-wrap gap-2">
@@ -141,11 +145,11 @@ export function PropertyCard({
           <div className="mt-4 grid grid-cols-3 gap-3">
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{bedrooms}</p>
-              <p className="text-xs text-stone-600">Bed{bedrooms !== 1 ? 's' : ''}</p>
+              <p className="text-xs text-stone-600">{t('beds')}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{bathrooms}</p>
-              <p className="text-xs text-stone-600">Bath{bathrooms !== 1 ? 's' : ''}</p>
+              <p className="text-xs text-stone-600">{t('baths')}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-charcoal-950">{areaSqm}</p>
@@ -154,7 +158,7 @@ export function PropertyCard({
           </div>
 
           <span className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-bold text-white transition group-hover:bg-estate-800">
-            View details
+            {t('viewDetails')}
           </span>
         </div>
       </Link>

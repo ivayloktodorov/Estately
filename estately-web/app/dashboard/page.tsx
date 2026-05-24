@@ -5,7 +5,7 @@ import { requireAuth } from '@/lib/auth';
 import { PropertyImageUpload } from '@/components/properties/property-image-upload';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 import { getRecentUserActivity, type UserActivityType } from '@/lib/activity/service';
 
 const DASHBOARD_PROPERTY_LIMIT = 5;

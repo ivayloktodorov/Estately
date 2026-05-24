@@ -4,7 +4,8 @@ import { Container } from '@/components/ui/container';
 import { PropertyCard } from '@/components/ui/property-card';
 import { PropertyGrid } from '@/components/ui/property-grid';
 import { ButtonLink } from '@/components/ui/button-link';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { propertyDetailsHref } from '@/lib/properties/search';
 
 export default async function FavoritesPage() {
@@ -14,7 +15,7 @@ export default async function FavoritesPage() {
   const formattedProperties = favoriteProperties.map((prop) => ({
     id: prop.id,
     title: prop.title,
-    price: `$${Number(prop.price).toLocaleString()}`,
+    price: formatCurrencyEUR(prop.price),
     city: prop.city,
     address: prop.address,
     bedrooms: prop.bedrooms,

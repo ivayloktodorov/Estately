@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLanguage } from '@/components/i18n/language-provider';
 import type { AuthUser } from '@/lib/auth/types';
 import { LogoutButton } from './logout-button';
 
@@ -90,6 +91,21 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const name = displayName(user);
+  const { t } = useLanguage();
+  const translatedProfileLinks = profileLinks.map((link) => {
+    const labels: Record<string, string> = {
+      Dashboard: t('dashboard'),
+      'My Properties': t('myProperties'),
+      'Add Property': t('addProperty'),
+      Messages: t('messages'),
+      'Saved Searches': t('savedSearches'),
+      Profile: t('profile'),
+      Favorites: t('favorites'),
+      Notifications: t('notifications'),
+    };
+
+    return { ...link, label: labels[link.label] ?? link.label };
+  });
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
@@ -143,7 +159,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
             </div>
           </div>
           <div className="py-2">
-            {profileLinks.map((link) => (
+            {translatedProfileLinks.map((link) => (
               <Link
                 className="block px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-cream-50 hover:text-estate-700"
                 href={link.href}

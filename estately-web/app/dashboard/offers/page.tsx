@@ -1,15 +1,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { requireAuth } from '@/lib/auth';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { getUserOffers, type OfferListItem } from '@/lib/offers/service';
 import { updatePropertyOfferStatusAction } from '@/lib/offers/actions';
-
-function formatCurrency(amount: string): string {
-  return `${Number(amount).toLocaleString('en', {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  })} EUR`;
-}
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en', {
@@ -70,7 +64,7 @@ export default async function DashboardOffersPage() {
                       <p className="mt-1 text-sm text-slate-600">
                         {offer.buyerName} · {offer.buyerEmail}
                       </p>
-                      <p className="mt-3 text-2xl font-bold text-charcoal-950">{formatCurrency(offer.amount)}</p>
+                      <p className="mt-3 text-2xl font-bold text-charcoal-950">{formatCurrencyEUR(offer.amount)}</p>
                       {offer.message ? <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">{offer.message}</p> : null}
                       <time className="mt-3 block text-xs font-medium uppercase tracking-wide text-slate-500" dateTime={offer.createdAt.toISOString()}>
                         {formatDate(offer.createdAt)}
@@ -118,7 +112,7 @@ export default async function DashboardOffersPage() {
                     <Link className="font-semibold text-charcoal-950 hover:text-estate-700" href={`/properties/${offer.propertyId}`}>
                       {offer.propertyTitle}
                     </Link>
-                    <p className="mt-2 text-xl font-bold text-charcoal-950">{formatCurrency(offer.amount)}</p>
+                    <p className="mt-2 text-xl font-bold text-charcoal-950">{formatCurrencyEUR(offer.amount)}</p>
                     <time className="mt-1 block text-xs font-medium uppercase tracking-wide text-slate-500" dateTime={offer.createdAt.toISOString()}>
                       {formatDate(offer.createdAt)}
                     </time>

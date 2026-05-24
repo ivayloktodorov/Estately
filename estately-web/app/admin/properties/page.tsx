@@ -7,17 +7,15 @@ import {
   type AdminProperty,
   type ModerationStatus,
 } from '@/lib/admin/properties';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getTranslations } from '@/lib/i18n';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 import { bulkModeratePropertiesAction, deletePropertyAction, moderatePropertyAction } from './actions';
 import { AdminNavigation } from '../admin-navigation';
 import { DeletePropertyButton } from './delete-property-button';
 
 interface AdminPropertiesPageProps {
   searchParams?: Promise<AdminPropertiesSearchParams>;
-}
-
-function formatPrice(price: string): string {
-  return `$${Number(price).toLocaleString()}`;
 }
 
 function formatDate(date: Date): string {
@@ -223,6 +221,7 @@ function Pagination({
 
 export default async function AdminPropertiesPage({ searchParams }: AdminPropertiesPageProps) {
   await requireAdmin();
+  const t = await getTranslations();
   const result = await getAdminProperties((await searchParams) ?? {});
 
   return (
@@ -269,7 +268,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
               <option value="rent">Rent</option>
             </select>
             <select className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 outline-none focus:border-estate-700 focus:ring-2 focus:ring-estate-700/10" defaultValue={result.sort} name="sort">
-              <option value="newest">Newest first</option>
+              <option value="newest">{t.newestFirst}</option>
               <option value="oldest">Oldest first</option>
               <option value="price_asc">Price low-high</option>
               <option value="price_desc">Price high-low</option>
@@ -279,14 +278,14 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
             </select>
             <button className="h-11 rounded-lg bg-estate-700 px-5 text-sm font-semibold text-white transition hover:bg-estate-800">Apply</button>
             <Link className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700" href="/admin/properties">
-              Clear
+              {t.clear}
             </Link>
           </form>
         </section>
 
         {result.properties.length === 0 ? (
           <section className="mt-6 rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-950">No properties found.</h2>
+            <h2 className="text-xl font-semibold text-slate-950">{t.noPropertiesFound}</h2>
           </section>
         ) : (
           <>
@@ -314,10 +313,10 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                         <input aria-label="Select all visible properties" className="h-4 w-4 rounded border-slate-300 text-estate-700" type="checkbox" />
                       </th>
                       <th className="w-[26%] px-4 py-3">Property</th>
-                      <th className="w-[8%] px-4 py-3">City</th>
-                      <th className="w-[8%] px-4 py-3">Type</th>
+                      <th className="w-[8%] px-4 py-3">{t.city}</th>
+                      <th className="w-[8%] px-4 py-3">{t.type}</th>
                       <th className="w-[7%] px-4 py-3">Listing</th>
-                      <th className="w-[8%] px-4 py-3">Price</th>
+                      <th className="w-[8%] px-4 py-3">{t.price}</th>
                       <th className="w-[17%] px-4 py-3">Owner / User</th>
                       <th className="w-[9%] px-4 py-3">Created</th>
                       <th className="w-[9%] px-4 py-3">Status</th>
@@ -357,7 +356,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                         <td className="px-4 py-6 text-slate-700">{property.city}</td>
                         <td className="px-4 py-6 text-slate-700">{readableLabel(property.propertyType)}</td>
                         <td className="px-4 py-6 text-slate-700">{readableLabel(property.listingType)}</td>
-                        <td className="px-4 py-6 font-semibold text-slate-950">{formatPrice(property.price)}</td>
+                        <td className="px-4 py-6 font-semibold text-slate-950">{formatCurrencyEUR(property.price)}</td>
                         <td className="px-4 py-6 text-slate-700">
                           {property.owner ? (
                             <>
@@ -404,7 +403,7 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                     <div className="min-w-0 flex-1">
                       <p className="font-mono text-xs text-slate-500">#{property.id}</p>
                       <h2 className="truncate font-semibold text-slate-950">{property.title}</h2>
-                      <p className="mt-1 text-sm font-semibold text-slate-950">{formatPrice(property.price)}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-950">{formatCurrencyEUR(property.price)}</p>
                       <p className="mt-1 text-xs text-slate-600">
                         {property.city} · {readableLabel(property.propertyType)} · {readableLabel(property.listingType)}
                       </p>

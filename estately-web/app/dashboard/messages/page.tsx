@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { requireAuth } from '@/lib/auth';
 import { getUserConversations } from '@/lib/messages/service';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 
 export const metadata = {
   title: 'Messages - Estately',

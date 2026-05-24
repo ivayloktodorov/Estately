@@ -9,14 +9,17 @@ import { PropertyGallery } from '@/components/ui/property-gallery';
 import { PropertyOverview } from '@/components/ui/property-overview';
 import { PropertyDetailsSection } from '@/components/ui/property-details-section';
 import { PropertySidebar } from '@/components/ui/property-sidebar';
-import { getOrCreatePropertyGalleryImages, propertyImageUrl } from '@/lib/properties/images';
+import { getOrCreatePropertyGalleryImages } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 import { getCurrentUser } from '@/lib/auth';
 import { PropertyInquiryForm } from '@/components/properties/property-inquiry-form';
 import { PropertyViewTracker } from '@/components/properties/property-view-tracker';
 import { MakeOfferCard } from '@/components/offers/make-offer-card';
 import { PropertyCard } from '@/components/ui/property-card';
 import { getSimilarProperties, propertyDetailsHref } from '@/lib/properties/search';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { absoluteUrl, defaultKeywords } from '@/lib/seo';
+import { getTranslations } from '@/lib/i18n';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
@@ -154,6 +157,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
 
   // Fetch property data
   const user = await getCurrentUser();
+  const t = await getTranslations();
   const data = await getProperty(numId, user);
 
   if (!data) {
@@ -161,7 +165,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
   }
 
   const { property, images } = data;
-  const price = `$${Number(property.price).toLocaleString()}`;
+  const price = formatCurrencyEUR(property.price);
   const galleryImages = [...new Set(images.map((image) => propertyImageUrl(image, property.propertyType)))];
   const coverImageUrl = galleryImages[0] ?? propertyImageUrl(property.imageCoverUrl, property.propertyType);
 
@@ -185,7 +189,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
     offers: {
       '@type': 'Offer',
       price: Number(property.price),
-      priceCurrency: 'USD',
+      priceCurrency: 'EUR',
       availability: 'https://schema.org/InStock',
       businessFunction: listingType === 'rent' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
     },
@@ -217,7 +221,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
           className="mb-6 inline-flex min-h-10 items-center justify-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-charcoal-900 shadow-sm transition hover:border-estate-300 hover:bg-estate-50 hover:text-estate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
         >
           <span aria-hidden="true" className="mr-2">←</span>
-          Back to results
+          {t.backToResults}
         </Link>
 
         {/* Hero Section with Gallery */}
@@ -243,9 +247,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
 
             {/* Property Overview */}
             <div>
-              <h2 className="text-2xl font-bold text-charcoal-950 mb-6">
-                Property Features
-              </h2>
+              <h2 className="text-2xl font-bold text-charcoal-950 mb-6">{t.propertySummary}</h2>
               <PropertyOverview
                 bedrooms={property.bedrooms}
                 bathrooms={property.bathrooms}
@@ -263,7 +265,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
               </h2>
               <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
                 <div>
-                  <p className="text-sm text-stone-600 mb-2">Property Type</p>
+                  <p className="text-sm text-stone-600 mb-2">{t.propertyType}</p>
                   <p className="text-lg font-semibold text-charcoal-950">
                     {property.propertyType}
                   </p>
@@ -317,7 +319,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
           <section className="mt-16">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-charcoal-950 sm:text-3xl">Similar properties</h2>
+                <h2 className="text-2xl font-bold text-charcoal-950 sm:text-3xl">{t.similarProperties}</h2>
                 <p className="mt-2 max-w-2xl text-stone-600">
                   More {listingType === 'rent' ? 'rentals' : 'homes for sale'} like this in and around {property.city}.
                 </p>
@@ -347,7 +349,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
                         similarProperty.imageCoverUrl,
                         similarProperty.propertyType,
                       )}
-                      price={`$${Number(similarProperty.price).toLocaleString()}`}
+                      price={formatCurrencyEUR(similarProperty.price)}
                       title={similarProperty.title}
                       city={similarProperty.city}
                       address={similarProperty.address}

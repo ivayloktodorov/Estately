@@ -1,5 +1,7 @@
 'use client';
 
+import { useLanguage } from '@/components/i18n/language-provider';
+
 interface PropertySearchBarProps {
   className?: string;
   value: string;
@@ -7,9 +9,11 @@ interface PropertySearchBarProps {
 }
 
 export function PropertySearchBar({ className = '', value, onChange }: PropertySearchBarProps) {
+  const { t } = useLanguage();
+
   return (
     <label className={`flex min-w-0 flex-1 flex-col gap-1.5 text-xs font-semibold text-charcoal-950 ${className}`}>
-      Search
+      {t('search')}
       <input
         type="search"
         name="search"

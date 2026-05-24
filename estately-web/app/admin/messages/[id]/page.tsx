@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminConversation } from '@/lib/admin/messages';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { AdminNavigation } from '../../admin-navigation';
 import { DeleteAttachmentButton, DeleteMessageButton } from '../moderation-buttons';
 import { deleteAttachmentAction, deleteMessageAction } from '../actions';
@@ -15,10 +16,6 @@ function formatDate(date: Date): string {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
-}
-
-function formatPrice(price: string): string {
-  return `$${Number(price).toLocaleString()}`;
 }
 
 function formatFileSize(bytes: number): string {
@@ -65,7 +62,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
             <div>
               <h1 className="text-3xl font-semibold text-slate-950">{conversation.property.title}</h1>
               <p className="mt-2 text-slate-600">
-                {conversation.property.city} · {formatPrice(conversation.property.price)}
+                {conversation.property.city} · {formatCurrencyEUR(conversation.property.price)}
               </p>
             </div>
             <Link

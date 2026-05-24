@@ -1,5 +1,7 @@
 'use client';
 
+import { useLanguage } from '@/components/i18n/language-provider';
+
 interface PropertyDetailsSectionProps {
   title: string;
   price: string;
@@ -13,6 +15,8 @@ export function PropertyDetailsSection({
   description,
   listingType = 'sale',
 }: PropertyDetailsSectionProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-8">
       {/* Header Section */}
@@ -30,7 +34,7 @@ export function PropertyDetailsSection({
                 )}
               </p>
               <div className="bg-estate-700 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                {listingType === 'sale' ? 'For Sale' : 'For Rent'}
+                {listingType === 'sale' ? t('forSale') : t('forRent')}
               </div>
             </div>
           </div>
@@ -39,7 +43,7 @@ export function PropertyDetailsSection({
 
       {/* Description Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-charcoal-950">About this property</h2>
+        <h2 className="text-2xl font-bold text-charcoal-950">{t('propertySummary')}</h2>
         <div className="prose prose-stone max-w-none">
           <p className="text-lg text-stone-700 leading-relaxed whitespace-pre-wrap">
             {description}

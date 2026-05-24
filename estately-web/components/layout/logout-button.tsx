@@ -1,6 +1,7 @@
 'use client';
 
 import { logoutAction } from '@/lib/auth/actions';
+import { useLanguage } from '@/components/i18n/language-provider';
 
 interface LogoutButtonProps {
   className?: string;
@@ -9,6 +10,8 @@ interface LogoutButtonProps {
 }
 
 export function LogoutButton({ className = '', formClassName = 'w-full', onClick }: LogoutButtonProps) {
+  const { t } = useLanguage();
+
   return (
     <form action={logoutAction} className={formClassName}>
       <button
@@ -16,7 +19,7 @@ export function LogoutButton({ className = '', formClassName = 'w-full', onClick
         onClick={onClick}
         type="submit"
       >
-        Logout
+        {t('logout')}
       </button>
     </form>
   );

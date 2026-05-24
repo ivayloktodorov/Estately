@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { LanguageProvider } from "@/components/i18n/language-provider";
 import { getCurrentUser } from "@/lib/auth";
+import { getLocale } from "@/lib/i18n";
 import { siteUrl } from "@/lib/seo";
 import "./globals.css";
 
@@ -61,16 +63,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const locale = await getLocale();
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-screen flex-col bg-cream-50 text-charcoal-950">
-        <Header user={user} />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <LanguageProvider initialLocale={locale}>
+          <Header user={user} />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ import {
   savedSearchResultsHref,
   type SavedSearchListItem,
 } from '@/lib/saved-searches/service';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { deleteSavedSearchAction, updateSavedSearchAction } from '@/lib/saved-searches/actions';
 
 function formatDate(date: Date): string {
@@ -26,8 +27,8 @@ function filterBadges(search: SavedSearchListItem): string[] {
     search.city,
     search.propertyType ? label(search.propertyType) : null,
     search.listingType ? (search.listingType === 'sale' ? 'For sale' : 'For rent') : null,
-    search.minPrice !== undefined ? `From $${search.minPrice.toLocaleString()}` : null,
-    search.maxPrice !== undefined ? `Up to $${search.maxPrice.toLocaleString()}` : null,
+    search.minPrice !== undefined ? `From ${formatCurrencyEUR(search.minPrice)}` : null,
+    search.maxPrice !== undefined ? `Up to ${formatCurrencyEUR(search.maxPrice)}` : null,
     search.bedrooms !== undefined ? `${search.bedrooms}+ beds` : null,
     search.bathrooms !== undefined ? `${search.bathrooms}+ baths` : null,
   ].filter((item): item is string => Boolean(item));

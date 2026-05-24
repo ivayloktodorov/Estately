@@ -3,7 +3,8 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { requireAuth } from '@/lib/auth';
 import { getConversationForUser } from '@/lib/messages/service';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { formatCurrencyEUR } from '@/lib/format/currency';
+import { propertyImageUrl } from '@/lib/properties/image-url';
 import { ReplyForm } from './reply-form';
 
 interface ConversationPageProps {
@@ -15,10 +16,6 @@ function formatDate(date: Date): string {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
-}
-
-function formatPrice(price: string): string {
-  return `$${Number(price).toLocaleString()}`;
 }
 
 function formatFileSize(bytes: number): string {
@@ -111,7 +108,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
                 {conversation.property.title}
               </h1>
               <p className="mt-2 text-sm text-slate-600 sm:text-base">
-                {conversation.property.city} · {formatPrice(conversation.property.price)}
+                {conversation.property.city} · {formatCurrencyEUR(conversation.property.price)}
               </p>
               <div className="mt-3 flex min-w-0 items-center gap-2">
                 {otherParticipant.avatarUrl ? (

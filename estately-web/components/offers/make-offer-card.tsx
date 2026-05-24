@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useState } from 'react';
+import { useLanguage } from '@/components/i18n/language-provider';
 import { submitPropertyOfferAction } from '@/lib/offers/actions';
 import type { OfferActionState } from '@/lib/offers/types';
 
@@ -35,6 +36,7 @@ export function MakeOfferCard({
   const [state, formAction, pending] = useActionState(submitAction, initialState);
   const amountError = state.errors?.amount;
   const messageError = state.errors?.message;
+  const { t } = useLanguage();
 
   if (!isAuthenticated) {
     return (
@@ -46,20 +48,20 @@ export function MakeOfferCard({
             window.location.href = authHref('/login', propertyId);
           }}
         >
-          Make an offer
+          {t('makeOffer')}
         </button>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Link
             className="inline-flex h-10 items-center justify-center rounded-lg border border-estate-200 bg-white px-4 text-sm font-semibold text-estate-700 transition hover:border-estate-300 hover:bg-cream-50"
             href={authHref('/login', propertyId)}
           >
-            Login
+            {t('login')}
           </Link>
           <Link
             className="inline-flex h-10 items-center justify-center rounded-lg border border-estate-200 bg-white px-4 text-sm font-semibold text-estate-700 transition hover:border-estate-300 hover:bg-cream-50"
             href={authHref('/register', propertyId)}
           >
-            Register
+            {t('register')}
           </Link>
         </div>
       </div>
@@ -81,14 +83,14 @@ export function MakeOfferCard({
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
-        Make an offer
+        {t('makeOffer')}
       </button>
 
       {isOpen ? (
         <form action={formAction} className="mt-4 space-y-4">
           <div>
             <label className="mb-2 block text-sm font-semibold text-charcoal-950" htmlFor="offer-amount">
-              Offer amount
+              {t('offerAmount')}
             </label>
             <input
               aria-describedby={amountError ? 'offer-amount-error' : undefined}
@@ -117,7 +119,7 @@ export function MakeOfferCard({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-charcoal-950" htmlFor="offer-message">
-              Message
+              {t('message')}
             </label>
             <textarea
               aria-describedby={messageError ? 'offer-message-error' : undefined}
@@ -158,7 +160,7 @@ export function MakeOfferCard({
             disabled={pending}
             type="submit"
           >
-            {pending ? 'Submitting offer...' : 'Submit offer'}
+            {pending ? t('submittingOffer') : t('submitOffer')}
           </button>
         </form>
       ) : null}

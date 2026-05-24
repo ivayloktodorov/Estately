@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createSavedSearchAction } from '@/lib/saved-searches/actions';
 import type { PropertySearchFilters } from '@/lib/properties/search';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 
 interface SaveSearchButtonProps {
   isAuthenticated: boolean;
@@ -13,7 +14,7 @@ function defaultTitle(filters: PropertySearchFilters): string {
   const parts = [
     filters.city,
     filters.type ? `${filters.type}s` : 'properties',
-    filters.maxPrice ? `under $${filters.maxPrice.toLocaleString()}` : '',
+    filters.maxPrice ? `under ${formatCurrencyEUR(filters.maxPrice)}` : '',
   ].filter(Boolean);
 
   return parts.join(' ') || 'My property search';

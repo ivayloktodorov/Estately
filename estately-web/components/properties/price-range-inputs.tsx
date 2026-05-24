@@ -1,5 +1,7 @@
 'use client';
 
+import { useLanguage } from '@/components/i18n/language-provider';
+
 interface PriceRangeInputsProps {
   className?: string;
   minPrice: string;
@@ -8,10 +10,12 @@ interface PriceRangeInputsProps {
 }
 
 export function PriceRangeInputs({ className = '', minPrice, maxPrice, onChange }: PriceRangeInputsProps) {
+  const { t } = useLanguage();
+
   return (
     <div className={`grid gap-3 sm:grid-cols-2 ${className}`}>
       <label className="flex min-w-0 flex-col gap-1.5 text-xs font-semibold text-charcoal-950">
-        Min
+        {t('min')}
         <input
           type="number"
           min="0"
@@ -24,7 +28,7 @@ export function PriceRangeInputs({ className = '', minPrice, maxPrice, onChange 
         />
       </label>
       <label className="flex min-w-0 flex-col gap-1.5 text-xs font-semibold text-charcoal-950">
-        Max
+        {t('max')}
         <input
           type="number"
           min="0"

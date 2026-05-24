@@ -6,7 +6,9 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { PropertyFilters } from '@/components/properties/property-filters';
 import { PropertyPagination } from '@/components/properties/property-pagination';
 import { PropertySortSelect } from '@/components/properties/property-sort-select';
-import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyImageUrl } from '@/lib/properties/image-url';
+import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getTranslations } from '@/lib/i18n';
 import { createSeoMetadata } from '@/lib/seo';
 import {
   getPaginatedProperties,
@@ -33,6 +35,7 @@ interface SalePageProps {
 
 export default async function SalePage({ searchParams }: SalePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
+  const t = await getTranslations();
   const pagination = parsePropertyPaginationParams(resolvedSearchParams);
   const filters = { ...parsePropertySearchParams(resolvedSearchParams), listing: 'sale' as const };
   const sort = parsePropertySortParam(resolvedSearchParams);
@@ -44,7 +47,7 @@ export default async function SalePage({ searchParams }: SalePageProps) {
   const formattedProperties = result.properties.map((property) => ({
     id: property.id,
     imageUrl: propertyImageUrl(property.imageCoverUrl, property.propertyType),
-    price: `$${Number(property.price).toLocaleString()}`,
+    price: formatCurrencyEUR(property.price),
     title: property.title,
     city: property.city,
     address: property.address,
@@ -75,7 +78,7 @@ export default async function SalePage({ searchParams }: SalePageProps) {
       <Container>
         <SectionHeader
           description="Browse published homes for sale from the Estately marketplace."
-          title="Homes for sale"
+          title={t.homesForSale}
         />
         <div className="mt-8">
           <PropertyFilters
@@ -90,7 +93,7 @@ export default async function SalePage({ searchParams }: SalePageProps) {
           <PropertySortSelect searchParams={resolvedSearchParams} value={sort} />
         </div>
         <div className="mt-8">
-          <PropertyGrid isEmpty={isEmpty} emptyTitle="No properties found." emptyDescription={emptyDescription}>
+          <PropertyGrid isEmpty={isEmpty} emptyTitle={t.noPropertiesFound} emptyDescription={emptyDescription}>
             {formattedProperties.map((property) => (
               <PropertyCard
                 key={property.id}

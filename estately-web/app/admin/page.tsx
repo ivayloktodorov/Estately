@@ -6,6 +6,7 @@ import {
   type RecentAdminProperty,
   type RecentAdminUser,
 } from '@/lib/admin/overview';
+import { formatCurrencyEUR } from '@/lib/format/currency';
 import { AdminNavigation } from './admin-navigation';
 
 function formatDate(date: Date): string {
@@ -14,10 +15,6 @@ function formatDate(date: Date): string {
     day: 'numeric',
     year: 'numeric',
   }).format(date);
-}
-
-function formatPrice(price: string): string {
-  return `$${Number(price).toLocaleString()}`;
 }
 
 function preview(message: string): string {
@@ -118,7 +115,7 @@ function RecentProperties({ properties }: { properties: RecentAdminProperty[] })
                   {property.title}
                 </Link>
                 <p className="mt-1 text-sm text-slate-600">
-                  {property.city} · {formatPrice(property.price)}
+                  {property.city} · {formatCurrencyEUR(property.price)}
                 </p>
               </div>
               <div className="flex items-center gap-3">

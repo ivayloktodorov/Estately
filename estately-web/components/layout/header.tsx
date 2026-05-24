@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { AuthUser } from '@/lib/auth/types';
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 import { getUnreadNotificationCount, getUserNotifications } from '@/lib/notifications/service';
+import { getTranslations } from '@/lib/i18n';
 import { ButtonLink } from '@/components/ui/button-link';
 import { HeaderMobileMenu } from './mobile-menu-toggle';
 import { NotificationDropdown } from './notification-dropdown';
@@ -11,14 +13,14 @@ interface HeaderProps {
   user: AuthUser | null;
 }
 
-const publicLinks = [
-  { href: '/sale', label: 'Sale' },
-  { href: '/rent', label: 'Rent' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-];
-
 export async function Header({ user }: HeaderProps) {
+  const t = await getTranslations();
+  const publicLinks = [
+    { href: '/sale', label: t.sale },
+    { href: '/rent', label: t.rent },
+    { href: '/about', label: t.about },
+    { href: '/contact', label: t.contact },
+  ];
   const notificationData = user
     ? await Promise.allSettled([getUserNotifications(user.id, 5), getUnreadNotificationCount(user.id)])
     : null;
@@ -66,20 +68,22 @@ export async function Header({ user }: HeaderProps) {
             {user ? (
               <div className="flex flex-nowrap items-center gap-2">
                 <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
-                  SoftUni Exam
+                  {t.softUniExam}
                 </ButtonLink>
+                <LanguageSwitcher />
                 {notificationProps ? <NotificationDropdown {...notificationProps} /> : null}
                 <ProfileDropdown user={user} />
               </div>
             ) : (
               <div className="flex flex-nowrap items-center gap-2">
                 <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
-                  SoftUni Exam
+                  {t.softUniExam}
                 </ButtonLink>
+                <LanguageSwitcher />
                 <ButtonLink href="/login" variant="ghost">
-                  Login
+                  {t.login}
                 </ButtonLink>
-                <ButtonLink href="/register">Register</ButtonLink>
+                <ButtonLink href="/register">{t.register}</ButtonLink>
               </div>
             )}
           </div>
@@ -98,6 +102,7 @@ export async function Header({ user }: HeaderProps) {
                 <ProfileDropdown className="hidden min-w-0 max-w-[9.5rem] sm:block sm:max-w-none" user={user} />
               </>
             ) : null}
+            <LanguageSwitcher />
             <HeaderMobileMenu user={user} publicLinks={publicLinks} />
           </div>
         </div>
