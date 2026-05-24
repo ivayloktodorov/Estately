@@ -13,6 +13,8 @@ import { getFavoritePropertyIds } from '@/lib/favorites/actions';
 import { propertyImageUrl } from '@/lib/properties/images';
 import {
   getPaginatedProperties,
+  propertyDetailsHref,
+  propertyResultsHref,
   parsePropertyPaginationParams,
   parsePropertySearchParams,
   parsePropertySortParam,
@@ -93,6 +95,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     : new Set<number>();
 
   const isEmpty = formattedProperties.length === 0;
+  const returnTo = propertyResultsHref('/properties', resolvedSearchParams);
   const startResult = isEmpty
     ? 0
     : (paginatedProperties.currentPage - 1) * paginatedProperties.pageSize + 1;
@@ -140,6 +143,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
               <PropertyCard
                 key={property.id}
                 {...property}
+                detailsHref={propertyDetailsHref(property.id, returnTo)}
                 isAuthenticated={Boolean(user)}
                 isFavorited={favoritePropertyIds.has(property.id)}
                 showFavoriteButton

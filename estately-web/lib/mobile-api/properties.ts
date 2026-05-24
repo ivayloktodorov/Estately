@@ -118,7 +118,7 @@ export async function getMobilePropertyDetails(propertyId: number) {
     .select()
     .from(propertyImages)
     .where(eq(propertyImages.propertyId, propertyId))
-    .orderBy(asc(propertyImages.sortOrder), asc(propertyImages.id));
+    .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
 
   return { ...property, images };
 }

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, lte, ne, or, sql, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import {
@@ -232,4 +232,55 @@ export async function getPaginatedProperties(
     hasPreviousPage: currentPage > 1,
     hasNextPage: currentPage < totalPages,
   };
+}
+
+export function propertyResultsHref(basePath: string, searchParams: PropertySearchParams): string {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    const paramValue = firstParam(value).trim();
+
+    if (paramValue) {
+      params.set(key, paramValue);
+    }
+  });
+
+  const query = params.toString();
+  return query ? `${basePath}?${query}` : basePath;
+}
+
+export function propertyDetailsHref(propertyId: number, returnTo: string): string {
+  const params = new URLSearchParams({ returnTo });
+  return `/properties/${propertyId}?${params.toString()}`;
+}
+
+export async function getSimilarProperties(
+  property: typeof properties.$inferSelect,
+  limit = 6,
+) {
+  const price = Number(property.price);
+  const minPrice = Number.isFinite(price) ? (price * 0.7).toFixed(2) : undefined;
+  const maxPrice = Number.isFinite(price) ? (price * 1.3).toFixed(2) : undefined;
+  const conditions: SQL[] = [
+    eq(properties.moderationStatus, 'approved'),
+    eq(properties.isPublished, true),
+    ne(properties.id, property.id),
+    eq(properties.listingType, property.listingType),
+  ];
+
+  if (minPrice && maxPrice) {
+    conditions.push(gte(properties.price, minPrice), lte(properties.price, maxPrice));
+  }
+
+  return db
+    .select()
+    .from(properties)
+    .where(and(...conditions))
+    .orderBy(
+      desc(sql<number>`case when ${properties.propertyType} = ${property.propertyType} then 1 else 0 end`),
+      desc(sql<number>`case when lower(${properties.city}) = lower(${property.city}) then 1 else 0 end`),
+      asc(sql<number>`abs(${properties.price}::numeric - ${property.price}::numeric)`),
+      desc(properties.createdAt),
+    )
+    .limit(Math.min(Math.max(limit, 1), 6));
 }

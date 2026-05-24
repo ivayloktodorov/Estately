@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/src/db/client';
 import { properties, propertyImages } from '@/src/db/schema';
-import { eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 import { Container } from '@/components/ui/container';
 import { PropertyGallery } from '@/components/ui/property-gallery';
 import { PropertyOverview } from '@/components/ui/property-overview';
@@ -12,6 +13,8 @@ import { propertyImageUrl } from '@/lib/properties/images';
 import { getCurrentUser } from '@/lib/auth';
 import { PropertyInquiryForm } from '@/components/properties/property-inquiry-form';
 import { MakeOfferCard } from '@/components/offers/make-offer-card';
+import { PropertyCard } from '@/components/ui/property-card';
+import { getSimilarProperties, propertyDetailsHref } from '@/lib/properties/search';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
@@ -53,15 +56,14 @@ async function getProperty(id: number, user: AuthUser | null) {
       .select()
       .from(propertyImages)
       .where(eq(propertyImages.propertyId, id))
-      .then((results) =>
-        results.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-      );
+      .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
 
     const uploadedImages = images.map((img) => img.imageUrl);
+    const fallbackImage = propertyImageUrl(property.imageCoverUrl, property.propertyType);
 
     return {
       property,
-      images: uploadedImages.length > 0 ? uploadedImages : [propertyImageUrl(property.imageCoverUrl, property.propertyType)],
+      images: uploadedImages.length > 0 ? uploadedImages : [fallbackImage],
     };
   } catch (error) {
     console.error('Error fetching property:', error);
@@ -119,6 +121,14 @@ function firstParam(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
 }
 
+function safeReturnTo(value: string): string {
+  if (!value.startsWith('/') || value.startsWith('//')) {
+    return '/properties';
+  }
+
+  return value;
+}
+
 export default async function PropertyPage({ params, searchParams }: PropertyPageProps) {
   const { id } = await params;
   const query = searchParams ? await searchParams : {};
@@ -139,21 +149,36 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
 
   const { property, images } = data;
   const price = `$${Number(property.price).toLocaleString()}`;
-  const coverImageUrl = propertyImageUrl(images[0] ?? property.imageCoverUrl, property.propertyType);
+  const galleryImages = [...new Set(images.map((image) => propertyImageUrl(image, property.propertyType)))];
+  const coverImageUrl = galleryImages[0] ?? propertyImageUrl(property.imageCoverUrl, property.propertyType);
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
   const currentUserIsOwner = user?.id === property.createdByUserId;
   const shouldOpenOfferForm = firstParam(query.intent) === 'offer';
+  const returnTo = safeReturnTo(firstParam(query.returnTo));
+  const similarProperties = await getSimilarProperties(property, 6);
+  const similarSearchHref = `/${listingType === 'rent' ? 'rent' : 'buy'}?${new URLSearchParams({
+    city: property.city,
+    type: property.propertyType,
+  }).toString()}`;
 
   return (
     <main className="py-12 bg-cream-50">
       <Container>
+        <Link
+          href={returnTo}
+          className="mb-6 inline-flex min-h-10 items-center justify-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-charcoal-900 shadow-sm transition hover:border-estate-300 hover:bg-estate-50 hover:text-estate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+        >
+          <span aria-hidden="true" className="mr-2">←</span>
+          Back to results
+        </Link>
+
         {/* Hero Section with Gallery */}
         <div className="mb-12">
           <PropertyGallery
             mainImage={coverImageUrl}
             title={property.title}
-            allImages={images.filter((image) => image !== coverImageUrl)}
+            allImages={galleryImages.slice(1)}
           />
         </div>
 
@@ -240,6 +265,58 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
             />
           </div>
         </div>
+
+        {similarProperties.length > 0 ? (
+          <section className="mt-16">
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-charcoal-950">Similar properties</h2>
+                <p className="mt-2 max-w-2xl text-stone-600">
+                  More {listingType === 'rent' ? 'rentals' : 'homes for sale'} like this in and around {property.city}.
+                </p>
+              </div>
+              <Link
+                href={similarSearchHref}
+                className="inline-flex min-h-10 items-center justify-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-charcoal-900 shadow-sm transition hover:border-estate-300 hover:bg-estate-50 hover:text-estate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+              >
+                See more similar properties
+              </Link>
+            </div>
+
+            <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4">
+              {similarProperties.map((similarProperty) => {
+                const similarListingType =
+                  similarProperty.listingType === 'rent' ? 'rent' : 'sale';
+                const similarReturnTo = `/${similarListingType === 'rent' ? 'rent' : 'buy'}?${new URLSearchParams({
+                  city: similarProperty.city,
+                  type: similarProperty.propertyType,
+                }).toString()}`;
+
+                return (
+                  <div className="w-80 shrink-0 snap-start md:w-auto" key={similarProperty.id}>
+                    <PropertyCard
+                      id={similarProperty.id}
+                      imageUrl={propertyImageUrl(
+                        similarProperty.imageCoverUrl,
+                        similarProperty.propertyType,
+                      )}
+                      price={`$${Number(similarProperty.price).toLocaleString()}`}
+                      title={similarProperty.title}
+                      city={similarProperty.city}
+                      address={similarProperty.address}
+                      bedrooms={similarProperty.bedrooms}
+                      bathrooms={similarProperty.bathrooms}
+                      areaSqm={similarProperty.areaSqm}
+                      propertyType={similarProperty.propertyType}
+                      listingType={similarListingType}
+                      detailsHref={propertyDetailsHref(similarProperty.id, similarReturnTo)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </Container>
     </main>
   );

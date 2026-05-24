@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { asc, desc, eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 import { getUserPropertyById } from '@/lib/dashboard/properties';
 import { EditPropertyForm } from '@/components/edit-property-form';
+import { PropertyImageUpload } from '@/components/properties/property-image-upload';
+import { db } from '@/src/db/client';
+import { propertyImages } from '@/src/db/schema';
 
 interface EditPropertyPageProps {
   params: Promise<{
@@ -32,6 +36,16 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     notFound();
   }
 
+  const images = await db
+    .select()
+    .from(propertyImages)
+    .where(eq(propertyImages.propertyId, property.id))
+    .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
+  const initialImages = images.map((image) => ({
+    ...image,
+    createdAt: image.createdAt.toISOString(),
+  }));
+
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="mx-auto max-w-3xl">
@@ -48,6 +62,10 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
 
         <div className="rounded-lg border border-stone-200 bg-white p-8 shadow-estate-soft">
           <EditPropertyForm property={property} />
+        </div>
+
+        <div className="mt-8 rounded-lg border border-stone-200 bg-white p-8 shadow-estate-soft">
+          <PropertyImageUpload initialImages={initialImages} propertyId={property.id} />
         </div>
       </div>
     </main>

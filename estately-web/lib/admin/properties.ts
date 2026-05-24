@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, ilike, inArray, or, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
-import { properties, users } from '@/src/db/schema';
+import { properties, propertyImages, users } from '@/src/db/schema';
 
 export const MODERATION_STATUSES = ['pending', 'approved', 'rejected'] as const;
 export type ModerationStatus = (typeof MODERATION_STATUSES)[number];
@@ -22,6 +22,7 @@ export interface AdminProperty {
   bathrooms: number;
   areaSqm: number;
   imageCoverUrl: string;
+  imageCount: number;
   isPublished: boolean;
   moderationStatus: ModerationStatus;
   moderationNotes: string | null;
@@ -173,6 +174,15 @@ export async function getAdminProperties(
           .limit(DEFAULT_PAGE_SIZE)
           .offset(offset)
       : [];
+  const imageCounts =
+    rows.length > 0
+      ? await db
+          .select({ propertyId: propertyImages.propertyId, value: count() })
+          .from(propertyImages)
+          .where(inArray(propertyImages.propertyId, rows.map((row) => row.id)))
+          .groupBy(propertyImages.propertyId)
+      : [];
+  const imageCountByPropertyId = new Map(imageCounts.map((row) => [row.propertyId, row.value]));
 
   return {
     properties: rows.map((row) => ({
@@ -186,6 +196,7 @@ export async function getAdminProperties(
       bathrooms: row.bathrooms,
       areaSqm: row.areaSqm,
       imageCoverUrl: row.imageCoverUrl,
+      imageCount: imageCountByPropertyId.get(row.id) ?? 0,
       isPublished: row.isPublished,
       moderationStatus: moderationStatus(row.moderationStatus) || 'pending',
       moderationNotes: row.moderationNotes,

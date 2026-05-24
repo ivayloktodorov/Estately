@@ -7,6 +7,8 @@ import { PropertyPagination } from '@/components/properties/property-pagination'
 import { propertyImageUrl } from '@/lib/properties/images';
 import {
   getPaginatedProperties,
+  propertyDetailsHref,
+  propertyResultsHref,
   parsePropertyPaginationParams,
   type PropertySearchParams,
 } from '@/lib/properties/search';
@@ -41,6 +43,7 @@ export default async function BuyPage({ searchParams }: BuyPageProps) {
     listingType: 'sale' as const,
   }));
   const isEmpty = formattedProperties.length === 0;
+  const returnTo = propertyResultsHref('/buy', resolvedSearchParams);
 
   return (
     <main className="bg-white py-20">
@@ -52,7 +55,11 @@ export default async function BuyPage({ searchParams }: BuyPageProps) {
         <div className="mt-10">
           <PropertyGrid isEmpty={isEmpty} emptyTitle="No properties found." emptyDescription="Check back soon for new homes for sale.">
             {formattedProperties.map((property) => (
-              <PropertyCard key={property.id} {...property} />
+              <PropertyCard
+                key={property.id}
+                {...property}
+                detailsHref={propertyDetailsHref(property.id, returnTo)}
+              />
             ))}
           </PropertyGrid>
         </div>

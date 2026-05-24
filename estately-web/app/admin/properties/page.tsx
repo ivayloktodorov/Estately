@@ -345,7 +345,9 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                               <p className="mt-1 text-xs text-slate-600">
                                 {property.bedrooms} bed · {property.bathrooms} bath
                               </p>
-                              <p className="mt-1 text-xs text-slate-600">{property.areaSqm} m²</p>
+                              <p className="mt-1 text-xs text-slate-600">
+                                {property.areaSqm} m² · {property.imageCount} photo{property.imageCount === 1 ? '' : 's'}
+                              </p>
                               {property.moderationNotes ? (
                                 <p className="mt-1 truncate text-xs text-slate-500">{property.moderationNotes}</p>
                               ) : null}
@@ -405,6 +407,9 @@ export default async function AdminPropertiesPage({ searchParams }: AdminPropert
                       <p className="mt-1 text-sm font-semibold text-slate-950">{formatPrice(property.price)}</p>
                       <p className="mt-1 text-xs text-slate-600">
                         {property.city} · {readableLabel(property.propertyType)} · {readableLabel(property.listingType)}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        {property.imageCount} photo{property.imageCount === 1 ? '' : 's'}
                       </p>
                     </div>
                   </div>

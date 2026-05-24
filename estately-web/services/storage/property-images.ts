@@ -8,7 +8,7 @@ const allowedImageTypes = new Map([
   ['image/webp', 'webp'],
 ]);
 
-const maxImageSizeBytes = 5 * 1024 * 1024;
+const maxImageSizeBytes = 10 * 1024 * 1024;
 const localUploadDir = join(process.cwd(), 'public', 'uploads', 'property-images');
 
 export interface UploadPropertyImageResult {
@@ -53,7 +53,7 @@ export function validatePropertyImageFile(file: File): string | null {
   }
 
   if (file.size > maxImageSizeBytes) {
-    return 'Image must be 5MB or smaller.';
+    return 'Image must be 10MB or smaller.';
   }
 
   if (!allowedImageTypes.has(file.type)) {

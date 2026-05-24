@@ -15,6 +15,7 @@ interface PropertyCardProps {
   areaSqm: number;
   propertyType: string;
   listingType: 'sale' | 'rent';
+  detailsHref?: string;
   isFavorited?: boolean;
   isAuthenticated?: boolean;
   showFavoriteButton?: boolean;
@@ -32,15 +33,17 @@ export function PropertyCard({
   areaSqm,
   propertyType,
   listingType,
+  detailsHref,
   isFavorited = false,
   isAuthenticated = false,
   showFavoriteButton = false,
 }: PropertyCardProps) {
   const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
+  const propertyHref = detailsHref ?? `/properties/${id}`;
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">
-      <Link className="block h-full" href={`/properties/${id}`}>
+      <Link className="block h-full" href={propertyHref}>
         {/* Image Container */}
         <div className="relative h-64 overflow-hidden bg-stone-200">
           {showFavoriteButton ? (
@@ -104,6 +107,10 @@ export function PropertyCard({
               <p className="text-xs text-stone-600">m²</p>
             </div>
           </div>
+
+          <span className="mt-5 inline-flex min-h-10 items-center justify-center rounded-md bg-estate-700 px-4 text-sm font-bold text-white transition group-hover:bg-estate-800">
+            View details
+          </span>
         </div>
       </Link>
     </article>

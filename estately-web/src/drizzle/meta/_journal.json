@@ -92,6 +92,13 @@
       "when": 1779814800000,
       "tag": "0012_property_offers",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1779818400000,
+      "tag": "0013_property_image_gallery",
+      "breakpoints": true
     }
   ]
 }

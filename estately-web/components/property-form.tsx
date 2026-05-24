@@ -138,7 +138,7 @@ export function PropertyForm() {
   const [state, formAction, pending] = useActionState(createPropertyAction, initialState);
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-8" encType="multipart/form-data">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="md:col-span-2">
           <FormField error={state.errors?.title} label="Property title" name="title">
@@ -279,6 +279,22 @@ export function PropertyForm() {
           />
         </FormField>
       </div>
+
+      <FormField error={state.errors?.images} label="Upload Images" name="images">
+        <input
+          accept="image/jpeg,image/png,image/webp"
+          aria-describedby={state.errors?.images ? 'images-error' : undefined}
+          aria-invalid={Boolean(state.errors?.images)}
+          className="block w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-charcoal-950 shadow-sm file:mr-4 file:rounded-md file:border-0 file:bg-estate-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+          id="images"
+          multiple
+          name="images"
+          type="file"
+        />
+        <p className="mt-2 text-xs text-slate-500">
+          Add up to 10 JPG, PNG, or WEBP photos. The first image becomes the cover.
+        </p>
+      </FormField>
 
       {state.status === 'error' ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth';
 import { getUserProperties, type DashboardProperty } from '@/lib/dashboard/properties';
+import { propertyDetailsHref } from '@/lib/properties/search';
 import { deleteOwnPropertyAction } from './actions';
 import { DeletePropertyButton } from './delete-property-button';
 
@@ -43,7 +44,7 @@ function PropertyActions({ property }: { property: DashboardProperty }) {
     <div className="flex flex-wrap gap-2">
       <Link
         className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
-        href={`/properties/${property.id}`}
+        href={propertyDetailsHref(property.id, '/dashboard/properties')}
       >
         View
       </Link>

@@ -5,6 +5,7 @@ import { PropertyCard } from '@/components/ui/property-card';
 import { PropertyGrid } from '@/components/ui/property-grid';
 import { ButtonLink } from '@/components/ui/button-link';
 import { propertyImageUrl } from '@/lib/properties/images';
+import { propertyDetailsHref } from '@/lib/properties/search';
 
 export default async function FavoritesPage() {
   const user = await requireAuth();
@@ -62,6 +63,7 @@ export default async function FavoritesPage() {
             <PropertyCard
               key={property.id}
               {...property}
+              detailsHref={propertyDetailsHref(property.id, '/favorites')}
               isAuthenticated
               isFavorited
               showFavoriteButton
