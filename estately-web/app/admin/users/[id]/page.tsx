@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUserDetails } from '@/lib/admin/users';
+import { AdminNavigation } from '../../admin-navigation';
 import { AdminUserManagementForm } from './admin-user-management-form';
 
 interface AdminUserDetailsPageProps {
@@ -80,14 +80,7 @@ export default async function AdminUserDetailsPage({ params }: AdminUserDetailsP
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <nav className="flex flex-wrap items-center justify-between gap-4">
-          <Link className="text-xl font-semibold text-slate-950" href="/admin">
-            Estately Admin
-          </Link>
-          <Link className="text-sm font-medium text-slate-700 hover:text-emerald-700" href="/admin/users">
-            Back to users
-          </Link>
-        </nav>
+        <AdminNavigation active="users" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">

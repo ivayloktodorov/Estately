@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminConversations, type AdminMessagesSearchParams } from '@/lib/admin/messages';
+import { AdminNavigation } from '../admin-navigation';
 
 interface AdminMessagesPageProps {
   searchParams?: Promise<AdminMessagesSearchParams>;
@@ -28,34 +29,6 @@ function messagesHref(search: string, sort: string, page: number): string {
   return query ? `/admin/messages?${query}` : '/admin/messages';
 }
 
-function AdminTabs() {
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row">
-      <Link
-        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-9 text-sm font-semibold text-slate-950 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
-        href="/admin/properties"
-      >
-        <span aria-hidden="true">⌂</span>
-        Properties
-      </Link>
-      <Link
-        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-9 text-sm font-semibold text-slate-950 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
-        href="/admin/users"
-      >
-        <span aria-hidden="true">♙</span>
-        Users
-      </Link>
-      <Link
-        className="inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-emerald-800 px-9 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-900"
-        href="/admin/messages"
-      >
-        <span aria-hidden="true">◇</span>
-        Messages
-      </Link>
-    </div>
-  );
-}
-
 export default async function AdminMessagesPage({ searchParams }: AdminMessagesPageProps) {
   await requireAdmin();
   const result = await getAdminConversations((await searchParams) ?? {});
@@ -63,12 +36,7 @@ export default async function AdminMessagesPage({ searchParams }: AdminMessagesP
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <nav className="flex flex-wrap items-center justify-between gap-4">
-          <Link className="text-xl font-semibold text-slate-950" href="/admin">
-            Estately Admin
-          </Link>
-          <AdminTabs />
-        </nav>
+        <AdminNavigation active="messages" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Messaging oversight</p>

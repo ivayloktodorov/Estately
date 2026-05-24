@@ -6,6 +6,7 @@ import {
   type RecentAdminProperty,
   type RecentAdminUser,
 } from '@/lib/admin/overview';
+import { AdminNavigation } from './admin-navigation';
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en', {
@@ -49,35 +50,6 @@ function StatusBadge({ status }: { status: string }) {
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles}`}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
-  );
-}
-
-function AdminNav() {
-  const links = [
-    { href: '/admin', label: 'Overview' },
-    { href: '/admin/properties', label: 'Properties' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/messages', label: 'Messages' },
-    { href: '/dashboard/inquiries', label: 'Inquiries' },
-  ];
-
-  return (
-    <nav className="flex flex-wrap items-center justify-between gap-4">
-      <Link className="text-xl font-semibold text-slate-950" href="/admin">
-        Estately Admin
-      </Link>
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        {links.map((link) => (
-          <Link
-            className="font-medium text-slate-700 hover:text-emerald-700"
-            href={link.href}
-            key={link.href}
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
-    </nav>
   );
 }
 
@@ -223,7 +195,7 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <AdminNav />
+        <AdminNavigation active="dashboard" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">

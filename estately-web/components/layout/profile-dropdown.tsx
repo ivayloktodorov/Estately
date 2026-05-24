@@ -18,7 +18,6 @@ const profileLinks = [
   { href: '/dashboard/properties/new', label: 'Add Property' },
   { href: '/dashboard/inquiries', label: 'Inquiries' },
   { href: '/dashboard/messages', label: 'Messages' },
-  { href: '/dashboard/notifications', label: 'Notifications' },
   { href: '/dashboard/activity', label: 'Activity' },
   { href: '/dashboard/saved-searches', label: 'Saved Searches' },
   { href: '/profile', label: 'Profile' },

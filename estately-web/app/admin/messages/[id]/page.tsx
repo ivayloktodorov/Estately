@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminConversation } from '@/lib/admin/messages';
+import { AdminNavigation } from '../../admin-navigation';
 import { DeleteAttachmentButton, DeleteMessageButton } from '../moderation-buttons';
 import { deleteAttachmentAction, deleteMessageAction } from '../actions';
 
@@ -54,14 +55,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <nav className="flex flex-wrap items-center justify-between gap-4">
-          <Link className="text-xl font-semibold text-slate-950" href="/admin">
-            Estately Admin
-          </Link>
-          <Link className="text-sm font-semibold text-emerald-700 hover:text-emerald-800" href="/admin/messages">
-            Back to messages
-          </Link>
-        </nav>
+        <AdminNavigation active="messages" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">

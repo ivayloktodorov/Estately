@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { requireAdmin } from '@/lib/auth';
 import { getAdminUsers, type AdminUserListItem, type AdminUsersSearchParams } from '@/lib/admin/users';
+import { AdminNavigation } from '../admin-navigation';
 import { updateUserRoleAction } from './actions';
 
 interface AdminUsersPageProps {
@@ -161,22 +162,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <nav className="flex flex-wrap items-center justify-between gap-4">
-          <Link className="text-xl font-semibold text-slate-950" href="/admin">
-            Estately Admin
-          </Link>
-          <div className="flex items-center gap-3 text-sm">
-            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/admin/properties">
-              Properties
-            </Link>
-            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/admin/messages">
-              Messages
-            </Link>
-            <Link className="font-medium text-slate-700 hover:text-emerald-700" href="/dashboard">
-              Dashboard
-            </Link>
-          </div>
-        </nav>
+        <AdminNavigation active="users" />
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
@@ -275,7 +261,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                               className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
                               href={`/admin/users/${user.id}`}
                             >
-                              Details
+                              Edit
                             </Link>
                             <RoleForm user={user} />
                           </div>
@@ -310,7 +296,7 @@ export default async function AdminUsersPage({ searchParams }: AdminUsersPagePro
                       className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700"
                       href={`/admin/users/${user.id}`}
                     >
-                      Details
+                      Edit
                     </Link>
                     <RoleForm user={user} />
                   </div>
