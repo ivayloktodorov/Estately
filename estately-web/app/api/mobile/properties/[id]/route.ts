@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: MobilePropertyRouteP
       return mobileError('Property not found.', 404);
     }
 
-    if (property.moderationStatus !== 'approved') {
+    if (property.moderationStatus !== 'approved' || !property.isPublished) {
       const user = await getMobileAuthUser(request);
       const canView = user?.role === 'admin' || user?.id === property.createdByUserId;
 

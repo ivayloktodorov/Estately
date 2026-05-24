@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 import { uploadR2Image } from '@/services/storage/r2';
 
 function errorResponse(message: string, status: number) {
@@ -9,6 +10,8 @@ function errorResponse(message: string, status: number) {
 }
 
 export async function POST(request: NextRequest) {
+  await requireAdmin();
+
   const formData = await request.formData();
   const file = formData.get('image');
 

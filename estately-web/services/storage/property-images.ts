@@ -25,6 +25,10 @@ function hasR2Config(): boolean {
   );
 }
 
+function shouldUseLocalDevStorage(): boolean {
+  return process.env.NODE_ENV !== 'production' && process.env.ALLOW_LOCAL_UPLOAD_FALLBACK === '1';
+}
+
 function optionalEnv(...names: string[]): string | null {
   for (const name of names) {
     const value = process.env[name];
@@ -174,9 +178,13 @@ export async function uploadPropertyImage(
     throw new Error(validationError);
   }
 
-  const imageUrl = hasR2Config()
-    ? await uploadToR2(file, propertyId)
-    : await uploadToLocalDevStorage(file, propertyId);
+  if (hasR2Config()) {
+    return { imageUrl: await uploadToR2(file, propertyId) };
+  }
 
-  return { imageUrl };
+  if (shouldUseLocalDevStorage()) {
+    return { imageUrl: await uploadToLocalDevStorage(file, propertyId) };
+  }
+
+  throw new Error('Cloudflare R2 uploads are not configured.');
 }

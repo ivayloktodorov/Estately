@@ -34,12 +34,15 @@ const demoAccounts = [
 ];
 
 const quickAccessLinks: HubLink[] = [
-  { href: '/properties', label: 'Browse Properties', description: 'Search, filter, paginate, and open property details.' },
-  { href: '/dashboard', label: 'Dashboard', description: 'Open the authenticated user workspace.' },
+  { href: '/sale', label: 'Sale Listings', description: 'Browse published sale properties as a guest.' },
+  { href: '/rent', label: 'Rent Listings', description: 'Browse published rental properties as a guest.' },
+  { href: '/dashboard/properties/new', label: 'Add Property', description: 'Create a pending listing as the demo user.' },
   { href: '/favorites', label: 'Favorites', description: 'Review saved properties for the signed-in user.' },
-  { href: '/admin', label: 'Admin Dashboard', description: 'Inspect moderation, listings, users, and platform stats.' },
-  { href: '/docs/api', label: 'API Documentation', description: 'Review REST endpoints, payloads, auth, and responses.' },
-  { href: '/docs/database-schema', label: 'Database Schema', description: 'Inspect tables, relationships, and indexing notes.' },
+  { href: '/dashboard/offers', label: 'Offers', description: 'Check offer history after making an offer.' },
+  { href: '/dashboard/messages', label: 'Messages', description: 'Review inquiry and conversation messages.' },
+  { href: '/dashboard/notifications', label: 'Notifications', description: 'Check saved alerts, inquiries, offers, and moderation updates.' },
+  { href: '/admin/properties', label: 'Admin Moderation', description: 'Approve or reject pending property submissions.' },
+  { href: '/admin/users', label: 'Manage Users', description: 'Review user roles, status, and admin safeguards.' },
 ];
 
 const requirementsCoverage = [
@@ -56,6 +59,7 @@ const requirementsCoverage = [
 ];
 
 const technicalResources: HubLink[] = [
+  { href: '/', label: 'Live Web App', description: 'Root application route for the deployed or local web app.' },
   { href: '/docs/api', label: 'API Docs', description: 'Endpoint reference for web and mobile review.' },
   { href: '/docs/database-schema', label: 'Database Schema', description: 'Tables, relations, and data model overview.' },
   { href: '/docs/requirements', label: 'Requirements', description: 'Assignment requirements and implementation evidence.' },
@@ -68,16 +72,25 @@ const technicalResources: HubLink[] = [
   { href: '/docs/deployment', label: 'Deployment', description: 'Deployment process and production configuration.' },
 ];
 
-const testingChecklist = [
-  'Register new user',
-  'Login',
-  'Browse properties',
-  'Search/filter',
-  'Add favorite',
-  'Send inquiry',
-  'Open dashboard',
-  'Test admin panel',
-  'Test mobile app',
+const reviewerFlow = [
+  { href: '/sale', label: 'Browse Sale as guest', description: 'Open sale listings, use filters/search, and open a property detail page.' },
+  { href: '/rent', label: 'Browse Rent as guest', description: 'Confirm rental listings are published and reachable separately from sale listings.' },
+  { href: '/softuni-exam', label: 'Login as demo user', description: 'Use Test as User or softuni_user@estately.com / pass123.' },
+  { href: '/favorites', label: 'Save a favorite', description: 'Open a property and use the favorite control, then confirm it appears here.' },
+  { href: '/dashboard/messages', label: 'Send inquiry', description: 'Use the contact/inquiry form on a property, then check messages.' },
+  { href: '/dashboard/offers', label: 'Make offer', description: 'Submit an offer from a property page, then review the offer dashboard.' },
+  { href: '/dashboard/properties/new', label: 'Add property', description: 'Create a listing as the user; it should enter pending moderation.' },
+  { href: '/softuni-exam', label: 'Login as admin', description: 'Use Test as Admin or softuni_admin@estately.com / pass123.' },
+  { href: '/admin/properties', label: 'Approve or reject property', description: 'Moderate the pending listing and confirm publication status changes.' },
+  { href: '/admin/users', label: 'Manage users', description: 'Inspect user list, roles, status controls, and self-protection safeguards.' },
+  { href: '/dashboard/notifications', label: 'Check notifications/messages', description: 'Confirm moderation, inquiry, and offer examples are visible where seeded.' },
+];
+
+const deploymentUrls = [
+  { label: 'Local web review', value: 'http://localhost:3000/softuni-exam' },
+  { label: 'Local mobile API', value: 'http://localhost:3000/api/mobile' },
+  { label: 'Production web URL', value: 'Add final deployment URL after hosting is connected.' },
+  { label: 'Production mobile URL', value: 'Add Expo web/native preview URL after deployment.' },
 ];
 
 function StatusCard({ label }: { label: string }) {
@@ -182,6 +195,29 @@ export default function SoftUniExamPage() {
 
       <section className="bg-white py-14">
         <Container>
+          <h2 className="text-3xl font-bold text-charcoal-950">Recommended 5-10 Minute Testing Path</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {reviewerFlow.map((step, index) => (
+              <Link
+                className="group flex gap-4 rounded-lg border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-estate-700 hover:shadow-estate-soft"
+                href={step.href}
+                key={`${step.label}-${index}`}
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-estate-700 text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <span>
+                  <span className="text-base font-bold text-charcoal-950 group-hover:text-estate-700">{step.label}</span>
+                  <span className="mt-1 block text-sm leading-6 text-stone-600">{step.description}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-14">
+        <Container>
           <h2 className="text-3xl font-bold text-charcoal-950">Project Requirements Coverage</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {requirementsCoverage.map((requirement) => (
@@ -205,19 +241,13 @@ export default function SoftUniExamPage() {
       <section className="bg-white py-14">
         <Container>
           <div className="rounded-lg border border-stone-200 bg-slate-50 p-6 shadow-sm">
-            <h2 className="text-3xl font-bold text-slate-950">Testing Checklist</h2>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {testingChecklist.map((item) => (
-                <label
-                  className="flex min-h-12 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800"
-                  key={item}
-                >
-                  <input
-                    className="h-4 w-4 rounded border-slate-300 text-estate-700 focus:ring-estate-700"
-                    type="checkbox"
-                  />
-                  {item}
-                </label>
+            <h2 className="text-3xl font-bold text-slate-950">Deployment URLs</h2>
+            <div className="mt-6 grid gap-3 lg:grid-cols-2">
+              {deploymentUrls.map((url) => (
+                <div className="rounded-md border border-slate-200 bg-white px-4 py-3" key={url.label}>
+                  <p className="text-sm font-bold text-slate-950">{url.label}</p>
+                  <p className="mt-1 break-words font-mono text-sm text-slate-600">{url.value}</p>
+                </div>
               ))}
             </div>
           </div>

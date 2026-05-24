@@ -35,13 +35,14 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
         id: properties.id,
         title: properties.title,
         moderationStatus: properties.moderationStatus,
+        isPublished: properties.isPublished,
         ownerUserId: properties.createdByUserId,
       })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
 
-    if (!property || property.moderationStatus !== 'approved') {
+    if (!property || property.moderationStatus !== 'approved' || !property.isPublished) {
       return mobileError('Property not found.', 404);
     }
 

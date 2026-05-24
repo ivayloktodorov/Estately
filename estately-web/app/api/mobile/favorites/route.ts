@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     })
     .from(favorites)
     .innerJoin(properties, eq(favorites.propertyId, properties.id))
-    .where(and(eq(favorites.userId, user.id), eq(properties.moderationStatus, 'approved')))
+    .where(and(eq(favorites.userId, user.id), eq(properties.moderationStatus, 'approved'), eq(properties.isPublished, true)))
     .orderBy(desc(favorites.createdAt));
 
   return mobileSuccess({ properties: savedProperties });
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const property = await db
       .select({ id: properties.id })
       .from(properties)
-      .where(and(eq(properties.id, propertyId), eq(properties.moderationStatus, 'approved')))
+      .where(and(eq(properties.id, propertyId), eq(properties.moderationStatus, 'approved'), eq(properties.isPublished, true)))
       .then((rows) => rows[0]);
 
     if (!property) {

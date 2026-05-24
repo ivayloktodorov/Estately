@@ -4,7 +4,7 @@ import { AUTH_COOKIE_NAME } from './lib/auth/types';
 
 const protectedPagePaths = ['/dashboard', '/profile', '/favorites'];
 const adminPaths = ['/admin', '/api/admin'];
-const protectedApiPaths = ['/api/protected', '/api/notifications'];
+const protectedApiPaths = ['/api/protected', '/api/notifications', '/api/profile', '/api/messages/attachments', '/api/test-r2-upload'];
 const mobileApiPaths = ['/api/mobile'];
 
 function withMobileCorsHeaders(response: NextResponse): NextResponse {
@@ -83,6 +83,10 @@ export const config = {
     '/admin/:path*',
     '/api/protected/:path*',
     '/api/admin/:path*',
+    '/api/notifications/:path*',
+    '/api/profile/:path*',
+    '/api/messages/attachments/:path*',
+    '/api/test-r2-upload',
     '/api/mobile/:path*',
   ],
 };

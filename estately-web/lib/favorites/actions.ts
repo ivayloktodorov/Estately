@@ -40,7 +40,7 @@ export async function toggleFavoriteAction(
       const property = await db
         .select({ id: properties.id, title: properties.title })
         .from(properties)
-        .where(and(eq(properties.id, propertyId), eq(properties.moderationStatus, 'approved')))
+        .where(and(eq(properties.id, propertyId), eq(properties.moderationStatus, 'approved'), eq(properties.isPublished, true)))
         .then((rows) => rows[0]);
 
       if (!property) {

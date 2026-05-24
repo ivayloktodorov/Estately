@@ -24,6 +24,6 @@ export async function getFavoriteProperties(userId: number) {
     })
     .from(favorites)
     .innerJoin(properties, eq(favorites.propertyId, properties.id))
-    .where(and(eq(favorites.userId, userId), eq(properties.moderationStatus, 'approved')))
+    .where(and(eq(favorites.userId, userId), eq(properties.moderationStatus, 'approved'), eq(properties.isPublished, true)))
     .orderBy(desc(favorites.createdAt));
 }

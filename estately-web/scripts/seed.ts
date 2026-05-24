@@ -1,11 +1,21 @@
 import bcrypt from 'bcryptjs';
+import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { users, cities, properties, propertyImages, favorites, propertyMessages } from '../src/db/schema';
+import {
+  users,
+  cities,
+  properties,
+  propertyImages,
+  favorites,
+  propertyMessages,
+  propertyOffers,
+  notifications,
+} from '../src/db/schema';
 import { requireDatabaseUrl } from './load-env';
 
 const db = drizzle({
   connection: requireDatabaseUrl(),
-  schema: { users, cities, properties, propertyImages, favorites, propertyMessages },
+  schema: { users, cities, properties, propertyImages, favorites, propertyMessages, propertyOffers, notifications },
 });
 
 const sampleUsers = [
@@ -328,6 +338,25 @@ async function seed() {
     await db.insert(users).values(usersToInsert).onConflictDoNothing({ target: users.email });
     console.log(`✓ Ensured ${sampleUsers.length} users\n`);
 
+    const seededUsers = await db.query.users.findMany({
+      columns: { id: true, email: true },
+    });
+    const seededUserIds = sampleUsers
+      .map((sampleUser) => seededUsers.find((seededUser) => seededUser.email === sampleUser.email)?.id)
+      .filter((id): id is number => typeof id === 'number');
+    const softUniUser = await db.query.users.findFirst({
+      columns: { id: true },
+      where: eq(users.email, 'softuni_user@estately.com'),
+    });
+    const softUniAdmin = await db.query.users.findFirst({
+      columns: { id: true },
+      where: eq(users.email, 'softuni_admin@estately.com'),
+    });
+
+    if (!softUniUser || !softUniAdmin || seededUserIds.length === 0) {
+      throw new Error('SoftUni demo accounts were not created.');
+    }
+
     // Insert cities
     console.log('🏙️  Seeding cities...');
     await db.insert(cities).values(sampleCities);
@@ -335,15 +364,35 @@ async function seed() {
 
     // Insert properties
     console.log('🏠 Seeding properties...');
-    const propertiesToInsert = sampleProperties.map((prop, index) => ({
-      ...prop,
-      listingType: index % 3 === 0 ? 'rent' : 'sale',
-      latitude: (cityCoordinates[prop.city].latitude + (index % 4) * 0.006).toFixed(7),
-      longitude: (cityCoordinates[prop.city].longitude + (index % 5) * 0.006).toFixed(7),
-      createdByUserId: (index % sampleUsers.length) + 1,
-      isPublished: true,
-      moderationStatus: 'approved',
-    }));
+    const propertiesToInsert = [
+      ...sampleProperties.map((prop, index) => ({
+        ...prop,
+        listingType: index % 3 === 0 ? 'rent' : 'sale',
+        latitude: (cityCoordinates[prop.city].latitude + (index % 4) * 0.006).toFixed(7),
+        longitude: (cityCoordinates[prop.city].longitude + (index % 5) * 0.006).toFixed(7),
+        createdByUserId: seededUserIds[index % seededUserIds.length],
+        isPublished: true,
+        moderationStatus: 'approved',
+      })),
+      {
+        title: 'SoftUni Pending Review Apartment',
+        description: 'Demo listing intentionally left pending so reviewers can test admin approve/reject moderation.',
+        price: '210000.00',
+        city: 'Sofia',
+        address: '42 Reviewer Avenue, Sofia',
+        propertyType: 'apartment',
+        listingType: 'sale',
+        bedrooms: 2,
+        bathrooms: 1,
+        areaSqm: 82,
+        imageCoverUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400',
+        latitude: cityCoordinates.Sofia.latitude.toFixed(7),
+        longitude: cityCoordinates.Sofia.longitude.toFixed(7),
+        createdByUserId: softUniUser.id,
+        isPublished: false,
+        moderationStatus: 'pending',
+      },
+    ];
 
     const insertedPropertiesResult = await db
       .insert(properties)
@@ -407,6 +456,44 @@ async function seed() {
     }
     await db.insert(propertyMessages).values(messagesToInsert);
     console.log(`✓ Created ${messagesToInsert.length} property messages\n`);
+
+    // Insert reviewer-ready offer and notification examples
+    console.log('🔔 Seeding reviewer examples...');
+    const demoProperty = insertedPropertiesResult[0];
+    if (demoProperty) {
+      await db.insert(propertyOffers).values({
+        propertyId: demoProperty.id,
+        buyerUserId: softUniUser.id,
+        ownerUserId: softUniAdmin.id,
+        amount: '235000.00',
+        message: 'Demo offer for SoftUni review. Safe to accept or reject during evaluation.',
+        status: 'pending',
+      });
+
+      await db.insert(notifications).values([
+        {
+          userId: softUniUser.id,
+          type: 'listing_pending',
+          title: 'Demo listing awaits review',
+          message: 'SoftUni Pending Review Apartment is ready for admin moderation testing.',
+          entityType: 'property',
+          entityId: insertedPropertiesResult[insertedPropertiesResult.length - 1]?.id,
+          href: '/dashboard/properties',
+          isRead: false,
+        },
+        {
+          userId: softUniAdmin.id,
+          type: 'offer_received',
+          title: 'Demo offer received',
+          message: 'A seeded SoftUni review offer is waiting in the admin/user workflow.',
+          entityType: 'property',
+          entityId: demoProperty.id,
+          href: '/dashboard/offers',
+          isRead: false,
+        },
+      ]);
+    }
+    console.log('✓ Created reviewer offer and notification examples\n');
 
     console.log('✅ Database seeding completed successfully!');
     process.exit(0);

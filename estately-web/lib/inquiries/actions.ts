@@ -52,6 +52,7 @@ export async function submitPropertyInquiryAction(
       .select({
         id: properties.id,
         moderationStatus: properties.moderationStatus,
+        isPublished: properties.isPublished,
         ownerUserId: properties.createdByUserId,
         title: properties.title,
       })
@@ -59,7 +60,7 @@ export async function submitPropertyInquiryAction(
       .where(eq(properties.id, propertyId))
       .then((rows) => rows[0]);
 
-    if (!property || property.moderationStatus !== 'approved') {
+    if (!property || property.moderationStatus !== 'approved' || !property.isPublished) {
       return {
         status: 'error',
         message: 'This property is no longer available.',
