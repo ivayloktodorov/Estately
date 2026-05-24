@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 
 interface PropertyImageUploadProps {
   propertyId: number;
@@ -68,6 +68,22 @@ export function PropertyImageUpload({ initialImages = [], propertyId }: Property
   const [error, setError] = useState<string | null>(null);
 
   const orderedImageIds = useMemo(() => images.map((image) => image.id), [images]);
+  const remainingSlots = Math.max(0, maxImages - images.length);
+
+  useEffect(() => {
+    if (initialImages.length === 0) {
+      void loadImages();
+    }
+
+    // Loading is intentionally performed once so dashboard previews can hydrate existing images.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   async function loadImages() {
     setError(null);
@@ -92,7 +108,7 @@ export function PropertyImageUpload({ initialImages = [], propertyId }: Property
     setSelectedFiles(files);
     setPreviewUrls(files.map((file) => URL.createObjectURL(file)));
     setMessage(null);
-    setError(null);
+    setError(validateFiles(files, images.length));
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -201,7 +217,10 @@ export function PropertyImageUpload({ initialImages = [], propertyId }: Property
       <div>
         <h3 className="text-sm font-semibold text-charcoal-950">Upload Images</h3>
         <p className="mt-1 text-xs leading-5 text-slate-600">
-          Add up to {maxImages} JPG, PNG, or WEBP images. Choose a cover image for listing cards.
+          Add up to {maxImages} JPG, PNG, or WEBP images. Each image can be up to 10MB. Choose a cover image for listing cards.
+        </p>
+        <p className="mt-1 text-xs font-medium text-slate-500">
+          {remainingSlots} image {remainingSlots === 1 ? 'slot' : 'slots'} available.
         </p>
       </div>
 

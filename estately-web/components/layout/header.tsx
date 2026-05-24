@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 const publicLinks = [
-  { href: '/buy', label: 'Buy' },
+  { href: '/sale', label: 'Sale' },
   { href: '/rent', label: 'Rent' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -30,16 +30,16 @@ export async function Header({ user }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-cream-50 shadow-sm">
       <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
-        <div className="flex min-h-20 items-center justify-between gap-3">
+        <div className="flex min-h-20 items-center justify-between gap-2 sm:gap-3">
           {/* Logo */}
           <Link
             aria-label="Estately home"
-            className="shrink-0 transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50"
+            className="min-w-0 shrink transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50 sm:shrink-0"
             href="/"
           >
             <Image
               alt="Estately"
-              className="h-auto w-28 object-contain sm:w-[190px]"
+              className="h-auto w-28 object-contain sm:w-40 md:w-[190px]"
               height={96}
               priority
               src="/branding/logo-full.png?v=2"
@@ -72,12 +72,15 @@ export async function Header({ user }: HeaderProps) {
                 <ProfileDropdown user={user} />
               </div>
             ) : (
-              <>
+              <div className="flex flex-nowrap items-center gap-2">
+                <ButtonLink className="h-10 min-h-0 whitespace-nowrap rounded-md px-4 py-2" href="/softuni-exam" variant="secondary">
+                  SoftUni Exam
+                </ButtonLink>
                 <ButtonLink href="/login" variant="ghost">
                   Login
                 </ButtonLink>
                 <ButtonLink href="/register">Register</ButtonLink>
-              </>
+              </div>
             )}
           </div>
 
@@ -92,7 +95,7 @@ export async function Header({ user }: HeaderProps) {
                     initialUnreadCount={notificationProps.initialUnreadCount}
                   />
                 ) : null}
-                <ProfileDropdown className="min-w-0 max-w-[9.5rem] sm:max-w-none" user={user} />
+                <ProfileDropdown className="hidden min-w-0 max-w-[9.5rem] sm:block sm:max-w-none" user={user} />
               </>
             ) : null}
             <HeaderMobileMenu user={user} publicLinks={publicLinks} />

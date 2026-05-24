@@ -22,11 +22,11 @@ export function PropertySidebar({
   offerSlot,
 }: PropertySidebarProps) {
   return (
-    <aside className="space-y-6 lg:sticky lg:top-24">
+    <aside className="min-w-0 space-y-6 lg:sticky lg:top-24">
       {/* Price Card */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-estate-soft p-6">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-estate-soft sm:p-6">
         <p className="text-sm text-stone-600 mb-2">Price</p>
-        <p className="text-3xl font-bold text-estate-700 mb-1">
+        <p className="mb-1 break-words text-2xl font-bold text-estate-700 sm:text-3xl">
           {price}
           {listingType === 'rent' && (
             <span className="text-lg font-normal text-stone-600">/mo</span>
@@ -38,19 +38,19 @@ export function PropertySidebar({
       </div>
 
       {/* Property Summary */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-estate-soft p-6 space-y-4">
+      <div className="space-y-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-estate-soft sm:p-6">
         <h3 className="font-bold text-charcoal-950">Property Summary</h3>
         
         <div className="space-y-3">
-          <div className="flex justify-between items-center pb-3 border-b border-stone-100">
+          <div className="flex items-center justify-between gap-3 border-b border-stone-100 pb-3">
             <span className="text-stone-600">Bedrooms</span>
             <span className="font-semibold text-charcoal-950">{bedrooms}</span>
           </div>
-          <div className="flex justify-between items-center pb-3 border-b border-stone-100">
+          <div className="flex items-center justify-between gap-3 border-b border-stone-100 pb-3">
             <span className="text-stone-600">Bathrooms</span>
             <span className="font-semibold text-charcoal-950">{bathrooms}</span>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between gap-3">
             <span className="text-stone-600">Area</span>
             <span className="font-semibold text-charcoal-950">{areaSqm} m²</span>
           </div>
@@ -60,7 +60,7 @@ export function PropertySidebar({
       {offerSlot}
 
       {/* Location Card */}
-      <div className="bg-cream-100 rounded-2xl border border-stone-200 p-6">
+      <div className="rounded-2xl border border-stone-200 bg-cream-100 p-5 sm:p-6">
         <p className="text-sm text-stone-600 mb-2">Location</p>
         <p className="font-semibold text-charcoal-950 text-sm leading-relaxed">
           {address}

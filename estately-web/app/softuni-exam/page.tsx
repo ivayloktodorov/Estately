@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
 import { SectionHeader } from '@/components/ui/section-header';
+import type { SoftUniAccountType } from './actions';
+import { SoftUniLoginButton } from './softuni-login-button';
 
 export const metadata: Metadata = {
   title: 'SoftUni Exam',
@@ -18,17 +19,17 @@ interface HubLink {
 const demoAccounts = [
   {
     role: 'Admin',
-    email: 'admin@estately.com',
+    email: 'softuni_admin@estately.com',
     password: 'pass123',
-    actionLabel: 'Login as Admin',
-    href: '/login?email=admin%40estately.com',
+    actionLabel: 'Test as Admin',
+    accountType: 'admin' as SoftUniAccountType,
   },
   {
     role: 'User',
-    email: 'john@gmail.com',
+    email: 'softuni_user@estately.com',
     password: 'pass123',
-    actionLabel: 'Login as User',
-    href: '/login?email=john%40gmail.com',
+    actionLabel: 'Test as User',
+    accountType: 'user' as SoftUniAccountType,
   },
 ];
 
@@ -122,12 +123,12 @@ export default function SoftUniExamPage() {
                 Start with a user account, validate the property workflow, then switch to admin tools and technical documentation.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
-                <ButtonLink className="flex-1" href="/login?email=john%40gmail.com">
-                  Login as User
-                </ButtonLink>
-                <ButtonLink className="flex-1" href="/login?email=admin%40estately.com" variant="secondary">
-                  Login as Admin
-                </ButtonLink>
+                <SoftUniLoginButton accountType="user" className="flex-1">
+                  Test as User
+                </SoftUniLoginButton>
+                <SoftUniLoginButton accountType="admin" className="flex-1" variant="secondary">
+                  Test as Admin
+                </SoftUniLoginButton>
               </div>
             </div>
           </div>
@@ -143,9 +144,9 @@ export default function SoftUniExamPage() {
                 <article className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm" key={account.email}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <h3 className="text-2xl font-bold text-charcoal-950">{account.role}</h3>
-                    <ButtonLink href={account.href} variant="outline">
+                    <SoftUniLoginButton accountType={account.accountType} variant="outline">
                       {account.actionLabel}
-                    </ButtonLink>
+                    </SoftUniLoginButton>
                   </div>
                   <dl className="mt-5 grid gap-3 text-sm">
                     <div>

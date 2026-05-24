@@ -145,7 +145,7 @@ export function NotificationDropdown({
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Open notifications"
-        className="relative inline-flex h-12 w-12 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 hover:text-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+        className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 shadow-sm transition hover:border-estate-300 hover:bg-cream-50 hover:text-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2 sm:h-12 sm:w-12"
         onClick={() => {
           setIsOpen((current) => !current);
           if (!isOpen) refreshNotifications();
@@ -162,7 +162,7 @@ export function NotificationDropdown({
 
       {isOpen ? (
         <div
-          className="fixed left-4 right-4 top-24 z-50 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[380px]"
+          className="fixed left-3 right-3 top-24 z-50 max-h-[calc(100dvh-7rem)] overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(380px,calc(100vw-2rem))]"
           role="menu"
         >
           <div className="flex items-start justify-between gap-4 border-b border-stone-100 px-4 py-4">
@@ -180,7 +180,7 @@ export function NotificationDropdown({
             </button>
           </div>
 
-          <div className="max-h-[420px] overflow-y-auto py-2">
+          <div className="max-h-[min(420px,calc(100dvh-15rem))] overflow-y-auto py-2">
             {isPending && notifications.length === 0 ? (
               <p className="px-4 py-8 text-center text-sm font-medium text-stone-500">Loading notifications...</p>
             ) : null}

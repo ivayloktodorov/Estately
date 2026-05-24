@@ -168,6 +168,7 @@ async function ensureProperties(currentCount: number, availableUserIds: number[]
         longitude: coordinate(city.longitude, sequence + 11),
         imageCoverUrl: `https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&auto=format&fit=crop&sig=${sequence}`,
         isPublished: sequence % 7 !== 0,
+        moderationStatus: sequence % 7 !== 0 ? 'approved' : 'pending',
         createdByUserId: availableUserIds[sequence % availableUserIds.length],
         createdAt: createdAtFromSequence(sequence),
         updatedAt: createdAtFromSequence(sequence),

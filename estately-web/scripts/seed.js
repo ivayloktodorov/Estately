@@ -8,6 +8,8 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle({ client: pool, schema: { users, cities, properties, propertyImages, favorites, propertyMessages } });
 
 const sampleUsers = [
+  { email: 'softuni_user@estately.com', password: 'pass123', fullName: 'SoftUni User', role: 'user' },
+  { email: 'softuni_admin@estately.com', password: 'pass123', fullName: 'SoftUni Admin', role: 'admin' },
   { email: 'admin@estately.com', password: 'pass123', fullName: 'Admin User', role: 'admin' },
   { email: 'john@gmail.com', password: 'pass123', fullName: 'John Doe', role: 'user' },
   { email: 'maria@gmail.com', password: 'pass123', fullName: 'Maria Garcia', role: 'user' },
@@ -30,8 +32,6 @@ const sampleCities = [
   { name: 'Burgas', slug: 'burgas' },
   { name: 'Plovdiv', slug: 'plovdiv' },
 ];
-
-const propertyTypesArray = ['apartment', 'house', 'office', 'studio'];
 
 const sampleProperties = [
   {
@@ -294,6 +294,15 @@ const sampleMessages = [
   'Is there a chance for a long-term rental?',
 ];
 
+function withoutPassword(user) {
+  return {
+    email: user.email,
+    fullName: user.fullName,
+    passwordHash: user.passwordHash,
+    role: user.role,
+  };
+}
+
 async function seed() {
   try {
     console.log('🌱 Starting database seeding...\n');
@@ -308,9 +317,9 @@ async function seed() {
     );
 
     // Remove password field and insert
-    const usersToInsert = hashedUsers.map(({ password, ...rest }) => rest);
-    await db.insert(users).values(usersToInsert);
-    console.log(`✓ Created ${sampleUsers.length} users\n`);
+    const usersToInsert = hashedUsers.map(withoutPassword);
+    await db.insert(users).values(usersToInsert).onConflictDoNothing({ target: users.email });
+    console.log(`✓ Ensured ${sampleUsers.length} users\n`);
 
     // Insert cities
     console.log('🏙️  Seeding cities...');
@@ -321,7 +330,10 @@ async function seed() {
     console.log('🏠 Seeding properties...');
     const propertiesToInsert = sampleProperties.map((prop, index) => ({
       ...prop,
+      listingType: index % 3 === 0 ? 'rent' : 'sale',
       createdByUserId: (index % sampleUsers.length) + 1, // Distribute among admin and first user
+      isPublished: true,
+      moderationStatus: 'approved',
     }));
 
     const insertedPropertiesResult = await db.insert(properties).values(propertiesToInsert).returning({ id: properties.id });

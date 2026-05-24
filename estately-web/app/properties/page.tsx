@@ -11,6 +11,7 @@ import { SaveSearchButton } from '@/components/properties/save-search-button';
 import { getCurrentUser } from '@/lib/auth';
 import { getFavoritePropertyIds } from '@/lib/favorites/actions';
 import { propertyImageUrl } from '@/lib/properties/images';
+import { createSeoMetadata } from '@/lib/seo';
 import {
   getPaginatedProperties,
   propertyDetailsHref,
@@ -22,15 +23,12 @@ import {
 } from '@/lib/properties/search';
 
 export const metadata: Metadata = {
-  title: 'Browse Properties',
-  description:
-    'Explore our collection of premium properties available for sale and rent. Find your dream home in Bulgaria with Estately.',
-  openGraph: {
-    title: 'Browse Properties | Estately',
-    description:
-      'Explore our collection of premium properties available for sale and rent. Find your dream home in Bulgaria with Estately.',
-    type: 'website',
-  },
+  ...createSeoMetadata({
+    title: 'Browse properties | Estately',
+    description: 'Explore homes, apartments, villas and land listings available for sale and rent.',
+    path: '/properties',
+    keywords: ['browse properties', 'property search', 'real estate listings'],
+  }),
 };
 
 interface PropertiesPageProps {
@@ -86,6 +84,9 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     latitude: prop.latitude ? Number(prop.latitude) : null,
     longitude: prop.longitude ? Number(prop.longitude) : null,
     listingType: (prop.listingType === 'rent' ? 'rent' : 'sale') as 'sale' | 'rent',
+    createdAt: prop.createdAt,
+    views: prop.views,
+    isFeatured: prop.isFeatured,
   }));
   const favoritePropertyIds = user
     ? await getFavoritePropertyIds(

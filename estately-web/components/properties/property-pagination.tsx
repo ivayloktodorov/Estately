@@ -128,13 +128,13 @@ export function PaginationControls({
 
           {items.map((item, index) =>
             item === 'ellipsis' ? (
-              <span className="px-1 text-sm font-bold text-stone-400" key={`ellipsis-${index}`}>
+              <span className="hidden px-1 text-sm font-bold text-stone-400 sm:inline" key={`ellipsis-${index}`}>
                 ...
               </span>
             ) : item === currentPage ? (
               <span
                 aria-current="page"
-                className="inline-flex h-10 min-w-10 items-center justify-center rounded-lg bg-estate-700 px-3 text-sm font-bold text-white shadow-sm"
+                className="hidden h-10 min-w-10 items-center justify-center rounded-lg bg-estate-700 px-3 text-sm font-bold text-white shadow-sm sm:inline-flex"
                 key={item}
               >
                 {item}
@@ -142,7 +142,7 @@ export function PaginationControls({
             ) : (
               <Link
                 aria-label={`Go to page ${item}`}
-                className="inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-stone-200 bg-white px-3 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 focus:outline-none focus:ring-4 focus:ring-estate-700/10"
+                className="hidden h-10 min-w-10 items-center justify-center rounded-lg border border-stone-200 bg-white px-3 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 focus:outline-none focus:ring-4 focus:ring-estate-700/10 sm:inline-flex"
                 href={pageHref(basePath, searchParams, item)}
                 key={item}
               >

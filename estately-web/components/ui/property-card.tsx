@@ -19,6 +19,35 @@ interface PropertyCardProps {
   isFavorited?: boolean;
   isAuthenticated?: boolean;
   showFavoriteButton?: boolean;
+  createdAt?: Date;
+  views?: number;
+  isFeatured?: boolean;
+}
+
+const NEW_LISTING_DAYS = 7;
+const HOT_VIEW_THRESHOLD = 100;
+
+function propertyBadges(createdAt?: Date, views = 0, isFeatured = false): string[] {
+  const badges: string[] = [];
+
+  if (isFeatured) {
+    badges.push('FEATURED');
+  }
+
+  if (createdAt) {
+    const ageMs = Date.now() - createdAt.getTime();
+    const newListingMs = NEW_LISTING_DAYS * 24 * 60 * 60 * 1000;
+
+    if (ageMs >= 0 && ageMs <= newListingMs) {
+      badges.push('NEW');
+    }
+  }
+
+  if (views >= HOT_VIEW_THRESHOLD) {
+    badges.push('HOT');
+  }
+
+  return badges;
 }
 
 export function PropertyCard({
@@ -37,9 +66,13 @@ export function PropertyCard({
   isFavorited = false,
   isAuthenticated = false,
   showFavoriteButton = false,
+  createdAt,
+  views = 0,
+  isFeatured = false,
 }: PropertyCardProps) {
   const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
   const propertyHref = detailsHref ?? `/properties/${id}`;
+  const badges = propertyBadges(createdAt, views, isFeatured);
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-estate-soft transition duration-300 hover:-translate-y-2 hover:shadow-estate">
@@ -65,6 +98,18 @@ export function PropertyCard({
           <div className="absolute top-3 right-3 bg-estate-700 text-white px-3 py-1 rounded-full text-sm font-semibold">
             {listingType === 'sale' ? 'For Sale' : 'For Rent'}
           </div>
+          {badges.length > 0 ? (
+            <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+              {badges.slice(0, 2).map((badge) => (
+                <span
+                  className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-estate-800 shadow-sm"
+                  key={badge}
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Content */}

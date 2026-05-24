@@ -8,7 +8,7 @@ import { propertyImages, properties } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
 import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { createActivity } from '@/lib/activity/service';
-import { uploadPropertyImage } from '@/services/storage/property-images';
+import { uploadPropertyImage, validatePropertyImageFile } from '@/services/storage/property-images';
 import { createPropertySchema } from './validation';
 import type { PropertyActionState } from './types';
 
@@ -81,6 +81,19 @@ export async function createPropertyAction(
       fields,
       errors: { images: `Please upload ${maxPropertyImages} images or fewer.` },
     };
+  }
+
+  for (const file of imageFiles) {
+    const imageError = validatePropertyImageFile(file);
+
+    if (imageError) {
+      return {
+        status: 'error',
+        message: imageError,
+        fields,
+        errors: { images: imageError },
+      };
+    }
   }
 
   let propertyId: number | undefined;

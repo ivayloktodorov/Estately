@@ -55,8 +55,13 @@ function cleanText(value: SearchParamValue): string | undefined {
 
 function cleanNumber(value: SearchParamValue): number | undefined {
   const text = firstParam(value).trim();
+
+  if (!text) {
+    return undefined;
+  }
+
   const numberValue = Number(text);
-  return Number.isFinite(numberValue) && numberValue >= 0 ? numberValue : undefined;
+  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : undefined;
 }
 
 function cleanPositiveInteger(
@@ -149,19 +154,19 @@ function buildPropertyConditions(filters: PropertySearchFilters): SQL[] {
     conditions.push(eq(properties.listingType, filters.listing));
   }
 
-  if (filters.minPrice !== undefined) {
+  if (filters.minPrice !== undefined && filters.minPrice > 0) {
     conditions.push(gte(properties.price, filters.minPrice.toString()));
   }
 
-  if (filters.maxPrice !== undefined) {
+  if (filters.maxPrice !== undefined && filters.maxPrice > 0) {
     conditions.push(lte(properties.price, filters.maxPrice.toString()));
   }
 
-  if (filters.bedrooms !== undefined) {
+  if (filters.bedrooms !== undefined && filters.bedrooms > 0) {
     conditions.push(gte(properties.bedrooms, filters.bedrooms));
   }
 
-  if (filters.bathrooms !== undefined) {
+  if (filters.bathrooms !== undefined && filters.bathrooms > 0) {
     conditions.push(gte(properties.bathrooms, filters.bathrooms));
   }
 
@@ -191,7 +196,7 @@ export async function getFilteredProperties(filters: PropertySearchFilters) {
     .select()
     .from(properties)
     .where(and(...buildPropertyConditions(filters)))
-    .orderBy(desc(properties.createdAt));
+    .orderBy(desc(properties.createdAt), desc(properties.id));
 }
 
 export async function getPaginatedProperties(

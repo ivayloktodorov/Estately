@@ -8,7 +8,7 @@ interface PropertySearchBarProps {
 
 export function PropertySearchBar({ className = '', value, onChange }: PropertySearchBarProps) {
   return (
-    <label className={`flex min-w-0 flex-1 flex-col gap-2 text-sm font-semibold text-charcoal-950 ${className}`}>
+    <label className={`flex min-w-0 flex-1 flex-col gap-1.5 text-xs font-semibold text-charcoal-950 ${className}`}>
       Search
       <input
         type="search"
@@ -16,7 +16,7 @@ export function PropertySearchBar({ className = '', value, onChange }: PropertyS
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Search by title, city, address..."
-        className="h-12 w-full rounded-xl border border-stone-200 bg-white px-4 text-sm font-medium text-charcoal-950 shadow-sm outline-none transition placeholder:text-stone-400 focus:border-estate-700 focus:ring-4 focus:ring-estate-700/10"
+        className="h-11 w-full rounded-md border border-stone-200 bg-white px-3 text-sm font-medium text-charcoal-950 shadow-sm outline-none transition placeholder:text-stone-400 focus:border-estate-700 focus:ring-4 focus:ring-estate-700/10"
       />
     </label>
   );

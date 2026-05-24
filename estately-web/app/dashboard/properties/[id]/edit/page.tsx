@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { asc, desc, eq } from 'drizzle-orm';
 import { requireAuth } from '@/lib/auth';
 import { getUserPropertyById } from '@/lib/dashboard/properties';
+import { getOrCreatePropertyGalleryImages } from '@/lib/properties/images';
 import { EditPropertyForm } from '@/components/edit-property-form';
 import { PropertyImageUpload } from '@/components/properties/property-image-upload';
-import { db } from '@/src/db/client';
-import { propertyImages } from '@/src/db/schema';
 
 interface EditPropertyPageProps {
   params: Promise<{
@@ -36,11 +34,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     notFound();
   }
 
-  const images = await db
-    .select()
-    .from(propertyImages)
-    .where(eq(propertyImages.propertyId, property.id))
-    .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
+  const images = await getOrCreatePropertyGalleryImages(property);
   const initialImages = images.map((image) => ({
     ...image,
     createdAt: image.createdAt.toISOString(),

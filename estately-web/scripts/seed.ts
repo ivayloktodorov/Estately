@@ -9,6 +9,8 @@ const db = drizzle({
 });
 
 const sampleUsers = [
+  { email: 'softuni_user@estately.com', password: 'pass123', fullName: 'SoftUni User', role: 'user' as const },
+  { email: 'softuni_admin@estately.com', password: 'pass123', fullName: 'SoftUni Admin', role: 'admin' as const },
   { email: 'admin@estately.com', password: 'pass123', fullName: 'Admin User', role: 'admin' as const },
   { email: 'john@gmail.com', password: 'pass123', fullName: 'John Doe', role: 'user' as const },
   { email: 'maria@gmail.com', password: 'pass123', fullName: 'Maria Garcia', role: 'user' as const },
@@ -300,6 +302,15 @@ const sampleMessages = [
   'Is there a chance for a long-term rental?',
 ];
 
+function withoutPassword(user: (typeof sampleUsers)[number] & { passwordHash: string }): typeof users.$inferInsert {
+  return {
+    email: user.email,
+    fullName: user.fullName,
+    passwordHash: user.passwordHash,
+    role: user.role,
+  };
+}
+
 async function seed() {
   try {
     console.log('🌱 Starting database seeding...\n');
@@ -313,9 +324,9 @@ async function seed() {
       }))
     );
 
-    const usersToInsert = hashedUsers.map(({ password, ...rest }) => rest);
-    await db.insert(users).values(usersToInsert);
-    console.log(`✓ Created ${sampleUsers.length} users\n`);
+    const usersToInsert = hashedUsers.map(withoutPassword);
+    await db.insert(users).values(usersToInsert).onConflictDoNothing({ target: users.email });
+    console.log(`✓ Ensured ${sampleUsers.length} users\n`);
 
     // Insert cities
     console.log('🏙️  Seeding cities...');
@@ -326,9 +337,12 @@ async function seed() {
     console.log('🏠 Seeding properties...');
     const propertiesToInsert = sampleProperties.map((prop, index) => ({
       ...prop,
+      listingType: index % 3 === 0 ? 'rent' : 'sale',
       latitude: (cityCoordinates[prop.city].latitude + (index % 4) * 0.006).toFixed(7),
       longitude: (cityCoordinates[prop.city].longitude + (index % 5) * 0.006).toFixed(7),
       createdByUserId: (index % sampleUsers.length) + 1,
+      isPublished: true,
+      moderationStatus: 'approved',
     }));
 
     const insertedPropertiesResult = await db

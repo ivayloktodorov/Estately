@@ -34,6 +34,29 @@ const docsLinks = [
 
 const testedModules: QaSection[] = [
   {
+    title: 'Property Gallery Implementation',
+    summary: 'Polished the existing property image gallery system so legacy cover images, multi-image uploads, cover selection, gallery viewing, and mobile interaction work as one backward-compatible flow.',
+    items: [
+      { label: 'Changes made', status: 'Fixed', notes: 'Reused the existing property_images table, upload API, image upload manager, and detail gallery. Added runtime gallery hydration from legacy imageCoverUrl values, improved cover synchronization, hydrated existing dashboard image managers, added client-side upload feedback for 10-image/10MB/type rules, and added touch swipe support to the detail gallery and fullscreen lightbox.' },
+      { label: 'Migration behavior', status: 'Fixed', notes: 'Existing migration 0013 already backfills property_images from imageCoverUrl. Runtime reads now also create a property_images cover row when an older property still has imageCoverUrl but no gallery rows, preserving current data without requiring a separate duplicate image system.' },
+      { label: 'Cover image rules', status: 'Fixed', notes: 'Cover rows remain the source for gallery order and imageCoverUrl is kept synchronized for cards, buy/rent results, favorites, dashboard rows, admin thumbnails, and similar properties. If all images are removed, the property falls back to the typed placeholder image.' },
+      { label: 'Tested scenarios', status: 'Manual Verification', notes: 'Verified by static inspection and build/lint that multiple upload, reorder via move controls, delete, set cover, legacy image fallback, detail thumbnails, fullscreen next/previous, ESC/arrow keys, mobile swipe handlers, and admin/owner edit entry points are wired through the existing API.' },
+      { label: 'Remaining known issues', status: 'Known Warning', notes: 'Live upload QA still needs browser testing with configured R2 credentials or local uploads to verify real files, reorder/delete/set-cover interactions, and mobile gestures against seeded data.' },
+    ],
+  },
+  {
+    title: 'Responsive UI QA',
+    summary: 'Responsive pass for desktop, tablet, and mobile web layouts at 320px, 375px, 390px, 414px, 768px, 1024px, and 1440px with emphasis on horizontal overflow, dropdown fit, tables, forms, cards, and property media.',
+    items: [
+      { label: 'Tested screen sizes', status: 'Manual Verification', notes: 'Checked responsive breakpoints and layout risk areas for 320px, 375px, 390px, 414px, 768px, 1024px, and 1440px. Local static verification was paired with build/lint checks; browser/device QA should be repeated after deployment.' },
+      { label: 'Issues found', status: 'Fixed', notes: 'Mobile authenticated header could crowd 320px screens, dropdown panels needed stronger viewport height constraints, homepage hero/stat content was oversized on narrow screens, pagination page-number controls could wrap awkwardly, property detail cards needed safer mobile stacking, and docs/code/table content needed global overflow guards.' },
+      { label: 'Fixes applied', status: 'Fixed', notes: 'Reduced narrow header pressure by hiding the profile trigger below the sm breakpoint while keeping profile access in the mobile menu, made mobile menu fixed and scrollable, constrained profile and notification dropdowns to viewport height/width, tightened homepage mobile type/media spacing, hid dense pagination page numbers on phones, made property detail/sidebar sections min-width safe, and added global form/code/table overflow protection.' },
+      { label: 'Tables and documentation', status: 'Fixed', notes: 'Admin user/property/message tables already use desktop tables with mobile card layouts or scroll-safe wrappers; global pre/code/table rules now prevent README-style docs, code blocks, and tables from breaking page width.' },
+      { label: 'Property images', status: 'Passed', notes: 'Property cards and galleries preserve stable aspect ratios and object-cover behavior; detail lightbox uses object-contain for full image inspection without distortion.' },
+      { label: 'Remaining known issues', status: 'Known Warning', notes: 'No known blocking responsive issues remain from this pass. Final confirmation should include authenticated dashboard/admin routes with seeded production-like data in a real browser because this report cannot encode every role/data combination.' },
+    ],
+  },
+  {
     title: 'Production Bug Fix Pass',
     summary: 'Targeted reliability pass for known production crash paths, mutation actions, uploads, redirects, and admin/profile workflows without changing architecture or adding features.',
     items: [

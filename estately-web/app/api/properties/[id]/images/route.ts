@@ -4,6 +4,7 @@ import { and, asc, desc, eq, ne } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties, propertyImages } from '@/src/db/schema';
 import { getCurrentUser } from '@/lib/auth';
+import { getOrCreatePropertyGalleryImages, getPropertyPlaceholderImage } from '@/lib/properties/images';
 import { uploadPropertyImage } from '@/services/storage/property-images';
 
 interface PropertyImagesRouteProps {
@@ -42,7 +43,11 @@ async function authorizedProperty(propertyId: number) {
   return { error: null, property, user };
 }
 
-async function syncCoverImage(propertyId: number, fallbackImageUrl?: string) {
+async function syncCoverImage(
+  propertyId: number,
+  fallbackImageUrl?: string,
+  propertyType?: string | null,
+) {
   const coverImage = await db
     .select({ id: propertyImages.id, imageUrl: propertyImages.imageUrl })
     .from(propertyImages)
@@ -68,7 +73,10 @@ async function syncCoverImage(propertyId: number, fallbackImageUrl?: string) {
 
   await db
     .update(properties)
-    .set({ imageCoverUrl: firstImage?.imageUrl ?? fallbackImageUrl ?? '', updatedAt: new Date() })
+    .set({
+      imageCoverUrl: firstImage?.imageUrl ?? fallbackImageUrl ?? getPropertyPlaceholderImage(propertyType),
+      updatedAt: new Date(),
+    })
     .where(eq(properties.id, propertyId));
 }
 
@@ -100,11 +108,7 @@ export async function GET(_request: NextRequest, { params }: PropertyImagesRoute
     return auth.error;
   }
 
-  const images = await db
-    .select()
-    .from(propertyImages)
-    .where(eq(propertyImages.propertyId, propertyId))
-    .orderBy(asc(propertyImages.sortOrder), asc(propertyImages.id));
+  const images = await getOrCreatePropertyGalleryImages(auth.property);
 
   return NextResponse.json({ status: 'success', data: { images } });
 }
@@ -129,6 +133,8 @@ export async function POST(request: NextRequest, { params }: PropertyImagesRoute
   if (files.length === 0) {
     return errorResponse('Please upload at least one image file.', 400);
   }
+
+  await getOrCreatePropertyGalleryImages(auth.property);
 
   const existingImages = await db
     .select({ id: propertyImages.id, sortOrder: propertyImages.sortOrder })
@@ -158,7 +164,7 @@ export async function POST(request: NextRequest, { params }: PropertyImagesRoute
       uploadedImages.push({ imageUrl, sortOrder, isCover });
     }
 
-    await syncCoverImage(propertyId, auth.property.imageCoverUrl);
+    await syncCoverImage(propertyId, auth.property.imageCoverUrl, auth.property.propertyType);
     revalidatePropertyImages(propertyId);
 
     return NextResponse.json({
@@ -219,7 +225,7 @@ export async function PATCH(request: NextRequest, { params }: PropertyImagesRout
     await db.update(propertyImages).set({ isCover: true }).where(eq(propertyImages.id, coverImageId));
   }
 
-  await syncCoverImage(propertyId, auth.property.imageCoverUrl);
+  await syncCoverImage(propertyId, auth.property.imageCoverUrl, auth.property.propertyType);
   revalidatePropertyImages(propertyId);
 
   return NextResponse.json({ status: 'success' });
@@ -253,7 +259,7 @@ export async function DELETE(request: NextRequest, { params }: PropertyImagesRou
     return errorResponse('Image not found.', 404);
   }
 
-  await syncCoverImage(propertyId, auth.property.imageCoverUrl);
+  await syncCoverImage(propertyId, undefined, auth.property.propertyType);
   revalidatePropertyImages(propertyId);
 
   return NextResponse.json({ status: 'success' });

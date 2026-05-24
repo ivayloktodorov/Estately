@@ -80,6 +80,7 @@
   textarea,
   select {
     font: inherit;
+    max-width: 100%;
   }
 
   button {
@@ -91,6 +92,20 @@
     display: block;
     max-width: 100%;
     height: auto;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  code {
+    overflow-wrap: anywhere;
+  }
+
+  table {
+    max-width: 100%;
   }
 
   ::selection {

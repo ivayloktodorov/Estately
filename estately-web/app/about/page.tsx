@@ -2,10 +2,15 @@ import type { Metadata } from 'next';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
 import { SectionHeader } from '@/components/ui/section-header';
+import { createSeoMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'About',
-  description: 'Learn about Estately and its modern approach to real estate search.',
+  ...createSeoMetadata({
+    title: 'About Estately',
+    description: 'Learn about Estately and its modern approach to real estate search, saved homes, and property management.',
+    path: '/about',
+    keywords: ['about Estately', 'real estate platform'],
+  }),
 };
 
 const values = [

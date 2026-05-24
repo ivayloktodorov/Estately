@@ -123,7 +123,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
       </button>
 
       <div
-        className={`absolute top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10 transition duration-200 ${
+        className={`absolute top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top overflow-visible rounded-xl border border-stone-200 bg-white shadow-xl shadow-slate-900/10 transition duration-200 ${
           align === 'right' ? 'right-0' : 'left-0'
         } ${
           isOpen
@@ -132,7 +132,7 @@ export function ProfileDropdown({ align = 'right', className = '', user }: Profi
         }`}
         role="menu"
       >
-        <div className="max-h-[min(32rem,calc(100vh-7rem))] overflow-y-auto rounded-xl">
+        <div className="rounded-xl">
           <div className="border-b border-stone-100 px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
               <UserAvatar user={user} />

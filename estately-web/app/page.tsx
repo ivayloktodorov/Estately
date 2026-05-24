@@ -1,59 +1,21 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
 import { PropertyCard } from '@/components/ui/property-card';
 import { SectionHeader } from '@/components/ui/section-header';
 import { getCurrentUser } from '@/lib/auth';
+import { formatPropertyCard, getNewestProperties, getTrendingProperties } from '@/lib/properties/discovery';
+import { createSeoMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Modern Real Estate Search',
-  description: 'Browse, save, and manage premium property listings with Estately.',
+  ...createSeoMetadata({
+    title: 'Estately | Find homes for sale and rent',
+    description: 'Browse homes, apartments, villas and land listings for sale or rent.',
+    path: '/',
+    keywords: ['property marketplace', 'buy property', 'rent property'],
+  }),
 };
-
-const featuredProperties = [
-  {
-    id: 1001,
-    imageUrl:
-      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=900&auto=format&fit=crop',
-    price: '$845,000',
-    title: 'Glass House Retreat',
-    city: 'Scottsdale',
-    address: 'North Scottsdale, AZ',
-    bedrooms: 4,
-    bathrooms: 3,
-    areaSqm: 3180,
-    propertyType: 'house',
-    listingType: 'sale' as const,
-  },
-  {
-    id: 1002,
-    imageUrl:
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=900&auto=format&fit=crop',
-    price: '$612,500',
-    title: 'Townhome Near the Park',
-    city: 'Austin',
-    address: 'Austin, TX',
-    bedrooms: 3,
-    bathrooms: 2,
-    areaSqm: 2040,
-    propertyType: 'townhome',
-    listingType: 'sale' as const,
-  },
-  {
-    id: 1003,
-    imageUrl:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&auto=format&fit=crop',
-    price: '$1,240,000',
-    title: 'Modern Hillside Villa',
-    city: 'Laguna Beach',
-    address: 'Laguna Beach, CA',
-    bedrooms: 5,
-    bathrooms: 4,
-    areaSqm: 4420,
-    propertyType: 'villa',
-    listingType: 'sale' as const,
-  },
-];
 
 const benefits = [
   {
@@ -71,29 +33,35 @@ const benefits = [
 ];
 
 export default async function HomePage() {
-  const user = await getCurrentUser();
+  const [user, newestProperties, trendingProperties] = await Promise.all([
+    getCurrentUser(),
+    getNewestProperties(8),
+    getTrendingProperties(8),
+  ]);
+  const newestCards = newestProperties.map(formatPropertyCard);
+  const trendingCards = trendingProperties.map(formatPropertyCard);
 
   return (
     <main>
       <section className="bg-cream-50">
-        <Container className="grid min-h-[calc(100vh-5rem)] items-center gap-12 py-14 lg:grid-cols-[1fr_0.92fr] lg:py-20">
+        <Container className="grid min-h-[calc(100vh-5rem)] items-center gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_0.92fr] lg:gap-12 lg:py-20">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-estate-700">
               Premium property search
             </p>
-            <h1 className="mt-5 max-w-4xl text-5xl sm:text-6xl lg:text-7xl font-bold text-charcoal-950">
+            <h1 className="mt-5 max-w-4xl text-4xl font-bold text-charcoal-950 sm:text-6xl lg:text-7xl">
               Find the right home with a calmer way to search.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-stone-600">
               Estately brings modern real estate discovery, saved favorites, and protected account
               workflows into one elegant platform.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {user ? (
-                <ButtonLink href="/buy">Continue browsing</ButtonLink>
+                <ButtonLink href="/sale">Continue browsing</ButtonLink>
               ) : (
                 <>
-                  <ButtonLink href="/buy">Browse Properties</ButtonLink>
+                  <ButtonLink href="/sale">Browse Properties</ButtonLink>
                   <ButtonLink href="/login" variant="secondary">
                     Login
                   </ButtonLink>
@@ -104,20 +72,20 @@ export default async function HomePage() {
               )}
             </div>
           </div>
-          <div className="relative min-h-[520px] overflow-hidden rounded-xl bg-[url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&auto=format&fit=crop')] bg-cover bg-center shadow-xl shadow-charcoal-950/10">
-            <div className="absolute bottom-5 left-5 right-5 rounded-lg bg-white/95 p-6 shadow-xl backdrop-blur">
+          <div className="relative min-h-[360px] overflow-hidden rounded-xl bg-[url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&auto=format&fit=crop')] bg-cover bg-center shadow-xl shadow-charcoal-950/10 sm:min-h-[460px] lg:min-h-[520px]">
+            <div className="absolute bottom-4 left-4 right-4 rounded-lg bg-white/95 p-4 shadow-xl backdrop-blur sm:bottom-5 sm:left-5 sm:right-5 sm:p-6">
               <p className="text-sm font-semibold text-estate-700">Market snapshot</p>
-              <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center sm:gap-3">
                 <div>
-                  <p className="text-2xl font-bold text-charcoal-950">2.4k</p>
+                  <p className="text-xl font-bold text-charcoal-950 sm:text-2xl">2.4k</p>
                   <p className="mt-1 text-xs text-stone-500">Active listings</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-charcoal-950">18</p>
+                  <p className="text-xl font-bold text-charcoal-950 sm:text-2xl">18</p>
                   <p className="mt-1 text-xs text-stone-500">Cities</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-charcoal-950">24h</p>
+                  <p className="text-xl font-bold text-charcoal-950 sm:text-2xl">24h</p>
                   <p className="mt-1 text-xs text-stone-500">Fresh updates</p>
                 </div>
               </div>
@@ -130,23 +98,45 @@ export default async function HomePage() {
         <Container>
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeader
-              description="A first look at the kind of premium listing experience Estately is built to support."
-              eyebrow="Featured homes"
-              title="Homes worth a closer look"
+              description="The latest approved homes, apartments, villas, offices, and land listings on Estately."
+              eyebrow="Newest listings"
+              title="Recently added properties"
             />
-            <ButtonLink href="/buy" variant="secondary">
+            <ButtonLink className="w-full sm:w-auto" href="/sale" variant="secondary">
               View all
             </ButtonLink>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {featuredProperties.map((property) => (
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {newestCards.map((property) => (
               <PropertyCard key={property.id} {...property} />
             ))}
           </div>
         </Container>
       </section>
 
-      <section className="bg-cream-50 py-20">
+      {trendingCards.length > 0 ? (
+        <section className="bg-cream-50 py-20">
+          <Container>
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <SectionHeader
+                description="Popular public listings ranked by favorites, views, and recent marketplace activity."
+                eyebrow="Trending properties"
+                title="Properties getting attention"
+              />
+              <ButtonLink className="w-full sm:w-auto" href="/properties" variant="secondary">
+                Explore more
+              </ButtonLink>
+            </div>
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {trendingCards.map((property) => (
+                <PropertyCard key={property.id} {...property} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      <section className="bg-white py-20">
         <Container>
           <SectionHeader
             align="center"
@@ -168,30 +158,29 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      <section className="bg-estate-800 py-20 text-white">
+      <section className="border-y border-estate-100 bg-cream-50 py-20 text-charcoal-950">
         <Container className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-cream-100">
+            <p className="text-sm font-semibold uppercase tracking-widest text-estate-700">
               Ready when you are
             </p>
-            <h2 className="mt-3 max-w-3xl text-4xl font-bold">
+            <h2 className="mt-3 max-w-3xl text-3xl font-bold sm:text-4xl">
               Start saving homes and building your shortlist today.
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row md:justify-end">
-            <ButtonLink
-              className="border border-estate-700 bg-estate-700 text-white shadow-lg shadow-estate-900/20 hover:bg-estate-800 focus-visible:ring-white"
-              href="/buy"
+            <Link
+              className="inline-flex min-h-12 items-center justify-center rounded-md bg-estate-700 px-6 py-3 text-sm font-bold text-white shadow-estate-soft transition hover:bg-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
+              href="/sale"
             >
               Browse Properties
-            </ButtonLink>
-            <ButtonLink
-              className="border-white/35 bg-transparent text-white hover:border-white/70 hover:bg-white/10 focus-visible:ring-white"
+            </Link>
+            <Link
+              className="inline-flex min-h-12 items-center justify-center rounded-md border border-estate-200 bg-white px-6 py-3 text-sm font-bold text-estate-700 shadow-sm transition hover:border-brand-purple hover:bg-estate-50 hover:text-estate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
               href={user ? '/favorites' : '/register'}
-              variant="outline"
             >
               {user ? 'View Favorites' : 'Create Account'}
-            </ButtonLink>
+            </Link>
           </div>
         </Container>
       </section>

@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
 import { Container } from '@/components/ui/container';
 import { SectionHeader } from '@/components/ui/section-header';
+import { createSeoMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Contact the Estately team.',
+  ...createSeoMetadata({
+    title: 'Contact Estately',
+    description: 'Contact the Estately team about listings, saved homes, or platform access.',
+    path: '/contact',
+    keywords: ['contact Estately', 'real estate support'],
+  }),
 };
 
 export default function ContactPage() {

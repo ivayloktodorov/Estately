@@ -11,6 +11,7 @@ import { PropertySearchBar } from './property-search-bar';
 interface PropertyFiltersProps {
   filters: PropertySearchFilters;
   cities: string[];
+  fixedListing?: 'sale' | 'rent';
   sort: string;
   view: string;
 }
@@ -33,12 +34,12 @@ function formatLabel(value: string): string {
     .join(' ');
 }
 
-function initialState(filters: PropertySearchFilters): FilterFormState {
+function initialState(filters: PropertySearchFilters, fixedListing?: 'sale' | 'rent'): FilterFormState {
   return {
     search: filters.search ?? '',
     city: filters.city ?? '',
     type: filters.type ?? '',
-    listing: filters.listing ?? '',
+    listing: fixedListing ?? filters.listing ?? '',
     minPrice: filters.minPrice?.toString() ?? '',
     maxPrice: filters.maxPrice?.toString() ?? '',
     bedrooms: filters.bedrooms?.toString() ?? '',
@@ -46,12 +47,11 @@ function initialState(filters: PropertySearchFilters): FilterFormState {
   };
 }
 
-export function PropertyFilters({ filters, cities, sort, view }: PropertyFiltersProps) {
+export function PropertyFilters({ filters, cities, fixedListing, sort, view }: PropertyFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [formState, setFormState] = useState<FilterFormState>(() => initialState(filters));
+  const [formState, setFormState] = useState<FilterFormState>(() => initialState(filters, fixedListing));
 
   const cityOptions = useMemo(
     () => cities.map((city) => ({ label: city, value: city })),
@@ -81,6 +81,10 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
     const params = new URLSearchParams();
 
     Object.entries(nextState).forEach(([key, value]) => {
+      if (fixedListing && key === 'listing') {
+        return;
+      }
+
       const trimmedValue = value.trim();
 
       if (trimmedValue) {
@@ -105,13 +109,11 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     pushFilters(formState);
-    setIsMobileOpen(false);
   };
 
   const clearFilters = () => {
-    const emptyState = initialState({});
+    const emptyState = initialState({}, fixedListing);
     setFormState(emptyState);
-    setIsMobileOpen(false);
     startTransition(() => {
       router.push(pathname);
     });
@@ -120,12 +122,12 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
   const controls = (
     <>
       <PropertySearchBar
-        className="lg:col-span-3 xl:col-span-4"
+        className="md:col-span-2 lg:col-span-3 xl:col-span-3"
         value={formState.search}
         onChange={(value) => updateField('search', value)}
       />
       <FilterSelect
-        className="lg:col-span-1 xl:col-span-2"
+        className="lg:col-span-2 xl:col-span-1"
         label="City"
         name="city"
         value={formState.city}
@@ -134,7 +136,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <FilterSelect
-        className="lg:col-span-1 xl:col-span-2"
+        className="lg:col-span-2 xl:col-span-1"
         label="Type"
         name="type"
         value={formState.type}
@@ -142,23 +144,25 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         options={propertyTypeOptions}
         onChange={updateField}
       />
-      <FilterSelect
-        className="lg:col-span-1 xl:col-span-2"
-        label="Listing"
-        name="listing"
-        value={formState.listing}
-        placeholder="Sale or rent"
-        options={listingTypeOptions}
-        onChange={updateField}
-      />
+      {fixedListing ? null : (
+        <FilterSelect
+          className="lg:col-span-2 xl:col-span-1"
+          label="Listing"
+          name="listing"
+          value={formState.listing}
+          placeholder="Sale or rent"
+          options={listingTypeOptions}
+          onChange={updateField}
+        />
+      )}
       <PriceRangeInputs
-        className="lg:col-span-3 xl:col-span-4"
+        className="md:col-span-2 lg:col-span-4 xl:col-span-2"
         minPrice={formState.minPrice}
         maxPrice={formState.maxPrice}
         onChange={updateField}
       />
       <FilterSelect
-        className="lg:col-span-1 xl:col-span-2"
+        className="lg:col-span-1 xl:col-span-1"
         label="Beds"
         name="bedrooms"
         value={formState.bedrooms}
@@ -167,7 +171,7 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
         onChange={updateField}
       />
       <FilterSelect
-        className="lg:col-span-1 xl:col-span-2"
+        className="lg:col-span-1 xl:col-span-1"
         label="Baths"
         name="bathrooms"
         value={formState.bathrooms}
@@ -179,32 +183,17 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
   );
 
   return (
-    <section className="mb-8 rounded-lg border border-stone-200 bg-white p-5 shadow-estate-soft md:p-6">
-      <div className="flex items-center justify-between gap-3 md:hidden">
-        <div>
-          <h2 className="text-lg font-semibold text-charcoal-950">Filters</h2>
-          <p className="text-sm text-stone-600">Search and refine properties</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsMobileOpen((current) => !current)}
-          className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-charcoal-950 shadow-sm"
-          aria-expanded={isMobileOpen}
-        >
-          {isMobileOpen ? 'Close' : 'Open'}
-        </button>
-      </div>
-
+    <section className="mb-8 rounded-lg border border-stone-200 bg-white p-4 shadow-estate-soft">
       <form
         onSubmit={handleSubmit}
-        className={`${isMobileOpen ? 'mt-5 grid' : 'hidden'} gap-4 md:grid md:grid-cols-2 md:items-end lg:grid-cols-6 xl:grid-cols-12`}
+        className="grid gap-3 md:grid-cols-4 md:items-end lg:grid-cols-8 xl:grid-cols-11"
       >
         {controls}
-        <div className="flex flex-col gap-3 sm:flex-row lg:col-span-1 lg:flex-col xl:col-span-2 xl:flex-row xl:self-end">
+        <div className="flex flex-col gap-3 sm:flex-row md:col-span-2 lg:col-span-2 xl:col-span-2 xl:self-end">
           <button
             type="submit"
             disabled={isPending}
-            className="h-12 flex-1 whitespace-nowrap rounded-md bg-estate-700 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-70"
+            className="h-11 flex-1 whitespace-nowrap rounded-md bg-estate-700 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-estate-800 disabled:cursor-wait disabled:opacity-70"
           >
             {isPending ? 'Searching...' : 'Search'}
           </button>
@@ -212,9 +201,9 @@ export function PropertyFilters({ filters, cities, sort, view }: PropertyFilters
             type="button"
             onClick={clearFilters}
             disabled={isPending}
-            className="h-12 flex-1 whitespace-nowrap rounded-md border border-stone-200 bg-white px-5 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 disabled:cursor-wait disabled:opacity-70"
+            className="h-11 flex-1 whitespace-nowrap rounded-md border border-stone-200 bg-white px-4 text-sm font-bold text-charcoal-950 shadow-sm transition hover:border-estate-700 hover:text-estate-700 disabled:cursor-wait disabled:opacity-70"
           >
-            Clear filters
+            Clear
           </button>
         </div>
       </form>
