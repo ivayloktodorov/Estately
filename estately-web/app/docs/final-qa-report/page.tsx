@@ -174,7 +174,7 @@ const testedModules: QaSection[] = [
       { label: 'Database verification', status: 'Passed', notes: 'db:verify passed with 10,000 users, 10,000 properties, 10,002 messages, and 10,001 favorites.' },
       { label: 'Relationships and indexes', status: 'Passed', notes: 'Schema and migrations include relationships and indexes for property search/filter workloads.' },
       { label: 'Invalid upload handling', status: 'Passed', notes: 'Upload routes validate file presence, MIME type, and 5MB size limit.' },
-      { label: 'Live R2 upload', status: 'Passed', notes: 'The /api/test-r2-upload smoke path uploaded an image to R2 and the returned public image URL loaded successfully.' },
+      { label: 'Live R2 upload', status: 'Manual Verification', notes: 'Verify R2 through the add/edit property image workflow in the deployed environment.' },
     ],
   },
   {

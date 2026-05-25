@@ -4,7 +4,7 @@ import { AUTH_COOKIE_NAME } from './lib/auth/types';
 
 const protectedPagePaths = ['/dashboard', '/profile', '/favorites'];
 const adminPaths = ['/admin', '/api/admin'];
-const protectedApiPaths = ['/api/protected', '/api/notifications', '/api/profile', '/api/messages/attachments', '/api/test-r2-upload'];
+const protectedApiPaths = ['/api/protected', '/api/notifications', '/api/profile', '/api/messages/attachments'];
 const mobileApiPaths = ['/api/mobile'];
 
 function withMobileCorsHeaders(response: NextResponse): NextResponse {
@@ -32,8 +32,6 @@ function unauthorizedJson(status: 401 | 403, code: 'UNAUTHORIZED' | 'FORBIDDEN',
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
-  console.log('[middleware-hit]', pathname);
 
   const isAdminRoute = isPathMatch(pathname, adminPaths);
   const isMobileApi = isPathMatch(pathname, mobileApiPaths);

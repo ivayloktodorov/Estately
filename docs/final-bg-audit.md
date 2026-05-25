@@ -20,7 +20,7 @@ Date: 2026-05-24
 
 - `npm run --workspace=apps/mobile lint` passed.
 - `npx tsc --noEmit -p apps/mobile/tsconfig.json` passed.
-- `npm run --workspace=estately-web lint` passed with one pre-existing warning in `estately-web/app/test-r2/page.tsx` about `<img>`.
+- `npm run --workspace=estately-web lint` passed after the public R2 diagnostic route was removed.
 - `npx tsc --noEmit -p estately-web/tsconfig.json` passed.
 - Dictionary parity check passed: English and Bulgarian both contain 221 keys with no missing counterparts.
 

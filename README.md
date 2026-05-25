@@ -47,18 +47,20 @@ http://localhost:3000
 Reviewer shortcut:
 
 ```text
-http://localhost:3000/demo
+http://localhost:3000/softuni-exam
 ```
 
 ## 3. Demo Credentials
 
 ```text
 Admin:
-admin@estately.com / pass123
+softuni_admin@estately.com / pass123
 
 User:
-john@gmail.com / pass123
+softuni_user@estately.com / pass123
 ```
+
+The `/softuni-exam` page also provides one-click `Test as User` and `Test as Admin` buttons.
 
 ## 4. Features
 
@@ -244,19 +246,12 @@ Storage coverage:
 - Cloudflare R2 client service
 - Property image upload workflow
 - Image URL persistence in the database
-- R2 smoke test page and API route
-
-Run the R2 smoke test locally from:
-
-```text
-http://localhost:3000/test-r2
-```
+- R2 verification through the real add/edit property image workflow
 
 ## 15. Documentation Links
 
 When the web app is running locally, these pages are available:
 
-- `/demo`
 - `/docs/api`
 - `/docs/architecture`
 - `/docs/database-schema`
@@ -357,7 +352,7 @@ Production notes:
 - Configure Cloudflare R2 credentials in the hosting provider.
 - Set `EXPO_PUBLIC_API_URL` to the deployed backend origin for mobile builds.
 - Deploy `apps/mobile` as a separate Netlify static site with base directory `apps/mobile`, build command `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run export:web`, and publish directory `dist`.
-- Verify image uploads with the R2 smoke test.
+- Verify image uploads through the add/edit property workflow.
 
 Deployment guide:
 
@@ -377,6 +372,8 @@ Deployment guide:
 - [x] Object storage
 - [x] Documentation
 - [x] AGENTS.md
+- [x] SoftUni Exam reviewer hub
+- [x] GitHub conventional commit workflow documented
 
 Additional reviewer pages:
 
@@ -384,4 +381,3 @@ Additional reviewer pages:
 - `/docs/production-readiness`
 - `/docs/compliance`
 - `/docs/final-qa-report`
-- `/demo`

@@ -147,7 +147,7 @@ const auditSections: AuditSection[] = [
     score: 72,
     items: [
       { label: 'Cloudflare R2 configured', status: process.env.R2_ACCOUNT_ID && process.env.R2_BUCKET_NAME ? 'Passed' : 'Review', evidence: 'R2 service reads account, key, secret, and bucket variables without exposing values.' },
-      { label: 'Upload test successful', status: 'Review', evidence: 'The /test-r2 page and /api/test-r2-upload route exist; run them against production credentials.' },
+      { label: 'Upload test successful', status: 'Review', evidence: 'Verify R2 with the real add/edit property image workflow against production credentials.' },
       { label: 'Image URLs work', status: 'Review', evidence: 'Property image upload stores URLs; verify final public bucket/CDN access in production.' },
     ],
   },

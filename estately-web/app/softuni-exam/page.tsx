@@ -58,6 +58,34 @@ const requirementsCoverage = [
   'Documentation',
 ];
 
+const technologiesUsed = [
+  'Next.js 16',
+  'React 19',
+  'TypeScript',
+  'Tailwind CSS',
+  'Expo',
+  'React Native',
+  'Neon PostgreSQL',
+  'Drizzle ORM',
+  'JWT + bcrypt',
+  'Cloudflare R2',
+];
+
+const knownLimitations = [
+  'Bulgarian translation files remain in the repository, but the visible language switcher is hidden and the final UI defaults to English.',
+  'R2 should be verified through the real add/edit property image workflow with production credentials.',
+  'Seed and load-test scripts are for demo/review databases and should not be run against long-lived production data.',
+];
+
+const finalChecklist = [
+  'Guest sale/rent/details/auth paths documented',
+  'User dashboard, favorites, property, inquiry, offer, messages, notifications, and logout paths documented',
+  'Admin dashboard, moderation, users, messages, approve/reject, edit user, and logout paths documented',
+  'Mobile web property list, details, login, favorites, and profile paths documented',
+  'Public debug/test routes removed except SoftUni Exam',
+  'Build, lint, mobile typecheck, and mobile export commands documented in final QA',
+];
+
 const technicalResources: HubLink[] = [
   { href: '/', label: 'Live Web App', description: 'Root application route for the deployed or local web app.' },
   { href: '/docs/api', label: 'API Docs', description: 'Endpoint reference for web and mobile review.' },
@@ -227,6 +255,17 @@ export default function SoftUniExamPage() {
         </Container>
       </section>
 
+      <section className="bg-slate-50 py-14">
+        <Container>
+          <h2 className="text-3xl font-bold text-slate-950">Technologies Used</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {technologiesUsed.map((technology) => (
+              <StatusCard key={technology} label={technology} />
+            ))}
+          </div>
+        </Container>
+      </section>
+
       <section className="bg-cream-50 py-14">
         <Container>
           <h2 className="text-3xl font-bold text-charcoal-950">Technical Resources</h2>
@@ -234,6 +273,29 @@ export default function SoftUniExamPage() {
             {technicalResources.map((link) => (
               <LinkCard key={link.href} link={link} />
             ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-14">
+        <Container>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-lg border border-stone-200 bg-cream-50 p-6 shadow-sm">
+              <h2 className="text-3xl font-bold text-charcoal-950">Known Limitations</h2>
+              <ul className="mt-5 space-y-3 text-sm leading-6 text-stone-700">
+                {knownLimitations.map((limitation) => (
+                  <li key={limitation}>{limitation}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-lg border border-stone-200 bg-slate-50 p-6 shadow-sm">
+              <h2 className="text-3xl font-bold text-slate-950">Final Checklist</h2>
+              <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
+                {finalChecklist.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </Container>
       </section>

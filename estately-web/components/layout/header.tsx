@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { AuthUser } from '@/lib/auth/types';
-import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 import { getUnreadNotificationCount, getUserNotifications } from '@/lib/notifications/service';
 import { getTranslations } from '@/lib/i18n';
 import { ButtonLink } from '@/components/ui/button-link';
@@ -70,7 +69,6 @@ export async function Header({ user }: HeaderProps) {
                 <ButtonLink className="hidden h-11 min-h-0 whitespace-nowrap rounded-lg bg-estate-700 px-3.5 py-2 text-white shadow-sm hover:bg-estate-800 xl:inline-flex" href="/softuni-exam" variant="secondary">
                   {t.softUniExam}
                 </ButtonLink>
-                <LanguageSwitcher />
                 {notificationProps ? <NotificationDropdown {...notificationProps} /> : null}
                 <ProfileDropdown user={user} />
               </div>
@@ -79,7 +77,6 @@ export async function Header({ user }: HeaderProps) {
                 <ButtonLink className="hidden h-11 min-h-0 whitespace-nowrap rounded-lg bg-estate-700 px-3.5 py-2 text-white shadow-sm hover:bg-estate-800 xl:inline-flex" href="/softuni-exam" variant="secondary">
                   {t.softUniExam}
                 </ButtonLink>
-                <LanguageSwitcher />
                 <ButtonLink className="h-11 min-h-0 rounded-lg px-3.5 py-2" href="/login" variant="ghost">
                   {t.login}
                 </ButtonLink>
@@ -102,7 +99,6 @@ export async function Header({ user }: HeaderProps) {
                 <ProfileDropdown className="hidden min-w-0 max-w-[9.5rem] sm:block sm:max-w-none" user={user} />
               </>
             ) : null}
-            <LanguageSwitcher />
             <HeaderMobileMenu user={user} publicLinks={publicLinks} />
           </div>
         </div>

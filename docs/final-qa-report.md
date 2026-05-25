@@ -1,106 +1,69 @@
 # Final QA Report
 
-Date: 2026-05-24
+Date: 2026-05-25
 
-## SoftUni Review Readiness
-
-### Reviewer URLs
+## Reviewer URLs
 
 - Web app / backend: `https://estatelybg.netlify.app`
 - Mobile web app: `https://estatelybg-mobile.netlify.app`
-- Mobile API base compiled into Expo web: `https://estatelybg.netlify.app/api/mobile`
+- Mobile API base: `https://estatelybg.netlify.app/api/mobile`
+- Reviewer hub: `/softuni-exam`
 
-### Reviewer Accounts
+## Demo Accounts
 
 - User: `softuni_user@estately.com` / `pass123`
 - Admin: `softuni_admin@estately.com` / `pass123`
-- One-click access: `/softuni-exam` includes `Test as User` and `Test as Admin` buttons that create the accounts if missing and redirect to the correct dashboard.
+- SoftUni Exam one-click buttons create or refresh the demo accounts and redirect to the correct dashboard.
 
-### Tested Flow
+## Final QA Path
 
-Recommended 5-10 minute review path:
+1. Guest: open homepage, `/sale`, `/rent`, property details, `/register`, and `/login`.
+2. User: sign in from `/softuni-exam`, check dashboard, favorites, add property, edit own property, upload images, send inquiry, make offer, messages, notifications, and logout.
+3. Admin: sign in from `/softuni-exam`, check admin dashboard, property moderation, user management, messages, approve/reject property, edit user, and logout.
+4. Mobile web: open the mobile URL, check property list, property details, login, favorites, and profile.
 
-1. Open `/softuni-exam`.
-2. Browse `/sale` as a guest and open a published sale property.
-3. Browse `/rent` as a guest and open a published rental property.
-4. Use `Test as User`.
-5. Save a favorite and confirm it appears in `/favorites`.
-6. Send an inquiry from a property detail page and check `/dashboard/messages`.
-7. Make an offer from a property detail page and check `/dashboard/offers`.
-8. Add a property from `/dashboard/properties/new`; it should be pending moderation.
-9. Use `Test as Admin`.
-10. Approve or reject pending listings from `/admin/properties`.
-11. Review user management from `/admin/users`.
-12. Check seeded and newly created examples in `/dashboard/notifications` and `/dashboard/messages`.
+## Hardening Changes
 
-### Demo Data Readiness
+- Visible EN/BG language switcher was removed from the header and mobile menu for final submission.
+- UI locale is forced to English while the i18n provider, dictionaries, and translation files remain in place.
+- Public debug/test upload surfaces were removed: `/test-r2` and `/api/test-r2-upload`.
+- Required debug routes are absent from the final app surface: `/api/debug/property/[id]` and `/property-debug-page/[id]`.
+- Temporary middleware request logging was removed.
 
-- Published sale properties: seeded by `npm run db:seed --workspace=estately-web`.
-- Published rent properties: seeded by `npm run db:seed --workspace=estately-web`.
-- Pending moderation property: `SoftUni Pending Review Apartment`.
-- Demo user and admin: seeded and also auto-created by the SoftUni Exam login buttons.
-- Offer/message/notification examples: the TypeScript seed script creates property inquiries, a pending demo offer, and reviewer notifications.
+## Requirement Coverage
 
-### Documentation Links Verified
+- Authentication: registration, login, logout, httpOnly JWT web sessions, bearer-token mobile API.
+- Roles: `user`, `admin`, and `moderator` role support with admin route protections.
+- Property CRUD: user create/edit/delete own listings; admin moderation and management.
+- Database: Neon PostgreSQL with Drizzle schema, migrations, seed scripts, and 10,000+ record load-test script.
+- Search/filter/pagination: public listing pages and mobile API support server-side filtering and pagination.
+- File upload/storage: property image upload flow with Cloudflare R2 support.
+- Mobile app: Expo app and web export via `apps/mobile`.
+- REST/mobile API: `/api/mobile` auth, properties, favorites, and inquiries.
+- Responsive UI: desktop and mobile web layouts plus Expo mobile UI.
+- Deployment: Netlify-ready web and mobile deployment docs.
+- Documentation: README, deployment, local setup, API, architecture, schema, requirements, compliance, and QA docs.
+- GitHub commits: conventional commit workflow documented; final commit history should be checked before submission.
 
-- README: `/` project root `README.md`.
-- API docs: `/docs/api`.
-- Architecture docs: `/docs/architecture`.
-- Database schema docs: `/docs/database-schema`.
-- Local setup: `/docs/local-setup`.
-- Deployment guide: `/docs/deployment`.
-- Final QA report: `/docs/final-qa-report`.
-- Requirements checklist: `/docs/requirements` and `/docs/compliance`.
+## Known Limitations
 
-### Known Limitations
+- Bulgarian translations remain in the repository but the visible switcher is intentionally hidden for review stability.
+- R2 should be verified through the real add/edit property image upload workflow in the deployed environment.
+- Seed and load-test scripts are intended for demo/review databases, not long-lived production data.
+- Production mobile export must be built with `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`.
 
-- The existing `https://estatelybg.netlify.app` Netlify backend currently returns a database query error from `GET /api/mobile/properties`; the local configured database verifies successfully, so the deployed web/backend site must be checked for a stale or incorrect `DATABASE_URL`.
-- Live R2 upload and mobile-device QA should be repeated in the final deployed environment with production credentials.
-- The seed script is intended for review/demo databases; do not run it against production data unless the target database is disposable.
+## Final Checklist
 
-### Final Readiness Status
+- [x] SoftUni Exam page remains available.
+- [x] Language switcher hidden; default UI language English.
+- [x] Public debug/test upload routes removed.
+- [x] Guest, user, admin, and mobile review paths documented.
+- [x] Requirement coverage documented.
+- [x] Production URLs and demo accounts documented.
 
-Ready for SoftUni review from the local/deployed review hub. A reviewer can start at `/softuni-exam`, use the visible credentials or one-click login buttons, follow the guided path, and reach all important documentation and role-specific workflows in 5-10 minutes.
+## Final Build Verification
 
-## Final Security & Access Control Audit
-
-### Tested Areas
-
-- Authentication: invalid/missing session handling, protected page redirects, API auth responses, login/session DTO shape, logout/session clearing paths.
-- Authorization: admin route middleware, server-side `requireAdmin()` checks, user-scoped profile/favorites/notifications/messages/offers/property edits.
-- Admin access: listing moderation actions, user management actions, own-account delete/deactivate/demote safeguards.
-- Upload security: avatar uploads, property image uploads, message attachments, file type and file size validation, R2 storage behavior.
-- Sensitive data: password hash usage, JWT secret usage, R2 secret usage, API response DTOs, client bundle references.
-- API safety: protected API matchers, mobile bearer-token auth, safe validation errors, user-scoped notification mutation.
-
-### Issues Found
-
-- Protected API paths such as `/api/profile`, `/api/notifications`, `/api/messages/attachments/:id`, and `/api/test-r2-upload` were handled by route-level auth but were missing from the middleware matcher, causing unauthenticated requests to receive redirects instead of consistent API auth handling.
-- `/api/test-r2-upload` allowed unauthenticated upload attempts before route-level admin protection.
-- Property image uploads could fall back to local filesystem storage when R2 was not configured.
-- Mobile property details allowed `approved` but unpublished listings to be returned publicly.
-- Favorite and inquiry paths checked moderation approval but did not consistently require `isPublished`.
-
-### Fixes Applied
-
-- Added missing protected API routes to the middleware matcher.
-- Protected `/api/test-r2-upload` with `requireAdmin()`.
-- Disabled local filesystem upload fallback by default; local fallback now requires non-production mode and `ALLOW_LOCAL_UPLOAD_FALLBACK=1`.
-- Required both `moderationStatus === 'approved'` and `isPublished === true` for public/mobile property detail, favorite, and inquiry flows.
-- Confirmed admin user deletion prevents deleting the acting admin account, and own deactivation is blocked.
-- Confirmed message, attachment, notification, offer, favorite, and property edit operations are scoped by authenticated user ID or admin role server-side.
-
-### Verification
-
-- `npx tsc --noEmit -p estately-web/tsconfig.json` passed.
-- `npm run --workspace=estately-web lint` passed with one existing warning on the `/test-r2` smoke page raw `<img>`.
-- `npm run --workspace=estately-web build` passed.
-- Black-box checks confirmed unauthenticated `/admin`, `/admin/properties`, and `/dashboard` redirect to login.
-- Black-box checks confirmed unauthenticated `/api/admin/me` returns `401`.
-
-### Remaining Risks
-
-- The `/test-r2` page is still publicly viewable, but the upload API is admin-protected. It can be hidden or removed before a production launch if desired.
-- Browser-level security testing with real authenticated regular/admin sessions should still be performed before final deployment.
-- Mobile API CORS is intentionally broad for Expo/mobile development; tighten allowed origins if the production mobile/web deployment model permits it.
-- Some route handlers still rely on route-level auth in addition to middleware. This is acceptable defense-in-depth, but future protected API routes must be added to the middleware matcher when consistent API auth responses are required.
+- `npm run --workspace=estately-web lint`: passed.
+- `npm run --workspace=estately-web build`: passed.
+- `npm run --workspace=@estately/mobile typecheck`: passed.
+- `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run mobile:export-web`: passed; Expo exported `apps/mobile/dist`.

@@ -148,7 +148,7 @@ R2_BUCKET_NAME=
 ```
 
 4. Configure public access or a custom public domain if images must be served directly.
-5. Verify upload from the web app property image workflow or test upload route.
+5. Verify upload from the web app add/edit property image workflow.
 
 ## 6. Expo Mobile Web Export
 
@@ -227,10 +227,10 @@ Demo credentials:
 
 ```text
 Admin:
-admin@estately.com / pass123
+softuni_admin@estately.com / pass123
 
 User:
-john@gmail.com / pass123
+softuni_user@estately.com / pass123
 ```
 
 ## 9. Common Deployment Issues

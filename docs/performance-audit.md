@@ -86,4 +86,4 @@ Largest static assets after:
 - Full browser waterfall metrics still need a real browser run in CI or a machine with Playwright/Lighthouse installed.
 - The largest shared JS chunks are framework/app chunks; a deeper bundle analyzer pass would be needed to attribute exact dependency cost.
 - The homepage still uses a remote CSS background hero image, which cannot receive the same `next/image` optimization controls as an image element.
-- Existing `app/test-r2/page.tsx` still has a lint warning for raw `<img>`, but it is a smoke-test page rather than a public browsing path.
+- Public upload diagnostics have been removed from the final app surface; image performance should be checked through the real property upload flow.

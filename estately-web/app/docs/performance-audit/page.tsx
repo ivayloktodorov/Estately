@@ -93,7 +93,7 @@ const requestCounts = [
 
 const remainingNotes = [
   'File preview images in upload forms intentionally remain raw <img> tags because they render local blob URLs before upload.',
-  'The internal /test-r2 diagnostic page still uses a raw preview image and is not part of the production user flow.',
+  'Internal upload diagnostics were removed from the public app surface; verify image performance through the real property upload flow.',
   'Exact browser before/after transfer totals should be captured from Netlify after redeploy because production image optimization and CDN cache behavior depend on the deployed edge environment.',
   'Enable AUTH_PERF_LOGS=1 temporarily in Netlify to split production login time into validation, DB lookup, bcrypt, JWT/cookie, and redirect phases without logging secrets.',
 ];
