@@ -304,7 +304,10 @@ export function propertyDetailsHref(propertyId: number, returnTo: string): strin
 }
 
 async function getSimilarPropertiesUncached(
-  property: typeof properties.$inferSelect,
+  property: Pick<
+    typeof properties.$inferSelect,
+    'id' | 'price' | 'listingType' | 'propertyType' | 'city'
+  >,
   limit = 6,
 ) {
   const price = Number(property.price);
