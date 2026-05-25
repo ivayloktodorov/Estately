@@ -62,6 +62,8 @@ export function getPropertyImageUploadConfigDiagnostics() {
     hasPublicUrl: config.hasPublicUrl,
     hasAccessKey: config.hasAccessKey,
     hasSecretKey: config.hasSecretKey,
+    bucketNameUsed: config.bucketNameUsed,
+    publicUrlHost: config.publicUrlHost,
     uploadMode: getPropertyImageUploadMode(),
   };
 }

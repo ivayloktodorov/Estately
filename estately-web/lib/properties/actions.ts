@@ -23,6 +23,7 @@ const genericError = 'Something went wrong. Please try again.';
 const defaultCoverImageUrl =
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop';
 const maxPropertyImages = 10;
+const createFailureFallback = 'Unable to create this property right now. Please try again.';
 
 function formValue(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -55,15 +56,47 @@ function imageFilesFromForm(formData: FormData): File[] {
     .slice(0, maxPropertyImages);
 }
 
-function logPropertyCreate(message: string, details: Record<string, unknown>): void {
-  console.log('[property-create]', message, details);
+function logPropertyCreateStep(step: string, details: Record<string, unknown> = {}): void {
+  console.log(`[property-create:${step}]`, details);
 }
 
-function errorDetails(error: unknown) {
+function safeErrorDetails(error: unknown, step: string) {
+  const errorRecord = typeof error === 'object' && error !== null ? error as Record<string, unknown> : {};
+  const cause = error instanceof Error ? error.cause : undefined;
+  const causeMessage =
+    cause instanceof Error
+      ? cause.message
+      : typeof cause === 'string'
+        ? cause
+        : undefined;
+
   return {
+    step,
     name: error instanceof Error ? error.name : 'UnknownError',
     message: error instanceof Error ? error.message : 'Unknown error',
+    causeMessage,
+    code:
+      typeof errorRecord.code === 'string' || typeof errorRecord.code === 'number'
+        ? errorRecord.code
+        : undefined,
+    stackFirstLine: error instanceof Error ? error.stack?.split('\n')[0] : undefined,
   };
+}
+
+function temporaryDebugMessage(error: unknown, step: string, propertyWasCreated: boolean): string {
+  if (error instanceof PropertyImageUploadError) {
+    return `Create failed: ${error.message}`;
+  }
+
+  if (error instanceof Error && error.message) {
+    return `Create failed at step: ${step}. ${error.message}`;
+  }
+
+  if (propertyWasCreated) {
+    return `Create failed at step: ${step}. Property was created, but image upload did not complete.`;
+  }
+
+  return `Create failed at step: ${step}`;
 }
 
 export async function createPropertyAction(
@@ -71,6 +104,7 @@ export async function createPropertyAction(
   formData: FormData,
 ): Promise<PropertyActionState> {
   const user = await requireAuth();
+  let currentStep = 'start';
 
   const fields = {
     title: formValue(formData, 'title'),
@@ -91,17 +125,17 @@ export async function createPropertyAction(
     .getAll('images')
     .filter((value) => value instanceof File && value.size > 0).length;
 
-  logPropertyCreate('received', {
+  logPropertyCreateStep('start', {
     userId: user.id,
-    fields,
+    fieldKeys: Object.keys(fields),
     filesCount: receivedImageFilesCount,
     uploadMode: getPropertyImageUploadMode(),
   });
-  console.log('[property-upload-config]', getPropertyImageUploadConfigDiagnostics());
 
   if (!parsed.success) {
     return validationErrorState(parsed.error, fields);
   }
+  logPropertyCreateStep('validated', { userId: user.id });
 
   if (receivedImageFilesCount > maxPropertyImages) {
     return {
@@ -125,25 +159,32 @@ export async function createPropertyAction(
     }
   }
 
+  logPropertyCreateStep('image-count', {
+    userId: user.id,
+    filesCount: imageFiles.length,
+    receivedFilesCount: receivedImageFilesCount,
+  });
+
   if (imageFiles.length > 0) {
     try {
+      currentStep = 'r2-config';
+      const r2Diagnostics = getPropertyImageUploadConfigDiagnostics();
+      logPropertyCreateStep('r2-config', r2Diagnostics);
+      console.log('[property-upload-config]', r2Diagnostics);
       assertPropertyImageUploadsConfigured();
     } catch (error) {
-      logPropertyCreate('upload configuration error', {
-        userId: user.id,
-        filesCount: imageFiles.length,
-        uploadMode: getPropertyImageUploadMode(),
-        error: errorDetails(error),
-      });
+      console.error('[property-create:error]', safeErrorDetails(error, currentStep));
 
       return {
         status: 'error',
-        message:
-          error instanceof PropertyImageUploadError
-            ? error.safeMessage
-            : 'Image upload is not configured in production.',
+        message: temporaryDebugMessage(error, currentStep, false),
         fields,
-        errors: { images: 'Image upload is not configured in production.' },
+        errors: {
+          images:
+            error instanceof PropertyImageUploadError
+              ? error.safeMessage
+              : 'Image upload is not configured in production.',
+        },
       };
     }
   }
@@ -153,6 +194,8 @@ export async function createPropertyAction(
   try {
     const validatedData = parsed.data;
 
+    currentStep = 'db-insert-start';
+    logPropertyCreateStep('db-insert-start', { userId: user.id });
     const result = await db
       .insert(properties)
       .values({
@@ -176,7 +219,8 @@ export async function createPropertyAction(
       .returning({ id: properties.id, title: properties.title });
 
     propertyId = result[0]?.id;
-    logPropertyCreate('property created', {
+    currentStep = 'db-insert-success';
+    logPropertyCreateStep('db-insert-success', {
       userId: user.id,
       propertyId,
       filesCount: imageFiles.length,
@@ -200,22 +244,39 @@ export async function createPropertyAction(
 
     if (propertyId && imageFiles.length > 0) {
       for (const [index, file] of imageFiles.entries()) {
+        currentStep = 'image-upload-start';
+        logPropertyCreateStep('image-upload-start', {
+          userId: user.id,
+          propertyId,
+          fileIndex: index,
+          fileType: file.type,
+          fileSize: file.size,
+          uploadMode: getPropertyImageUploadMode(),
+        });
         const { imageUrl } = await uploadPropertyImage(file, propertyId);
-        logPropertyCreate('upload result', {
+        currentStep = 'image-upload-success';
+        logPropertyCreateStep('image-upload-success', {
           userId: user.id,
           propertyId,
           fileIndex: index,
           uploadMode: getPropertyImageUploadMode(),
-          imageUrl,
+          imageUrlHost: new URL(imageUrl).host,
         });
 
+        currentStep = 'property-images-insert-start';
+        logPropertyCreateStep('property-images-insert-start', {
+          userId: user.id,
+          propertyId,
+          fileIndex: index,
+        });
         const insertedImages = await db.insert(propertyImages).values({
           propertyId,
           imageUrl,
           sortOrder: index,
           isCover: index === 0,
         }).returning({ id: propertyImages.id });
-        logPropertyCreate('property_images insert result', {
+        currentStep = 'property-images-insert-success';
+        logPropertyCreateStep('property-images-insert-success', {
           userId: user.id,
           propertyId,
           fileIndex: index,
@@ -224,21 +285,27 @@ export async function createPropertyAction(
         });
 
         if (index === 0) {
+          currentStep = 'cover-update-start';
+          logPropertyCreateStep('cover-update-start', {
+            userId: user.id,
+            propertyId,
+            fileIndex: index,
+          });
           await db
             .update(properties)
             .set({ imageCoverUrl: imageUrl, updatedAt: new Date() })
             .where(eq(properties.id, propertyId));
+          currentStep = 'cover-update-success';
+          logPropertyCreateStep('cover-update-success', {
+            userId: user.id,
+            propertyId,
+            fileIndex: index,
+          });
         }
       }
     }
   } catch (error) {
-    console.error('[property-create]', 'failed', {
-      userId: user.id,
-      propertyId,
-      filesCount: imageFiles.length,
-      uploadMode: getPropertyImageUploadMode(),
-      error: errorDetails(error),
-    });
+    console.error('[property-create:error]', safeErrorDetails(error, currentStep));
 
     if (propertyId && imageFiles.length > 0) {
       const safeMessage =
@@ -248,7 +315,7 @@ export async function createPropertyAction(
 
       return {
         status: 'error',
-        message: `${safeMessage} You can edit this property and upload images again.`,
+        message: temporaryDebugMessage(error, currentStep, true),
         fields,
         errors: { images: safeMessage },
       };
@@ -256,9 +323,10 @@ export async function createPropertyAction(
 
     return {
       status: 'error',
-      message: error instanceof PropertyImageUploadError
-        ? error.safeMessage
-        : 'Unable to create this property right now. Please try again.',
+      message:
+        error instanceof PropertyImageUploadError
+          ? error.safeMessage
+          : temporaryDebugMessage(error, currentStep, false) || createFailureFallback,
       fields,
     };
   }

@@ -43,6 +43,8 @@ export interface R2ConfigStatus {
   hasBucket: boolean;
   hasPublicUrl: boolean;
   hasEndpoint: boolean;
+  bucketNameUsed: string | null;
+  publicUrlHost: string | null;
   isConfigured: boolean;
 }
 
@@ -69,13 +71,24 @@ function requiredEnv(...names: string[]): string {
 }
 
 export function getR2ConfigStatus(): R2ConfigStatus {
+  const bucketNameUsed = optionalEnv('R2_BUCKET', 'R2_BUCKET_NAME', 'CLOUDFLARE_R2_BUCKET');
+  const publicUrl = optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL');
   const hasR2Url = Boolean(optionalEnv('R2_URL', 'CLOUDFLARE_R2_URL'));
   const hasAccountId = Boolean(optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID'));
   const hasAccessKey = Boolean(optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID'));
   const hasSecretKey = Boolean(optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY'));
-  const hasBucket = Boolean(optionalEnv('R2_BUCKET', 'R2_BUCKET_NAME', 'CLOUDFLARE_R2_BUCKET'));
-  const hasPublicUrl = Boolean(optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'));
+  const hasBucket = Boolean(bucketNameUsed);
+  const hasPublicUrl = Boolean(publicUrl);
   const hasEndpoint = hasR2Url || hasAccountId;
+  let publicUrlHost: string | null = null;
+
+  if (publicUrl) {
+    try {
+      publicUrlHost = new URL(publicUrl).host;
+    } catch {
+      publicUrlHost = null;
+    }
+  }
 
   return {
     hasR2Url,
@@ -85,6 +98,8 @@ export function getR2ConfigStatus(): R2ConfigStatus {
     hasBucket,
     hasPublicUrl,
     hasEndpoint,
+    bucketNameUsed,
+    publicUrlHost,
     isConfigured: hasEndpoint && hasAccessKey && hasSecretKey && hasBucket,
   };
 }
