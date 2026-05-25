@@ -54,7 +54,7 @@ For Netlify or another static host:
 - Build command: `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run export:web`
 - Publish directory: `dist`
 - Environment variable: `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`
-- Production URL: `https://estatelybg-mobile.netlify.app`
+- Production URL: `https://estately-mobile-bg.netlify.app`
 
 If deploying with the Netlify CLI from `apps/mobile`, run:
 

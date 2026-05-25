@@ -5,7 +5,7 @@ Date: 2026-05-25
 ## Reviewer URLs
 
 - Web app / backend: `https://estatelybg.netlify.app`
-- Mobile web app: `https://estatelybg-mobile.netlify.app`
+- Mobile web app: `https://estately-mobile-bg.netlify.app`
 - Mobile API base: `https://estatelybg.netlify.app/api/mobile`
 - Reviewer hub: `/softuni-exam`
 

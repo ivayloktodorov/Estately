@@ -28,7 +28,7 @@ Web app / backend:
 https://estatelybg.netlify.app
 
 Mobile web app:
-https://estatelybg-mobile.netlify.app
+https://estately-mobile-bg.netlify.app
 ```
 
 For local review:
@@ -223,7 +223,7 @@ API docs:
 Mobile review URL:
 
 ```text
-https://estatelybg-mobile.netlify.app
+https://estately-mobile-bg.netlify.app
 ```
 
 The mobile web export is built with:

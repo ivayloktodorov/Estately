@@ -20,7 +20,7 @@ Web app / backend:
 https://estatelybg.netlify.app
 
 Mobile web app:
-https://estatelybg-mobile.netlify.app
+https://estately-mobile-bg.netlify.app
 ```
 
 ## 2. Web App Deployment
@@ -157,7 +157,7 @@ The mobile app is deployed separately as a static Expo Web export.
 Production mobile review URL:
 
 ```text
-https://estatelybg-mobile.netlify.app
+https://estately-mobile-bg.netlify.app
 ```
 
 Set the mobile app API URL to the deployed web/backend origin:
