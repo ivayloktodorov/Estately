@@ -32,6 +32,9 @@ function unauthorizedJson(status: 401 | 403, code: 'UNAUTHORIZED' | 'FORBIDDEN',
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  console.log('[middleware-hit]', pathname);
+
   const isAdminRoute = isPathMatch(pathname, adminPaths);
   const isMobileApi = isPathMatch(pathname, mobileApiPaths);
   const isProtectedPage = isPathMatch(pathname, protectedPagePaths);
@@ -77,16 +80,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/profile/:path*',
-    '/favorites/:path*',
-    '/admin/:path*',
-    '/api/protected/:path*',
-    '/api/admin/:path*',
-    '/api/notifications/:path*',
-    '/api/profile/:path*',
-    '/api/messages/attachments/:path*',
-    '/api/test-r2-upload',
-    '/api/mobile/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 };
