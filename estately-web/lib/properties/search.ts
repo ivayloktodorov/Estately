@@ -10,6 +10,7 @@ import {
   type PropertySortValue,
   type PropertyType,
 } from './constants';
+import { getPublicPropertyVisibilityCondition } from './visibility';
 
 export interface PropertySearchFilters {
   search?: string;
@@ -163,7 +164,7 @@ export function parsePropertyPaginationParams(
 }
 
 function buildPropertyConditions(filters: PropertySearchFilters): SQL[] {
-  const conditions: SQL[] = [eq(properties.isPublished, true)];
+  const conditions: SQL[] = [getPublicPropertyVisibilityCondition()];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;
@@ -310,7 +311,7 @@ async function getSimilarPropertiesUncached(
   const minPrice = Number.isFinite(price) ? (price * 0.7).toFixed(2) : undefined;
   const maxPrice = Number.isFinite(price) ? (price * 1.3).toFixed(2) : undefined;
   const conditions: SQL[] = [
-    eq(properties.isPublished, true),
+    getPublicPropertyVisibilityCondition(),
     ne(properties.id, property.id),
     eq(properties.listingType, property.listingType),
   ];

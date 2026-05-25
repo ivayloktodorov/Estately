@@ -113,6 +113,13 @@
       "when": 1779825600000,
       "tag": "0015_public_listing_performance_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1779868800000,
+      "tag": "0016_backfill_property_moderation_status",
+      "breakpoints": true
     }
   ]
 }

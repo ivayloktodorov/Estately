@@ -1,12 +1,13 @@
-import { and, count, desc, eq, sql } from 'drizzle-orm';
+import { count, desc, eq, sql } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
 import { db } from '@/src/db/client';
 import { favorites, properties } from '@/src/db/schema';
 import { publicPropertyCardColumns, type PublicPropertyCardData } from '@/lib/properties/search';
+import { getPublicPropertyVisibilityCondition } from '@/lib/properties/visibility';
 
 export type PublicProperty = PublicPropertyCardData;
 
-const publicPropertyConditions = eq(properties.isPublished, true);
+const publicPropertyConditions = getPublicPropertyVisibilityCondition();
 
 export function formatPropertyCard(property: PublicProperty) {
   return {

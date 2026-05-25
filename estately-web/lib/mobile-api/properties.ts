@@ -1,12 +1,13 @@
 import { and, asc, count, desc, eq, gte, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties, propertyImages } from '@/src/db/schema';
+import { getPublicPropertyVisibilityCondition } from '@/lib/properties/visibility';
 import type { MobilePropertyFilters } from './validation';
 
 type PropertySort = MobilePropertyFilters['sort'];
 
 function buildMobilePropertyConditions(filters: MobilePropertyFilters): SQL[] {
-  const conditions: SQL[] = [eq(properties.isPublished, true)];
+  const conditions: SQL[] = [getPublicPropertyVisibilityCondition()];
 
   if (filters.search) {
     const searchPattern = `%${filters.search}%`;

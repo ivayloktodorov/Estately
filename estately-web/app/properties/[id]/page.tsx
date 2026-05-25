@@ -20,6 +20,7 @@ import { getSimilarProperties, propertyDetailsHref } from '@/lib/properties/sear
 import { formatCurrencyEUR } from '@/lib/format/currency';
 import { absoluteUrl, defaultKeywords } from '@/lib/seo';
 import { getTranslations } from '@/lib/i18n';
+import { canViewProperty, isPublicPropertyVisible } from '@/lib/properties/visibility';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
@@ -29,15 +30,25 @@ interface PropertyPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-function canViewProperty(
-  property: typeof properties.$inferSelect,
+function logPropertyVisibilityDecision(
+  propertyId: number,
+  property: typeof properties.$inferSelect | null,
   user: AuthUser | null,
-): boolean {
-  return (
-    (property.moderationStatus === 'approved' && property.isPublished) ||
-    user?.role === 'admin' ||
-    user?.id === property.createdByUserId
-  );
+  canView: boolean,
+) {
+  if (process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  console.info('[property-details:visibility]', {
+    requestedPropertyId: propertyId,
+    foundPropertyId: property?.id ?? null,
+    isPublished: property?.isPublished ?? null,
+    moderationStatus: property?.moderationStatus ?? null,
+    currentUserRole: user?.role ?? 'guest',
+    isOwner: Boolean(user && property && user.id === property.createdByUserId),
+    canView,
+  });
 }
 
 async function getProperty(id: number, user: AuthUser | null) {
@@ -49,16 +60,31 @@ async function getProperty(id: number, user: AuthUser | null) {
       .then((results) => results[0]);
 
     if (!property) {
+      logPropertyVisibilityDecision(id, null, user, false);
       return null;
     }
 
     if (!canViewProperty(property, user)) {
+      logPropertyVisibilityDecision(id, property, user, false);
       return null;
     }
 
-    const images = await getOrCreatePropertyGalleryImages(property);
-    const uploadedImages = images.map((img) => img.imageUrl);
+    logPropertyVisibilityDecision(id, property, user, true);
+
     const fallbackImage = propertyImageUrl(property.imageCoverUrl, property.propertyType);
+    let uploadedImages: string[] = [];
+
+    try {
+      const images = await getOrCreatePropertyGalleryImages(property);
+      uploadedImages = images.map((img) => img.imageUrl);
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[property-details:gallery]', {
+          propertyId: property.id,
+          message: error instanceof Error ? error.message : 'Unknown gallery error',
+        });
+      }
+    }
 
     return {
       property,
@@ -171,6 +197,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
   const currentUserIsOwner = user?.id === property.createdByUserId;
+  const canContactAgent = isPublicPropertyVisible(property);
   const shouldOpenOfferForm = firstParam(query.intent) === 'offer';
   const returnTo = safeReturnTo(firstParam(query.returnTo));
   const similarProperties = await getSimilarProperties(property, 6);
@@ -291,7 +318,9 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
               </div>
             </div>
 
-            <PropertyInquiryForm isAuthenticated={Boolean(user)} propertyId={property.id} />
+            {canContactAgent ? (
+              <PropertyInquiryForm isAuthenticated={Boolean(user)} propertyId={property.id} />
+            ) : null}
           </div>
 
           {/* Sidebar - Right Column (1/3 width on desktop) */}
@@ -304,12 +333,14 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
               address={property.address}
               listingType={listingType}
               offerSlot={
-                <MakeOfferCard
-                  currentUserIsOwner={currentUserIsOwner}
-                  isAuthenticated={Boolean(user)}
-                  propertyId={property.id}
-                  shouldOpen={shouldOpenOfferForm}
-                />
+                canContactAgent ? (
+                  <MakeOfferCard
+                    currentUserIsOwner={currentUserIsOwner}
+                    isAuthenticated={Boolean(user)}
+                    propertyId={property.id}
+                    shouldOpen={shouldOpenOfferForm}
+                  />
+                ) : null
               }
             />
           </div>

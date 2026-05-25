@@ -3,6 +3,7 @@ import { getMobileAuthUser } from '@/lib/mobile-api/auth';
 import { getMobilePropertyDetails } from '@/lib/mobile-api/properties';
 import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
 import { mobilePropertyIdSchema, validationErrorMessage } from '@/lib/mobile-api/validation';
+import { canViewProperty } from '@/lib/properties/visibility';
 
 interface MobilePropertyRouteProps {
   params: Promise<{
@@ -20,11 +21,10 @@ export async function GET(request: NextRequest, { params }: MobilePropertyRouteP
       return mobileError('Property not found.', 404);
     }
 
-    if (property.moderationStatus !== 'approved' || !property.isPublished) {
+    if (!canViewProperty(property, null)) {
       const user = await getMobileAuthUser(request);
-      const canView = user?.role === 'admin' || user?.id === property.createdByUserId;
 
-      if (!canView) {
+      if (!canViewProperty(property, user)) {
         return mobileError('Property not found.', 404);
       }
     }
