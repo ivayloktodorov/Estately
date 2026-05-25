@@ -102,7 +102,7 @@ function PropertyActions({ labels, property }: { labels: { approve: string; reje
       <div className="grid grid-cols-2 gap-2">
         <Link
           className="inline-flex h-9 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
-          href={`/properties/${property.id}`}
+          href={`/property/${property.id}`}
         >
           <TinyIcon>◉</TinyIcon>
           {labels.view}

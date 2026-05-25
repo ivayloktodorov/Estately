@@ -67,7 +67,7 @@ export default async function AdminConversationPage({ params }: AdminConversatio
             </div>
             <Link
               className="inline-flex h-10 items-center justify-center rounded-md border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700"
-              href={`/properties/${conversation.property.id}`}
+              href={`/property/${conversation.property.id}`}
             >
               View listing
             </Link>

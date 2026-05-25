@@ -230,7 +230,7 @@ export default async function DashboardPage() {
                       </div>
                       <Link
                         className="text-sm font-semibold text-estate-700 hover:text-estate-800"
-                        href={`/properties/${property.id}`}
+                        href={`/property/${property.id}`}
                       >
                         {t.viewListing}
                       </Link>

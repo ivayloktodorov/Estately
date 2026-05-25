@@ -140,7 +140,7 @@ export async function updatePropertyAction(
   }
 
   revalidatePath('/dashboard/properties');
-  revalidatePath(`/properties/${propertyId}`);
+  revalidatePath(`/property/${propertyId}`);
   redirect('/dashboard/properties');
 }
 

@@ -104,7 +104,7 @@ function PropertyPreview({ property }: { property: MapProperty }) {
         <p className="mt-1 text-sm text-stone-600">{property.city}</p>
         <Link
           className="mt-3 inline-flex rounded-lg bg-estate-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-estate-800 focus:outline-none focus:ring-4 focus:ring-estate-700/20"
-          href={`/properties/${property.id}`}
+          href={`/property/${property.id}`}
         >
           View details
         </Link>

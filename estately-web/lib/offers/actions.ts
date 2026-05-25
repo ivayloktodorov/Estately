@@ -58,7 +58,7 @@ export async function submitPropertyOfferAction(
       message: fields.message || null,
     });
 
-    revalidatePath(`/properties/${propertyId}`);
+    revalidatePath(`/property/${propertyId}`);
     revalidatePath('/dashboard/offers');
     revalidatePath('/dashboard/messages');
 

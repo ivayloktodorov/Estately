@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import type { Metadata } from 'next';
 import { eq } from 'drizzle-orm';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 import { formatCurrencyEUR } from '@/lib/format/currency';
 import { propertyImageUrl } from '@/lib/properties/image-url';
+import { absoluteUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -27,6 +29,43 @@ async function getPropertyByIdOnly(propertyId: number) {
     .from(properties)
     .where(eq(properties.id, propertyId))
     .then((results) => results[0] ?? null);
+}
+
+export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const propertyId = parsePropertyId(id);
+
+  if (!propertyId) {
+    return {};
+  }
+
+  const property = await getPropertyByIdOnly(propertyId);
+
+  if (!property) {
+    return {};
+  }
+
+  const canonicalPath = `/property/${property.id}`;
+  const description = `${property.title} in ${property.city}. ${property.bedrooms} bed, ${property.bathrooms} bath, ${property.areaSqm} sqm.`;
+
+  return {
+    title: property.title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      title: property.title,
+      description,
+      url: absoluteUrl(canonicalPath),
+      images: [
+        {
+          url: propertyImageUrl(property.imageCoverUrl, property.propertyType),
+          alt: property.title,
+        },
+      ],
+    },
+  };
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {

@@ -19,7 +19,7 @@ interface MakeOfferCardProps {
 }
 
 function authHref(pathname: '/login' | '/register', propertyId: number): string {
-  const redirect = `/properties/${propertyId}?intent=offer`;
+  const redirect = `/property/${propertyId}?intent=offer`;
   const params = new URLSearchParams({ redirect });
 
   return `${pathname}?${params.toString()}`;

@@ -300,7 +300,7 @@ export function propertyResultsHref(basePath: string, searchParams: PropertySear
 
 export function propertyDetailsHref(propertyId: number, returnTo: string): string {
   const params = new URLSearchParams({ returnTo });
-  return `/properties/${propertyId}?${params.toString()}`;
+  return `/property/${propertyId}?${params.toString()}`;
 }
 
 async function getSimilarPropertiesUncached(

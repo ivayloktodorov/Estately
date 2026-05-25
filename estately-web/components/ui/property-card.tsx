@@ -75,7 +75,7 @@ export async function PropertyCard({
   isFeatured = false,
 }: PropertyCardProps) {
   const coverImageUrl = propertyImageUrl(imageUrl, propertyType);
-  const propertyHref = detailsHref ?? `/properties/${id}`;
+  const propertyHref = detailsHref ?? `/property/${id}`;
   const badges = propertyBadges(createdAt, views, isFeatured);
   const t = await getTranslations();
 

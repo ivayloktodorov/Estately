@@ -111,7 +111,7 @@ function RecentProperties({ properties }: { properties: RecentAdminProperty[] })
               key={property.id}
             >
               <div>
-                <Link className="font-semibold text-slate-950 hover:text-estate-700" href={`/properties/${property.id}`}>
+                <Link className="font-semibold text-slate-950 hover:text-estate-700" href={`/property/${property.id}`}>
                   {property.title}
                 </Link>
                 <p className="mt-1 text-sm text-slate-600">
@@ -155,7 +155,7 @@ function RecentInquiries({ inquiries }: { inquiries: RecentAdminInquiry[] }) {
                 <div>
                   <Link
                     className="font-semibold text-slate-950 hover:text-estate-700"
-                    href={`/properties/${inquiry.propertyId}`}
+                    href={`/property/${inquiry.propertyId}`}
                   >
                     {inquiry.propertyTitle}
                   </Link>

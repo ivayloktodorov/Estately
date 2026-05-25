@@ -126,7 +126,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
             </div>
             <Link
               className="inline-flex h-10 items-center justify-center rounded-md border border-stone-200 px-4 text-sm font-semibold text-slate-700 transition hover:border-estate-300 hover:text-estate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-estate-700 focus-visible:ring-offset-2"
-              href={`/properties/${conversation.property.id}`}
+              href={`/property/${conversation.property.id}`}
             >
               View listing
             </Link>

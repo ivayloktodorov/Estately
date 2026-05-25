@@ -189,7 +189,7 @@ export async function updateOfferStatus(input: {
       : 'Your offer was rejected by the property owner.',
     entityType: 'property_offer',
     entityId: offer.id,
-    href: `/properties/${offer.propertyId}`,
+    href: `/property/${offer.propertyId}`,
   });
   await createActivity({
     userId: offer.buyerUserId,

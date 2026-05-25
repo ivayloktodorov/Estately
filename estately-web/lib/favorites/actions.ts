@@ -76,7 +76,7 @@ export async function toggleFavoriteAction(
 
     revalidatePath('/properties');
     revalidatePath('/favorites');
-    revalidatePath(`/properties/${propertyId}`);
+    revalidatePath(`/property/${propertyId}`);
 
     return {
       status: 'success',

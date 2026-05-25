@@ -60,7 +60,7 @@ export default async function DashboardOffersPage() {
                 <article className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm" key={offer.id}>
                   <div className="flex flex-col justify-between gap-4 lg:flex-row">
                     <div>
-                      <Link className="text-lg font-semibold text-charcoal-950 hover:text-estate-700" href={`/properties/${offer.propertyId}`}>
+                      <Link className="text-lg font-semibold text-charcoal-950 hover:text-estate-700" href={`/property/${offer.propertyId}`}>
                         {offer.propertyTitle}
                       </Link>
                       <p className="mt-1 text-sm text-slate-600">
@@ -111,7 +111,7 @@ export default async function DashboardOffersPage() {
               submitted.map((offer) => (
                 <article className="flex flex-col justify-between gap-4 rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center" key={offer.id}>
                   <div>
-                    <Link className="font-semibold text-charcoal-950 hover:text-estate-700" href={`/properties/${offer.propertyId}`}>
+                    <Link className="font-semibold text-charcoal-950 hover:text-estate-700" href={`/property/${offer.propertyId}`}>
                       {offer.propertyTitle}
                     </Link>
                     <p className="mt-2 text-xl font-bold text-charcoal-950">{formatCurrencyEUR(offer.amount)}</p>

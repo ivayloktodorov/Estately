@@ -65,7 +65,7 @@ export async function moderatePropertyAction(formData: FormData): Promise<void> 
     }
 
     revalidatePath('/admin/properties');
-    revalidatePath(`/properties/${propertyId}`);
+    revalidatePath(`/property/${propertyId}`);
   } catch (error) {
     console.error('Admin property moderation failed', {
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -130,7 +130,7 @@ export async function bulkModeratePropertiesAction(formData: FormData): Promise<
     revalidatePath('/admin/properties');
     revalidatePath('/properties');
     for (const propertyId of propertyIds) {
-      revalidatePath(`/properties/${propertyId}`);
+      revalidatePath(`/property/${propertyId}`);
     }
   } catch (error) {
     console.error('Admin bulk property action failed', {

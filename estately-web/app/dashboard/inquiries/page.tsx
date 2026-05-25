@@ -71,7 +71,7 @@ export default async function DashboardInquiriesPage() {
                     <div>
                       <Link
                         className="text-lg font-semibold text-charcoal-950 hover:text-estate-700"
-                        href={`/properties/${inquiry.propertyId}`}
+                        href={`/property/${inquiry.propertyId}`}
                       >
                         {inquiry.propertyTitle}
                       </Link>

@@ -65,7 +65,7 @@ function activityHref(entityType: string | null, entityId: number | null): strin
   }
 
   if (entityType === 'property') {
-    return `/properties/${entityId}`;
+    return `/property/${entityId}`;
   }
 
   if (entityType === 'conversation') {

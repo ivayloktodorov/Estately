@@ -16,7 +16,7 @@ interface PropertyInquiryFormProps {
 }
 
 function authHref(pathname: '/login' | '/register', propertyId: number): string {
-  const params = new URLSearchParams({ redirect: `/properties/${propertyId}` });
+  const params = new URLSearchParams({ redirect: `/property/${propertyId}` });
 
   return `${pathname}?${params.toString()}`;
 }

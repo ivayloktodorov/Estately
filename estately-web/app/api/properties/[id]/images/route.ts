@@ -85,7 +85,7 @@ function revalidatePropertyImages(propertyId: number) {
   revalidatePath('/dashboard/properties');
   revalidatePath('/admin/properties');
   revalidatePath('/properties');
-  revalidatePath(`/properties/${propertyId}`);
+  revalidatePath(`/property/${propertyId}`);
 }
 
 async function routePropertyId(params: PropertyImagesRouteProps['params']) {

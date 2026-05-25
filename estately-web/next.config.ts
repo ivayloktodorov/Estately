@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/properties/:id',
+        destination: '/property/:id',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

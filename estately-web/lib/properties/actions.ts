@@ -171,5 +171,5 @@ export async function createPropertyAction(
     return { status: 'error', message: genericError, fields };
   }
 
-  redirect(`/properties/${propertyId}`);
+  redirect(`/property/${propertyId}`);
 }

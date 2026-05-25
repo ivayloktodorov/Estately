@@ -198,7 +198,7 @@ export async function notifySavedSearchMatchesForProperty(propertyId: number): P
         message: `"${property.title}" in ${property.city} matches "${search.title}".`,
         entityType: 'property',
         entityId: property.id,
-        href: `/properties/${property.id}`,
+        href: `/property/${property.id}`,
       }),
     ),
   );
