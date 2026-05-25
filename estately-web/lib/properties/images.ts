@@ -12,16 +12,51 @@ function canCreateGalleryRecord(imageUrl: string | null | undefined): imageUrl i
 
 export type PropertyGalleryImage = typeof propertyImages.$inferSelect;
 
+function legacyCoverImage(property: {
+  id: number;
+  imageCoverUrl?: string | null;
+  propertyType?: string | null;
+}): PropertyGalleryImage[] {
+  if (!canCreateGalleryRecord(property.imageCoverUrl)) {
+    return [];
+  }
+
+  return [
+    {
+      id: 0,
+      propertyId: property.id,
+      imageUrl: property.imageCoverUrl.trim(),
+      sortOrder: 0,
+      isCover: true,
+      createdAt: new Date(0),
+    },
+  ];
+}
+
+function logGalleryFallback(error: unknown, propertyId: number): void {
+  console.error('[property-gallery-fallback]', {
+    propertyId,
+    error: error instanceof Error ? error.message : 'Unknown property gallery error',
+  });
+}
+
 export async function getOrCreatePropertyGalleryImages(property: {
   id: number;
   imageCoverUrl?: string | null;
   propertyType?: string | null;
 }): Promise<PropertyGalleryImage[]> {
-  const existingImages = await db
-    .select()
-    .from(propertyImages)
-    .where(eq(propertyImages.propertyId, property.id))
-    .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
+  let existingImages: PropertyGalleryImage[];
+
+  try {
+    existingImages = await db
+      .select()
+      .from(propertyImages)
+      .where(eq(propertyImages.propertyId, property.id))
+      .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
+  } catch (error) {
+    logGalleryFallback(error, property.id);
+    return legacyCoverImage(property);
+  }
 
   if (existingImages.length > 0) {
     return existingImages;
@@ -31,17 +66,22 @@ export async function getOrCreatePropertyGalleryImages(property: {
     return [];
   }
 
-  const [createdImage] = await db
-    .insert(propertyImages)
-    .values({
-      propertyId: property.id,
-      imageUrl: property.imageCoverUrl.trim(),
-      sortOrder: 0,
-      isCover: true,
-    })
-    .returning();
+  try {
+    const [createdImage] = await db
+      .insert(propertyImages)
+      .values({
+        propertyId: property.id,
+        imageUrl: property.imageCoverUrl.trim(),
+        sortOrder: 0,
+        isCover: true,
+      })
+      .returning();
 
-  return createdImage ? [createdImage] : [];
+    return createdImage ? [createdImage] : [];
+  } catch (error) {
+    logGalleryFallback(error, property.id);
+    return legacyCoverImage(property);
+  }
 }
 
 export async function syncPropertyCoverFromGallery(property: {

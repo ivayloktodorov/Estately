@@ -1,6 +1,7 @@
 import { and, asc, count, desc, eq, gte, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import { db } from '@/src/db/client';
-import { properties, propertyImages } from '@/src/db/schema';
+import { properties } from '@/src/db/schema';
+import { getOrCreatePropertyGalleryImages } from '@/lib/properties/images';
 import { getPublicPropertyVisibilityCondition } from '@/lib/properties/visibility';
 import type { MobilePropertyFilters } from './validation';
 
@@ -143,11 +144,7 @@ export async function getMobilePropertyDetails(propertyId: number) {
     return null;
   }
 
-  const images = await db
-    .select()
-    .from(propertyImages)
-    .where(eq(propertyImages.propertyId, propertyId))
-    .orderBy(desc(propertyImages.isCover), asc(propertyImages.sortOrder), asc(propertyImages.id));
+  const images = await getOrCreatePropertyGalleryImages(property);
 
   return { ...property, images };
 }
