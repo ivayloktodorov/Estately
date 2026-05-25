@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/src/db/client';
-import { properties } from '@/src/db/schema';
+import { properties, users } from '@/src/db/schema';
 import { eq } from 'drizzle-orm';
 import { Container } from '@/components/ui/container';
 import { PropertyGallery } from '@/components/ui/property-gallery';
@@ -34,15 +34,14 @@ interface PropertyPageProps {
 }
 
 type PropertyLoadReason =
-  | 'invalid_id'
-  | 'property_not_found'
-  | 'access_denied'
+  | 'invalid-id'
+  | 'missing-main-property'
+  | 'access-denied'
   | 'visible'
-  | 'property_query_error';
+  | 'unknown-loader-error';
 
 interface PropertyLoadResult {
   property: typeof properties.$inferSelect;
-  images: string[];
 }
 
 interface PropertyLoadMiss {
@@ -85,7 +84,7 @@ function logPropertyDetailsNotFound(input: {
   const { id, parsedId, property, user, reason } = input;
   const visibility = property ? getPropertyVisibilityDecision(property, user) : null;
 
-  console.log('[property-details-not-found]', {
+  console.error('[property-details-not-found]', {
     id,
     parsedId,
     foundByIdOnly: Boolean(property),
@@ -94,6 +93,35 @@ function logPropertyDetailsNotFound(input: {
     currentUserRole: user?.role ?? 'guest',
     isOwner: visibility?.isOwner ?? false,
     reason,
+  });
+}
+
+function logOptionalPropertyDetailsError(input: {
+  id: number;
+  reason: 'missing-gallery' | 'missing-images' | 'similar-properties-error' | 'missing-owner' | 'offer-loader-error' | 'metadata-error';
+  error: unknown;
+}) {
+  console.warn('[property-details-optional-error]', {
+    id: input.id,
+    reason: input.reason,
+    message: input.error instanceof Error ? input.error.message : 'Unknown optional loader error',
+  });
+}
+
+function logPropertyDetailsRender(input: {
+  id: number;
+  title: string;
+  galleryCount: number;
+  similarCount: number;
+  ownerLoaded: boolean;
+}) {
+  console.log('[property-details-render]', {
+    id: input.id,
+    propertyTitle: input.title,
+    canView: true,
+    galleryCount: input.galleryCount,
+    similarCount: input.similarCount,
+    ownerLoaded: input.ownerLoaded ? 'yes' : 'no',
   });
 }
 
@@ -125,9 +153,15 @@ async function getPropertyForMetadata(
 
     return getPropertyVisibilityDecision(property, user).canView ? property : null;
   } catch (error) {
-    console.warn('[property-details:metadata]', {
-      requestedPropertyId: requestedId,
-      parsedPropertyId: propertyId,
+    console.error('[property-details-not-found]', {
+      id: requestedId,
+      parsedId: propertyId,
+      foundByIdOnly: false,
+      isPublished: null,
+      moderationStatus: null,
+      currentUserRole: user?.role ?? 'guest',
+      isOwner: false,
+      reason: 'metadata-error',
       message: error instanceof Error ? error.message : 'Unknown metadata query error',
     });
 
@@ -150,9 +184,9 @@ async function getProperty(
         property: null,
         user,
         canView: false,
-        reason: 'property_not_found',
+        reason: 'missing-main-property',
       });
-      return { property: null, reason: 'property_not_found' };
+      return { property: null, reason: 'missing-main-property' };
     }
 
     const visibility = getPropertyVisibilityDecision(property, user);
@@ -164,9 +198,9 @@ async function getProperty(
         property,
         user,
         canView: false,
-        reason: 'access_denied',
+        reason: 'access-denied',
       });
-      return { property, reason: 'access_denied' };
+      return { property, reason: 'access-denied' };
     }
 
     logPropertyDetailsDecision({
@@ -178,22 +212,8 @@ async function getProperty(
       reason: 'visible',
     });
 
-    const fallbackImage = propertyImageUrl(property.imageCoverUrl, property.propertyType);
-    let uploadedImages: string[] = [];
-
-    try {
-      const images = await getOrCreatePropertyGalleryImages(property);
-      uploadedImages = images.map((img) => img.imageUrl);
-    } catch (error) {
-      console.warn('[property-details:gallery]', {
-        propertyId: property.id,
-        message: error instanceof Error ? error.message : 'Unknown gallery error',
-      });
-    }
-
     return {
       property,
-      images: uploadedImages.length > 0 ? uploadedImages : [fallbackImage],
     };
   } catch (error) {
     console.error('[property-details]', {
@@ -203,10 +223,64 @@ async function getProperty(
       currentUserId: user?.id ?? null,
       currentUserRole: user?.role ?? null,
       canView: false,
-      reason: 'property_query_error',
+      reason: 'unknown-loader-error',
       message: error instanceof Error ? error.message : 'Unknown property query error',
     });
-    return { property: null, reason: 'property_query_error' };
+    return { property: null, reason: 'unknown-loader-error' };
+  }
+}
+
+async function getOptionalGalleryImages(property: typeof properties.$inferSelect): Promise<string[]> {
+  const fallbackImage = propertyImageUrl(property.imageCoverUrl, property.propertyType);
+
+  try {
+    const images = await getOrCreatePropertyGalleryImages(property);
+    const uploadedImages = images.map((img) => img.imageUrl);
+
+    return uploadedImages.length > 0 ? uploadedImages : [fallbackImage];
+  } catch (error) {
+    logOptionalPropertyDetailsError({
+      id: property.id,
+      reason: 'missing-gallery',
+      error,
+    });
+
+    return [fallbackImage];
+  }
+}
+
+async function getOptionalSimilarProperties(property: typeof properties.$inferSelect) {
+  try {
+    return await getSimilarProperties(property, 6);
+  } catch (error) {
+    logOptionalPropertyDetailsError({
+      id: property.id,
+      reason: 'similar-properties-error',
+      error,
+    });
+
+    return [];
+  }
+}
+
+async function getOptionalOwner(property: typeof properties.$inferSelect) {
+  try {
+    return db
+      .select({
+        id: users.id,
+        fullName: users.fullName,
+      })
+      .from(users)
+      .where(eq(users.id, property.createdByUserId))
+      .then((results) => results[0] ?? null);
+  } catch (error) {
+    logOptionalPropertyDetailsError({
+      id: property.id,
+      reason: 'missing-owner',
+      error,
+    });
+
+    return null;
   }
 }
 
@@ -295,7 +369,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
       parsedId: null,
       property: null,
       user: null,
-      reason: 'invalid_id',
+      reason: 'invalid-id',
     });
     logPropertyDetailsDecision({
       requestedId: id,
@@ -303,7 +377,7 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
       property: null,
       user: null,
       canView: false,
-      reason: 'invalid_id',
+      reason: 'invalid-id',
     });
     notFound();
   }
@@ -323,7 +397,12 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
     notFound();
   }
 
-  const { property, images } = data;
+  const { property } = data;
+  const [images, similarProperties, owner] = await Promise.all([
+    getOptionalGalleryImages(property),
+    getOptionalSimilarProperties(property),
+    getOptionalOwner(property),
+  ]);
   const price = formatCurrencyEUR(property.price);
   const galleryImages = [...new Set(images.map((image) => propertyImageUrl(image, property.propertyType)))];
   const coverImageUrl = galleryImages[0] ?? propertyImageUrl(property.imageCoverUrl, property.propertyType);
@@ -333,18 +412,19 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
   const canContactAgent = isPublicPropertyVisible(property);
   const shouldOpenOfferForm = firstParam(query.intent) === 'offer';
   const returnTo = safeReturnTo(firstParam(query.returnTo));
-  const similarProperties = await getSimilarProperties(property, 6).catch((error) => {
-    console.warn('[property-details:similar]', {
-      propertyId: property.id,
-      message: error instanceof Error ? error.message : 'Unknown similar properties error',
-    });
-
-    return [];
-  });
   const similarSearchHref = `/${listingType === 'rent' ? 'rent' : 'sale'}?${new URLSearchParams({
     city: property.city,
     type: property.propertyType,
   }).toString()}`;
+
+  logPropertyDetailsRender({
+    id: property.id,
+    title: property.title,
+    galleryCount: galleryImages.length,
+    similarCount: similarProperties.length,
+    ownerLoaded: Boolean(owner),
+  });
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
