@@ -63,6 +63,7 @@ function logPropertyCreateStep(step: string, details: Record<string, unknown> = 
 function safeErrorDetails(error: unknown, step: string) {
   const errorRecord = typeof error === 'object' && error !== null ? error as Record<string, unknown> : {};
   const cause = error instanceof Error ? error.cause : undefined;
+  const causeRecord = typeof cause === 'object' && cause !== null ? cause as Record<string, unknown> : {};
   const causeMessage =
     cause instanceof Error
       ? cause.message
@@ -80,7 +81,67 @@ function safeErrorDetails(error: unknown, step: string) {
         ? errorRecord.code
         : undefined,
     stackFirstLine: error instanceof Error ? error.stack?.split('\n')[0] : undefined,
+    causeCode:
+      typeof causeRecord.code === 'string' || typeof causeRecord.code === 'number'
+        ? causeRecord.code
+        : undefined,
+    constraint: typeof causeRecord.constraint === 'string' ? causeRecord.constraint : undefined,
+    detail: typeof causeRecord.detail === 'string' ? causeRecord.detail : undefined,
+    table: typeof causeRecord.table === 'string' ? causeRecord.table : undefined,
+    column: typeof causeRecord.column === 'string' ? causeRecord.column : undefined,
   };
+}
+
+function databaseErrorDetails(error: unknown, step: string) {
+  const errorRecord = typeof error === 'object' && error !== null ? error as Record<string, unknown> : {};
+  const cause = error instanceof Error ? error.cause : undefined;
+  const causeRecord = typeof cause === 'object' && cause !== null ? cause as Record<string, unknown> : {};
+
+  return {
+    step,
+    errorName: error instanceof Error ? error.name : 'UnknownError',
+    errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    errorCode:
+      typeof causeRecord.code === 'string' || typeof causeRecord.code === 'number'
+        ? causeRecord.code
+        : typeof errorRecord.code === 'string' || typeof errorRecord.code === 'number'
+          ? errorRecord.code
+          : undefined,
+    constraint:
+      typeof causeRecord.constraint === 'string'
+        ? causeRecord.constraint
+        : typeof errorRecord.constraint === 'string'
+          ? errorRecord.constraint
+          : undefined,
+    detail:
+      typeof causeRecord.detail === 'string'
+        ? causeRecord.detail
+        : typeof errorRecord.detail === 'string'
+          ? errorRecord.detail
+          : undefined,
+    table:
+      typeof causeRecord.table === 'string'
+        ? causeRecord.table
+        : typeof errorRecord.table === 'string'
+          ? errorRecord.table
+          : undefined,
+    column:
+      typeof causeRecord.column === 'string'
+        ? causeRecord.column
+        : typeof errorRecord.column === 'string'
+          ? errorRecord.column
+          : undefined,
+  };
+}
+
+function databaseDebugMessage(error: unknown, step: string): string {
+  const details = databaseErrorDetails(error, step);
+
+  return [
+    `DB insert failed: code=${details.errorCode ?? 'unknown'}`,
+    `constraint=${details.constraint ?? 'unknown'}`,
+    `detail=${details.detail ?? 'unavailable'}`,
+  ].join(', ');
 }
 
 function temporaryDebugMessage(error: unknown, step: string, propertyWasCreated: boolean): string {
@@ -220,7 +281,16 @@ export async function createPropertyAction(
     }
 
     currentStep = 'db-insert-start';
-    logPropertyCreateStep('db-insert-start', { userId: sessionUser.id });
+    logPropertyCreateStep('db-insert-start', {
+      userId: sessionUser.id,
+      existsInUsersTable: true,
+      email: sessionUser.email,
+      role: sessionUser.role,
+      price: validatedData.price.toString(),
+      bedrooms: validatedData.bedrooms,
+      bathrooms: validatedData.bathrooms,
+      areaSqm: validatedData.areaSqm,
+    });
     const result = await db
       .insert(properties)
       .values({
@@ -331,6 +401,7 @@ export async function createPropertyAction(
     }
   } catch (error) {
     console.error('[property-create:error]', safeErrorDetails(error, currentStep));
+    console.error('[property-create:db-error]', databaseErrorDetails(error, currentStep));
 
     if (propertyId && imageFiles.length > 0) {
       const safeMessage =
@@ -351,7 +422,9 @@ export async function createPropertyAction(
       message:
         error instanceof PropertyImageUploadError
           ? error.safeMessage
-          : temporaryDebugMessage(error, currentStep, false) || createFailureFallback,
+          : currentStep === 'db-insert-start'
+            ? databaseDebugMessage(error, currentStep)
+            : temporaryDebugMessage(error, currentStep, false) || createFailureFallback,
       fields,
     };
   }
