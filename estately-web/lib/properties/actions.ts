@@ -97,7 +97,7 @@ export async function createPropertyAction(
     filesCount: receivedImageFilesCount,
     uploadMode: getPropertyImageUploadMode(),
   });
-  console.log('[property-image-upload-config]', getPropertyImageUploadConfigDiagnostics());
+  console.log('[property-upload-config]', getPropertyImageUploadConfigDiagnostics());
 
   if (!parsed.success) {
     return validationErrorState(parsed.error, fields);

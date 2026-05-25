@@ -32,7 +32,7 @@ function missingR2ConfigKeys(): string[] {
   const config = getR2ConfigStatus();
   const missing: string[] = [];
 
-  if (!config.hasAccountId) missing.push('R2_ACCOUNT_ID or CLOUDFLARE_R2_ACCOUNT_ID');
+  if (!config.hasEndpoint) missing.push('R2_URL, R2_ACCOUNT_ID, or CLOUDFLARE_R2_ACCOUNT_ID');
   if (!config.hasAccessKey) missing.push('R2_ACCESS_KEY_ID or CLOUDFLARE_R2_ACCESS_KEY_ID');
   if (!config.hasSecretKey) missing.push('R2_SECRET_ACCESS_KEY or CLOUDFLARE_R2_SECRET_ACCESS_KEY');
   if (!config.hasBucket) missing.push('R2_BUCKET or R2_BUCKET_NAME or CLOUDFLARE_R2_BUCKET');
@@ -56,11 +56,12 @@ export function getPropertyImageUploadConfigDiagnostics() {
   const config = getR2ConfigStatus();
 
   return {
+    hasR2Url: config.hasR2Url,
     hasAccountId: config.hasAccountId,
-    hasAccessKey: config.hasAccessKey,
-    hasSecretKey: config.hasSecretKey,
     hasBucket: config.hasBucket,
     hasPublicUrl: config.hasPublicUrl,
+    hasAccessKey: config.hasAccessKey,
+    hasSecretKey: config.hasSecretKey,
     uploadMode: getPropertyImageUploadMode(),
   };
 }

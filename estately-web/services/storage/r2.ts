@@ -36,6 +36,7 @@ export interface R2AttachmentUploadResult {
 }
 
 export interface R2ConfigStatus {
+  hasR2Url: boolean;
   hasAccountId: boolean;
   hasAccessKey: boolean;
   hasSecretKey: boolean;
@@ -68,21 +69,23 @@ function requiredEnv(...names: string[]): string {
 }
 
 export function getR2ConfigStatus(): R2ConfigStatus {
+  const hasR2Url = Boolean(optionalEnv('R2_URL', 'CLOUDFLARE_R2_URL'));
   const hasAccountId = Boolean(optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID'));
   const hasAccessKey = Boolean(optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID'));
   const hasSecretKey = Boolean(optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY'));
   const hasBucket = Boolean(optionalEnv('R2_BUCKET', 'R2_BUCKET_NAME', 'CLOUDFLARE_R2_BUCKET'));
   const hasPublicUrl = Boolean(optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'));
-  const hasEndpoint = Boolean(optionalEnv('R2_URL', 'CLOUDFLARE_R2_URL'));
+  const hasEndpoint = hasR2Url || hasAccountId;
 
   return {
+    hasR2Url,
     hasAccountId,
     hasAccessKey,
     hasSecretKey,
     hasBucket,
     hasPublicUrl,
     hasEndpoint,
-    isConfigured: hasAccountId && hasAccessKey && hasSecretKey && hasBucket,
+    isConfigured: hasEndpoint && hasAccessKey && hasSecretKey && hasBucket,
   };
 }
 
