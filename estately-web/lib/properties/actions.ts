@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { ZodError } from 'zod';
 import { db } from '@/src/db/client';
-import { propertyImages, properties } from '@/src/db/schema';
+import { propertyImages, properties, users } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
 import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { createActivity } from '@/lib/activity/service';
@@ -85,11 +85,7 @@ function safeErrorDetails(error: unknown, step: string) {
 
 function temporaryDebugMessage(error: unknown, step: string, propertyWasCreated: boolean): string {
   if (error instanceof PropertyImageUploadError) {
-    return `Create failed: ${error.message}`;
-  }
-
-  if (error instanceof Error && error.message) {
-    return `Create failed at step: ${step}. ${error.message}`;
+    return `Create failed: ${error.safeMessage}`;
   }
 
   if (propertyWasCreated) {
@@ -193,9 +189,38 @@ export async function createPropertyAction(
 
   try {
     const validatedData = parsed.data;
+    const sessionUser = await db.query.users.findFirst({
+      columns: {
+        id: true,
+        email: true,
+        role: true,
+      },
+      where: eq(users.id, user.id),
+    });
+
+    logPropertyCreateStep('user', {
+      sessionUserId: user.id,
+      existsInUsersTable: Boolean(sessionUser),
+      email: sessionUser?.email ?? user.email,
+      role: sessionUser?.role ?? user.role,
+    });
+    console.log('[property-create-user]', {
+      sessionUserId: user.id,
+      existsInUsersTable: Boolean(sessionUser),
+      email: sessionUser?.email ?? user.email,
+      role: sessionUser?.role ?? user.role,
+    });
+
+    if (!sessionUser) {
+      return {
+        status: 'error',
+        message: 'Your session could not be verified. Please sign in again and retry.',
+        fields,
+      };
+    }
 
     currentStep = 'db-insert-start';
-    logPropertyCreateStep('db-insert-start', { userId: user.id });
+    logPropertyCreateStep('db-insert-start', { userId: sessionUser.id });
     const result = await db
       .insert(properties)
       .values({
@@ -210,7 +235,7 @@ export async function createPropertyAction(
         bathrooms: validatedData.bathrooms,
         areaSqm: validatedData.areaSqm,
         imageCoverUrl: defaultCoverImageUrl,
-        createdByUserId: user.id,
+        createdByUserId: sessionUser.id,
         isPublished: false,
         moderationStatus: 'pending',
         moderationNotes: null,
@@ -221,7 +246,7 @@ export async function createPropertyAction(
     propertyId = result[0]?.id;
     currentStep = 'db-insert-success';
     logPropertyCreateStep('db-insert-success', {
-      userId: user.id,
+      userId: sessionUser.id,
       propertyId,
       filesCount: imageFiles.length,
       uploadMode: getPropertyImageUploadMode(),
@@ -229,7 +254,7 @@ export async function createPropertyAction(
 
     if (result[0]) {
       await createActivity({
-        userId: user.id,
+        userId: sessionUser.id,
         type: 'property_created',
         title: 'Property created',
         description: `You created "${result[0].title}".`,
@@ -246,7 +271,7 @@ export async function createPropertyAction(
       for (const [index, file] of imageFiles.entries()) {
         currentStep = 'image-upload-start';
         logPropertyCreateStep('image-upload-start', {
-          userId: user.id,
+          userId: sessionUser.id,
           propertyId,
           fileIndex: index,
           fileType: file.type,
@@ -256,7 +281,7 @@ export async function createPropertyAction(
         const { imageUrl } = await uploadPropertyImage(file, propertyId);
         currentStep = 'image-upload-success';
         logPropertyCreateStep('image-upload-success', {
-          userId: user.id,
+          userId: sessionUser.id,
           propertyId,
           fileIndex: index,
           uploadMode: getPropertyImageUploadMode(),
@@ -265,7 +290,7 @@ export async function createPropertyAction(
 
         currentStep = 'property-images-insert-start';
         logPropertyCreateStep('property-images-insert-start', {
-          userId: user.id,
+          userId: sessionUser.id,
           propertyId,
           fileIndex: index,
         });
@@ -277,7 +302,7 @@ export async function createPropertyAction(
         }).returning({ id: propertyImages.id });
         currentStep = 'property-images-insert-success';
         logPropertyCreateStep('property-images-insert-success', {
-          userId: user.id,
+          userId: sessionUser.id,
           propertyId,
           fileIndex: index,
           insertedCount: insertedImages.length,
@@ -287,7 +312,7 @@ export async function createPropertyAction(
         if (index === 0) {
           currentStep = 'cover-update-start';
           logPropertyCreateStep('cover-update-start', {
-            userId: user.id,
+            userId: sessionUser.id,
             propertyId,
             fileIndex: index,
           });
@@ -297,7 +322,7 @@ export async function createPropertyAction(
             .where(eq(properties.id, propertyId));
           currentStep = 'cover-update-success';
           logPropertyCreateStep('cover-update-success', {
-            userId: user.id,
+            userId: sessionUser.id,
             propertyId,
             fileIndex: index,
           });
