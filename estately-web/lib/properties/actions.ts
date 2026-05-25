@@ -8,7 +8,13 @@ import { propertyImages, properties } from '@/src/db/schema';
 import { requireAuth } from '@/lib/auth';
 import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { createActivity } from '@/lib/activity/service';
-import { uploadPropertyImage, validatePropertyImageFile } from '@/services/storage/property-images';
+import {
+  assertPropertyImageUploadsConfigured,
+  getPropertyImageUploadMode,
+  PropertyImageUploadError,
+  uploadPropertyImage,
+  validatePropertyImageFile,
+} from '@/services/storage/property-images';
 import { createPropertySchema } from './validation';
 import type { PropertyActionState } from './types';
 
@@ -48,6 +54,17 @@ function imageFilesFromForm(formData: FormData): File[] {
     .slice(0, maxPropertyImages);
 }
 
+function logPropertyCreate(message: string, details: Record<string, unknown>): void {
+  console.log('[property-create]', message, details);
+}
+
+function errorDetails(error: unknown) {
+  return {
+    name: error instanceof Error ? error.name : 'UnknownError',
+    message: error instanceof Error ? error.message : 'Unknown error',
+  };
+}
+
 export async function createPropertyAction(
   _prevState: PropertyActionState,
   formData: FormData,
@@ -69,12 +86,22 @@ export async function createPropertyAction(
 
   const parsed = createPropertySchema.safeParse(fields);
   const imageFiles = imageFilesFromForm(formData);
+  const receivedImageFilesCount = formData
+    .getAll('images')
+    .filter((value) => value instanceof File && value.size > 0).length;
+
+  logPropertyCreate('received', {
+    userId: user.id,
+    fields,
+    filesCount: receivedImageFilesCount,
+    uploadMode: getPropertyImageUploadMode(),
+  });
 
   if (!parsed.success) {
     return validationErrorState(parsed.error, fields);
   }
 
-  if (formData.getAll('images').filter((value) => value instanceof File && value.size > 0).length > maxPropertyImages) {
+  if (receivedImageFilesCount > maxPropertyImages) {
     return {
       status: 'error',
       message: `Please upload ${maxPropertyImages} images or fewer.`,
@@ -92,6 +119,29 @@ export async function createPropertyAction(
         message: imageError,
         fields,
         errors: { images: imageError },
+      };
+    }
+  }
+
+  if (imageFiles.length > 0) {
+    try {
+      assertPropertyImageUploadsConfigured();
+    } catch (error) {
+      logPropertyCreate('upload configuration error', {
+        userId: user.id,
+        filesCount: imageFiles.length,
+        uploadMode: getPropertyImageUploadMode(),
+        error: errorDetails(error),
+      });
+
+      return {
+        status: 'error',
+        message:
+          error instanceof PropertyImageUploadError
+            ? error.safeMessage
+            : 'Image upload is not configured in production.',
+        fields,
+        errors: { images: 'Image upload is not configured in production.' },
       };
     }
   }
@@ -124,6 +174,13 @@ export async function createPropertyAction(
       .returning({ id: properties.id, title: properties.title });
 
     propertyId = result[0]?.id;
+    logPropertyCreate('property created', {
+      userId: user.id,
+      propertyId,
+      filesCount: imageFiles.length,
+      uploadMode: getPropertyImageUploadMode(),
+    });
+
     if (result[0]) {
       await createActivity({
         userId: user.id,
@@ -142,12 +199,26 @@ export async function createPropertyAction(
     if (propertyId && imageFiles.length > 0) {
       for (const [index, file] of imageFiles.entries()) {
         const { imageUrl } = await uploadPropertyImage(file, propertyId);
+        logPropertyCreate('upload result', {
+          userId: user.id,
+          propertyId,
+          fileIndex: index,
+          uploadMode: getPropertyImageUploadMode(),
+          imageUrl,
+        });
 
-        await db.insert(propertyImages).values({
+        const insertedImages = await db.insert(propertyImages).values({
           propertyId,
           imageUrl,
           sortOrder: index,
           isCover: index === 0,
+        }).returning({ id: propertyImages.id });
+        logPropertyCreate('property_images insert result', {
+          userId: user.id,
+          propertyId,
+          fileIndex: index,
+          insertedCount: insertedImages.length,
+          imageIds: insertedImages.map((image) => image.id),
         });
 
         if (index === 0) {
@@ -159,10 +230,33 @@ export async function createPropertyAction(
       }
     }
   } catch (error) {
-    console.error('Property creation error:', error);
+    console.error('[property-create]', 'failed', {
+      userId: user.id,
+      propertyId,
+      filesCount: imageFiles.length,
+      uploadMode: getPropertyImageUploadMode(),
+      error: errorDetails(error),
+    });
+
+    if (propertyId && imageFiles.length > 0) {
+      const safeMessage =
+        error instanceof PropertyImageUploadError
+          ? error.safeMessage
+          : 'Property created, but image upload failed.';
+
+      return {
+        status: 'error',
+        message: `${safeMessage} You can edit this property and upload images again.`,
+        fields,
+        errors: { images: safeMessage },
+      };
+    }
+
     return {
       status: 'error',
-      message: 'Unable to create this property right now. Please try again.',
+      message: error instanceof PropertyImageUploadError
+        ? error.safeMessage
+        : 'Unable to create this property right now. Please try again.',
       fields,
     };
   }

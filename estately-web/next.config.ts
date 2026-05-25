@@ -8,7 +8,7 @@ loadEnv({ path: path.resolve(__dirname, '../.env.local'), quiet: true, override:
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: '6mb',
+      bodySizeLimit: '60mb',
     },
   },
   images: {

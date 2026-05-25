@@ -292,7 +292,7 @@ export function PropertyForm() {
           type="file"
         />
         <p className="mt-2 text-xs text-slate-500">
-          Add up to 10 JPG, PNG, or WEBP photos. The first image becomes the cover.
+          Add up to 10 JPG, PNG, or WEBP photos, 5MB each. The first image becomes the cover.
         </p>
       </FormField>
 

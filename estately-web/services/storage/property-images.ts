@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createHash, createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+import { uploadR2Image } from './r2';
 
 const allowedImageTypes = new Map([
   ['image/jpeg', 'jpg'],
@@ -8,21 +9,46 @@ const allowedImageTypes = new Map([
   ['image/webp', 'webp'],
 ]);
 
-const maxImageSizeBytes = 10 * 1024 * 1024;
+const maxImageSizeBytes = 5 * 1024 * 1024;
 const localUploadDir = join(process.cwd(), 'public', 'uploads', 'property-images');
 
 export interface UploadPropertyImageResult {
   imageUrl: string;
 }
 
-function hasR2Config(): boolean {
-  return Boolean(
-    optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID') &&
-      optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID') &&
-      optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY') &&
-      optionalEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET') &&
-      optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'),
-  );
+export type PropertyImageUploadMode = 'r2' | 'local fallback' | 'disabled';
+
+export class PropertyImageUploadError extends Error {
+  constructor(
+    message: string,
+    public readonly safeMessage: string,
+  ) {
+    super(message);
+    this.name = 'PropertyImageUploadError';
+  }
+}
+
+function r2Config() {
+  return {
+    accountId: optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID'),
+    accessKeyId: optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID'),
+    secretAccessKey: optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY'),
+    bucket: optionalEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET'),
+    publicUrl: optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'),
+  };
+}
+
+function missingR2ConfigKeys(): string[] {
+  const config = r2Config();
+  const missing: string[] = [];
+
+  if (!config.accountId) missing.push('R2_ACCOUNT_ID or CLOUDFLARE_R2_ACCOUNT_ID');
+  if (!config.accessKeyId) missing.push('R2_ACCESS_KEY_ID or CLOUDFLARE_R2_ACCESS_KEY_ID');
+  if (!config.secretAccessKey) missing.push('R2_SECRET_ACCESS_KEY or CLOUDFLARE_R2_SECRET_ACCESS_KEY');
+  if (!config.bucket) missing.push('R2_BUCKET_NAME or R2_BUCKET or CLOUDFLARE_R2_BUCKET');
+  if (!config.publicUrl) missing.push('R2_PUBLIC_URL or CLOUDFLARE_R2_PUBLIC_URL');
+
+  return missing;
 }
 
 function shouldUseLocalDevStorage(): boolean {
@@ -41,14 +67,25 @@ function optionalEnv(...names: string[]): string | null {
   return null;
 }
 
-function requiredEnv(...names: string[]): string {
-  const value = optionalEnv(...names);
-
-  if (!value) {
-    throw new Error(`${names.join(' or ')} is not configured.`);
+export function getPropertyImageUploadMode(): PropertyImageUploadMode {
+  if (missingR2ConfigKeys().length === 0) {
+    return 'r2';
   }
 
-  return value;
+  return shouldUseLocalDevStorage() ? 'local fallback' : 'disabled';
+}
+
+export function assertPropertyImageUploadsConfigured(): void {
+  const missing = missingR2ConfigKeys();
+
+  if (missing.length === 0 || shouldUseLocalDevStorage()) {
+    return;
+  }
+
+  throw new PropertyImageUploadError(
+    `Cloudflare R2 uploads are not configured. Missing: ${missing.join(', ')}.`,
+    'Image upload is not configured in production.',
+  );
 }
 
 export function validatePropertyImageFile(file: File): string | null {
@@ -57,7 +94,7 @@ export function validatePropertyImageFile(file: File): string | null {
   }
 
   if (file.size > maxImageSizeBytes) {
-    return 'Image must be 10MB or smaller.';
+    return 'Image must be 5MB or smaller.';
   }
 
   if (!allowedImageTypes.has(file.type)) {
@@ -95,77 +132,16 @@ async function uploadToLocalDevStorage(file: File, propertyId: number) {
   return `/uploads/property-images/${fileName}`;
 }
 
-function hmac(key: Buffer | string, value: string): Buffer {
-  return createHmac('sha256', key).update(value).digest();
-}
-
-function sha256Hex(value: Buffer | string): string {
-  return createHash('sha256').update(value).digest('hex');
-}
-
-function r2SigningKey(secretAccessKey: string, dateStamp: string): Buffer {
-  const dateKey = hmac(`AWS4${secretAccessKey}`, dateStamp);
-  const regionKey = hmac(dateKey, 'auto');
-  const serviceKey = hmac(regionKey, 's3');
-  return hmac(serviceKey, 'aws4_request');
-}
-
 async function uploadToR2(file: File, propertyId: number): Promise<string> {
-  const accountId = requiredEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID');
-  const accessKeyId = requiredEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID');
-  const secretAccessKey = requiredEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY');
-  const bucket = requiredEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET');
-  const publicUrl = requiredEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL').replace(/\/$/, '');
-  const key = objectKey(file, propertyId);
-  const encodedKey = key
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-  const host = `${accountId}.r2.cloudflarestorage.com`;
-  const url = `https://${host}/${bucket}/${encodedKey}`;
-  const body = Buffer.from(await file.arrayBuffer());
-  const payloadHash = sha256Hex(body);
-  const now = new Date();
-  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '');
-  const dateStamp = amzDate.slice(0, 8);
-  const credentialScope = `${dateStamp}/auto/s3/aws4_request`;
-  const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${amzDate}\n`;
-  const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-  const canonicalRequest = [
-    'PUT',
-    `/${bucket}/${encodedKey}`,
-    '',
-    canonicalHeaders,
-    signedHeaders,
-    payloadHash,
-  ].join('\n');
-  const stringToSign = [
-    'AWS4-HMAC-SHA256',
-    amzDate,
-    credentialScope,
-    sha256Hex(canonicalRequest),
-  ].join('\n');
-  const signature = createHmac('sha256', r2SigningKey(secretAccessKey, dateStamp))
-    .update(stringToSign)
-    .digest('hex');
-  const authorization = `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-
-  const response = await fetch(url, {
-    method: 'PUT',
-    body,
-    headers: {
-      Authorization: authorization,
-      'Content-Type': file.type,
-      'x-amz-content-sha256': payloadHash,
-      'x-amz-date': amzDate,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Unable to upload image to Cloudflare R2.');
+  try {
+    const upload = await uploadR2Image(file, `property-images/${propertyId}`);
+    return upload.imageUrl;
+  } catch (error) {
+    throw new PropertyImageUploadError(
+      error instanceof Error ? error.message : 'Unable to upload image to Cloudflare R2.',
+      'Property created, but image upload failed.',
+    );
   }
-
-  return `${publicUrl}/${key}`;
 }
 
 export async function uploadPropertyImage(
@@ -175,10 +151,10 @@ export async function uploadPropertyImage(
   const validationError = validatePropertyImageFile(file);
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new PropertyImageUploadError(validationError, validationError);
   }
 
-  if (hasR2Config()) {
+  if (missingR2ConfigKeys().length === 0) {
     return { imageUrl: await uploadToR2(file, propertyId) };
   }
 
@@ -186,5 +162,9 @@ export async function uploadPropertyImage(
     return { imageUrl: await uploadToLocalDevStorage(file, propertyId) };
   }
 
-  throw new Error('Cloudflare R2 uploads are not configured.');
+  assertPropertyImageUploadsConfigured();
+  throw new PropertyImageUploadError(
+    'Cloudflare R2 uploads are not configured.',
+    'Image upload is not configured in production.',
+  );
 }
