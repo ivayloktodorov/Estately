@@ -10,6 +10,7 @@ import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { createActivity } from '@/lib/activity/service';
 import {
   assertPropertyImageUploadsConfigured,
+  getPropertyImageUploadConfigDiagnostics,
   getPropertyImageUploadMode,
   PropertyImageUploadError,
   uploadPropertyImage,
@@ -96,6 +97,7 @@ export async function createPropertyAction(
     filesCount: receivedImageFilesCount,
     uploadMode: getPropertyImageUploadMode(),
   });
+  console.log('[property-image-upload-config]', getPropertyImageUploadConfigDiagnostics());
 
   if (!parsed.success) {
     return validationErrorState(parsed.error, fields);

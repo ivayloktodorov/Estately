@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { uploadR2Image } from './r2';
+import { getR2ConfigStatus, uploadR2Image } from './r2';
 
 const allowedImageTypes = new Map([
   ['image/jpeg', 'jpg'],
@@ -28,25 +28,14 @@ export class PropertyImageUploadError extends Error {
   }
 }
 
-function r2Config() {
-  return {
-    accountId: optionalEnv('R2_ACCOUNT_ID', 'CLOUDFLARE_R2_ACCOUNT_ID'),
-    accessKeyId: optionalEnv('R2_ACCESS_KEY_ID', 'CLOUDFLARE_R2_ACCESS_KEY_ID'),
-    secretAccessKey: optionalEnv('R2_SECRET_ACCESS_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY'),
-    bucket: optionalEnv('R2_BUCKET_NAME', 'R2_BUCKET', 'CLOUDFLARE_R2_BUCKET'),
-    publicUrl: optionalEnv('R2_PUBLIC_URL', 'CLOUDFLARE_R2_PUBLIC_URL'),
-  };
-}
-
 function missingR2ConfigKeys(): string[] {
-  const config = r2Config();
+  const config = getR2ConfigStatus();
   const missing: string[] = [];
 
-  if (!config.accountId) missing.push('R2_ACCOUNT_ID or CLOUDFLARE_R2_ACCOUNT_ID');
-  if (!config.accessKeyId) missing.push('R2_ACCESS_KEY_ID or CLOUDFLARE_R2_ACCESS_KEY_ID');
-  if (!config.secretAccessKey) missing.push('R2_SECRET_ACCESS_KEY or CLOUDFLARE_R2_SECRET_ACCESS_KEY');
-  if (!config.bucket) missing.push('R2_BUCKET_NAME or R2_BUCKET or CLOUDFLARE_R2_BUCKET');
-  if (!config.publicUrl) missing.push('R2_PUBLIC_URL or CLOUDFLARE_R2_PUBLIC_URL');
+  if (!config.hasAccountId) missing.push('R2_ACCOUNT_ID or CLOUDFLARE_R2_ACCOUNT_ID');
+  if (!config.hasAccessKey) missing.push('R2_ACCESS_KEY_ID or CLOUDFLARE_R2_ACCESS_KEY_ID');
+  if (!config.hasSecretKey) missing.push('R2_SECRET_ACCESS_KEY or CLOUDFLARE_R2_SECRET_ACCESS_KEY');
+  if (!config.hasBucket) missing.push('R2_BUCKET or R2_BUCKET_NAME or CLOUDFLARE_R2_BUCKET');
 
   return missing;
 }
@@ -55,30 +44,31 @@ function shouldUseLocalDevStorage(): boolean {
   return process.env.NODE_ENV !== 'production' && process.env.ALLOW_LOCAL_UPLOAD_FALLBACK === '1';
 }
 
-function optionalEnv(...names: string[]): string | null {
-  for (const name of names) {
-    const value = process.env[name];
-
-    if (value) {
-      return value;
-    }
-  }
-
-  return null;
-}
-
 export function getPropertyImageUploadMode(): PropertyImageUploadMode {
-  if (missingR2ConfigKeys().length === 0) {
+  if (getR2ConfigStatus().isConfigured) {
     return 'r2';
   }
 
   return shouldUseLocalDevStorage() ? 'local fallback' : 'disabled';
 }
 
+export function getPropertyImageUploadConfigDiagnostics() {
+  const config = getR2ConfigStatus();
+
+  return {
+    hasAccountId: config.hasAccountId,
+    hasAccessKey: config.hasAccessKey,
+    hasSecretKey: config.hasSecretKey,
+    hasBucket: config.hasBucket,
+    hasPublicUrl: config.hasPublicUrl,
+    uploadMode: getPropertyImageUploadMode(),
+  };
+}
+
 export function assertPropertyImageUploadsConfigured(): void {
   const missing = missingR2ConfigKeys();
 
-  if (missing.length === 0 || shouldUseLocalDevStorage()) {
+  if (getR2ConfigStatus().isConfigured || shouldUseLocalDevStorage()) {
     return;
   }
 
@@ -154,7 +144,7 @@ export async function uploadPropertyImage(
     throw new PropertyImageUploadError(validationError, validationError);
   }
 
-  if (missingR2ConfigKeys().length === 0) {
+  if (getR2ConfigStatus().isConfigured) {
     return { imageUrl: await uploadToR2(file, propertyId) };
   }
 
