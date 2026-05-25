@@ -20,7 +20,10 @@ import { getSimilarProperties, propertyDetailsHref } from '@/lib/properties/sear
 import { formatCurrencyEUR } from '@/lib/format/currency';
 import { absoluteUrl, defaultKeywords } from '@/lib/seo';
 import { getTranslations } from '@/lib/i18n';
-import { canViewProperty, isPublicPropertyVisible } from '@/lib/properties/visibility';
+import {
+  getPropertyVisibilityDecision,
+  isPublicPropertyVisible,
+} from '@/lib/properties/visibility';
 import type { AuthUser } from '@/lib/auth/types';
 
 interface PropertyPageProps {
@@ -40,6 +43,11 @@ type PropertyLoadReason =
 interface PropertyLoadResult {
   property: typeof properties.$inferSelect;
   images: string[];
+}
+
+interface PropertyLoadMiss {
+  property: typeof properties.$inferSelect | null;
+  reason: PropertyLoadReason;
 }
 
 function logPropertyDetailsDecision(input: {
@@ -67,23 +75,73 @@ function logPropertyDetailsDecision(input: {
   });
 }
 
+function logPropertyDetailsNotFound(input: {
+  id: string;
+  parsedId: number | null;
+  property: typeof properties.$inferSelect | null;
+  user: AuthUser | null;
+  reason: PropertyLoadReason;
+}) {
+  const { id, parsedId, property, user, reason } = input;
+  const visibility = property ? getPropertyVisibilityDecision(property, user) : null;
+
+  console.log('[property-details-not-found]', {
+    id,
+    parsedId,
+    foundByIdOnly: Boolean(property),
+    isPublished: property?.isPublished ?? null,
+    moderationStatus: property?.moderationStatus ?? null,
+    currentUserRole: user?.role ?? 'guest',
+    isOwner: visibility?.isOwner ?? false,
+    reason,
+  });
+}
+
 function parsePropertyId(id: string): number | null {
   const propertyId = Number(id);
 
   return Number.isInteger(propertyId) && propertyId > 0 ? propertyId : null;
 }
 
+async function getPropertyByIdOnly(propertyId: number): Promise<typeof properties.$inferSelect | null> {
+  return db
+    .select()
+    .from(properties)
+    .where(eq(properties.id, propertyId))
+    .then((results) => results[0] ?? null);
+}
+
+async function getPropertyForMetadata(
+  requestedId: string,
+  propertyId: number,
+  user: AuthUser | null,
+): Promise<typeof properties.$inferSelect | null> {
+  try {
+    const property = await getPropertyByIdOnly(propertyId);
+
+    if (!property) {
+      return null;
+    }
+
+    return getPropertyVisibilityDecision(property, user).canView ? property : null;
+  } catch (error) {
+    console.warn('[property-details:metadata]', {
+      requestedPropertyId: requestedId,
+      parsedPropertyId: propertyId,
+      message: error instanceof Error ? error.message : 'Unknown metadata query error',
+    });
+
+    return null;
+  }
+}
+
 async function getProperty(
   requestedId: string,
   propertyId: number,
   user: AuthUser | null,
-): Promise<PropertyLoadResult | null> {
+): Promise<PropertyLoadResult | PropertyLoadMiss> {
   try {
-    const property = await db
-      .select()
-      .from(properties)
-      .where(eq(properties.id, propertyId))
-      .then((results) => results[0]);
+    const property = await getPropertyByIdOnly(propertyId);
 
     if (!property) {
       logPropertyDetailsDecision({
@@ -94,10 +152,12 @@ async function getProperty(
         canView: false,
         reason: 'property_not_found',
       });
-      return null;
+      return { property: null, reason: 'property_not_found' };
     }
 
-    if (!canViewProperty(property, user)) {
+    const visibility = getPropertyVisibilityDecision(property, user);
+
+    if (!visibility.canView) {
       logPropertyDetailsDecision({
         requestedId,
         parsedId: propertyId,
@@ -106,7 +166,7 @@ async function getProperty(
         canView: false,
         reason: 'access_denied',
       });
-      return null;
+      return { property, reason: 'access_denied' };
     }
 
     logPropertyDetailsDecision({
@@ -146,7 +206,7 @@ async function getProperty(
       reason: 'property_query_error',
       message: error instanceof Error ? error.message : 'Unknown property query error',
     });
-    return null;
+    return { property: null, reason: 'property_query_error' };
   }
 }
 
@@ -164,16 +224,15 @@ export async function generateMetadata(
   }
 
   const user = await getCurrentUser();
-  const data = await getProperty(id, propertyId, user);
+  const property = await getPropertyForMetadata(id, propertyId, user);
 
-  if (!data) {
+  if (!property) {
     return {
       title: 'Property Not Found',
       description: 'The property you are looking for does not exist.',
     };
   }
 
-  const { property } = data;
   const coverImageUrl = propertyImageUrl(property.imageCoverUrl, property.propertyType);
   const description = `${property.propertyType} in ${property.city} with ${property.bedrooms} bedroom${property.bedrooms !== 1 ? 's' : ''} and ${property.areaSqm} m².`;
 
@@ -231,6 +290,13 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
   const propertyId = parsePropertyId(id);
 
   if (!propertyId) {
+    logPropertyDetailsNotFound({
+      id,
+      parsedId: null,
+      property: null,
+      user: null,
+      reason: 'invalid_id',
+    });
     logPropertyDetailsDecision({
       requestedId: id,
       parsedId: null,
@@ -246,7 +312,14 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
   const t = await getTranslations();
   const data = await getProperty(id, propertyId, user);
 
-  if (!data) {
+  if ('reason' in data) {
+    logPropertyDetailsNotFound({
+      id,
+      parsedId: propertyId,
+      property: data.property,
+      user,
+      reason: data.reason,
+    });
     notFound();
   }
 
