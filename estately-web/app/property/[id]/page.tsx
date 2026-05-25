@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { eq } from 'drizzle-orm';
-import { db } from '@/src/db/client';
-import { properties } from '@/src/db/schema';
 import { formatCurrencyEUR } from '@/lib/format/currency';
+import { getCurrentUser } from '@/lib/auth';
+import { getMobilePropertyDetails } from '@/lib/mobile-api/properties';
 import { propertyImageUrl } from '@/lib/properties/image-url';
+import { canViewProperty } from '@/lib/properties/visibility';
 import { absoluteUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -23,14 +23,6 @@ function parsePropertyId(id: string): number | null {
   return Number.isInteger(propertyId) && propertyId > 0 ? propertyId : null;
 }
 
-async function getPropertyByIdOnly(propertyId: number) {
-  return db
-    .select()
-    .from(properties)
-    .where(eq(properties.id, propertyId))
-    .then((results) => results[0] ?? null);
-}
-
 export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
   const { id } = await params;
   const propertyId = parsePropertyId(id);
@@ -39,9 +31,9 @@ export async function generateMetadata({ params }: PropertyPageProps): Promise<M
     return {};
   }
 
-  const property = await getPropertyByIdOnly(propertyId);
+  const property = await getMobilePropertyDetails(propertyId);
 
-  if (!property) {
+  if (!property || !canViewProperty(property, null)) {
     return {};
   }
 
@@ -82,7 +74,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     notFound();
   }
 
-  const property = await getPropertyByIdOnly(propertyId);
+  const property = await getMobilePropertyDetails(propertyId);
 
   if (!property) {
     console.error('[property-details-not-found]', {
@@ -92,6 +84,20 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
       reason: 'missing-main-property',
     });
     notFound();
+  }
+
+  if (!canViewProperty(property, null)) {
+    const user = await getCurrentUser();
+
+    if (!canViewProperty(property, user)) {
+      console.error('[property-details-not-found]', {
+        id,
+        parsedId: propertyId,
+        foundByIdOnly: true,
+        reason: 'visibility-denied',
+      });
+      notFound();
+    }
   }
 
   const listingType = property.listingType === 'rent' ? 'rent' : 'sale';
