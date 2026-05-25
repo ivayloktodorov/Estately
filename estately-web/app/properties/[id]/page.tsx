@@ -30,46 +30,93 @@ interface PropertyPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-function logPropertyVisibilityDecision(
-  propertyId: number,
+type PropertyLoadReason =
+  | 'invalid_id'
+  | 'property_not_found'
+  | 'access_denied'
+  | 'visible'
+  | 'property_query_error';
+
+interface PropertyLoadResult {
+  property: typeof properties.$inferSelect;
+  images: string[];
+}
+
+function logPropertyDetailsDecision(input: {
+  requestedId: string;
+  parsedId: number | null;
   property: typeof properties.$inferSelect | null,
   user: AuthUser | null,
-  canView: boolean,
-) {
-  if (process.env.NODE_ENV !== 'development') {
-    return;
-  }
+  canView: boolean;
+  reason: PropertyLoadReason;
+}) {
+  const { requestedId, parsedId, property, user, canView, reason } = input;
 
-  console.info('[property-details:visibility]', {
-    requestedPropertyId: propertyId,
+  console.log('[property-details]', {
+    requestedPropertyId: requestedId,
+    parsedPropertyId: parsedId,
+    foundById: Boolean(property),
     foundPropertyId: property?.id ?? null,
     isPublished: property?.isPublished ?? null,
     moderationStatus: property?.moderationStatus ?? null,
-    currentUserRole: user?.role ?? 'guest',
+    currentUserId: user?.id ?? null,
+    currentUserRole: user?.role ?? null,
     isOwner: Boolean(user && property && user.id === property.createdByUserId),
     canView,
+    reason,
   });
 }
 
-async function getProperty(id: number, user: AuthUser | null) {
+function parsePropertyId(id: string): number | null {
+  const propertyId = Number(id);
+
+  return Number.isInteger(propertyId) && propertyId > 0 ? propertyId : null;
+}
+
+async function getProperty(
+  requestedId: string,
+  propertyId: number,
+  user: AuthUser | null,
+): Promise<PropertyLoadResult | null> {
   try {
     const property = await db
       .select()
       .from(properties)
-      .where(eq(properties.id, id))
+      .where(eq(properties.id, propertyId))
       .then((results) => results[0]);
 
     if (!property) {
-      logPropertyVisibilityDecision(id, null, user, false);
+      logPropertyDetailsDecision({
+        requestedId,
+        parsedId: propertyId,
+        property: null,
+        user,
+        canView: false,
+        reason: 'property_not_found',
+      });
       return null;
     }
 
     if (!canViewProperty(property, user)) {
-      logPropertyVisibilityDecision(id, property, user, false);
+      logPropertyDetailsDecision({
+        requestedId,
+        parsedId: propertyId,
+        property,
+        user,
+        canView: false,
+        reason: 'access_denied',
+      });
       return null;
     }
 
-    logPropertyVisibilityDecision(id, property, user, true);
+    logPropertyDetailsDecision({
+      requestedId,
+      parsedId: propertyId,
+      property,
+      user,
+      canView: true,
+      reason: 'visible',
+    });
 
     const fallbackImage = propertyImageUrl(property.imageCoverUrl, property.propertyType);
     let uploadedImages: string[] = [];
@@ -78,12 +125,10 @@ async function getProperty(id: number, user: AuthUser | null) {
       const images = await getOrCreatePropertyGalleryImages(property);
       uploadedImages = images.map((img) => img.imageUrl);
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[property-details:gallery]', {
-          propertyId: property.id,
-          message: error instanceof Error ? error.message : 'Unknown gallery error',
-        });
-      }
+      console.warn('[property-details:gallery]', {
+        propertyId: property.id,
+        message: error instanceof Error ? error.message : 'Unknown gallery error',
+      });
     }
 
     return {
@@ -91,7 +136,16 @@ async function getProperty(id: number, user: AuthUser | null) {
       images: uploadedImages.length > 0 ? uploadedImages : [fallbackImage],
     };
   } catch (error) {
-    console.error('Error fetching property:', error);
+    console.error('[property-details]', {
+      requestedPropertyId: requestedId,
+      parsedPropertyId: propertyId,
+      foundById: false,
+      currentUserId: user?.id ?? null,
+      currentUserRole: user?.role ?? null,
+      canView: false,
+      reason: 'property_query_error',
+      message: error instanceof Error ? error.message : 'Unknown property query error',
+    });
     return null;
   }
 }
@@ -100,9 +154,9 @@ export async function generateMetadata(
   { params }: PropertyPageProps
 ): Promise<Metadata> {
   const { id } = await params;
-  const numId = parseInt(id, 10);
+  const propertyId = parsePropertyId(id);
 
-  if (isNaN(numId)) {
+  if (!propertyId) {
     return {
       title: 'Property Not Found',
       description: 'The property you are looking for does not exist.',
@@ -110,7 +164,7 @@ export async function generateMetadata(
   }
 
   const user = await getCurrentUser();
-  const data = await getProperty(numId, user);
+  const data = await getProperty(id, propertyId, user);
 
   if (!data) {
     return {
@@ -174,17 +228,23 @@ function safeReturnTo(value: string): string {
 export default async function PropertyPage({ params, searchParams }: PropertyPageProps) {
   const { id } = await params;
   const query = searchParams ? await searchParams : {};
-  const numId = parseInt(id, 10);
+  const propertyId = parsePropertyId(id);
 
-  // Validate ID format
-  if (isNaN(numId) || numId <= 0) {
+  if (!propertyId) {
+    logPropertyDetailsDecision({
+      requestedId: id,
+      parsedId: null,
+      property: null,
+      user: null,
+      canView: false,
+      reason: 'invalid_id',
+    });
     notFound();
   }
 
-  // Fetch property data
   const user = await getCurrentUser();
   const t = await getTranslations();
-  const data = await getProperty(numId, user);
+  const data = await getProperty(id, propertyId, user);
 
   if (!data) {
     notFound();
@@ -200,7 +260,14 @@ export default async function PropertyPage({ params, searchParams }: PropertyPag
   const canContactAgent = isPublicPropertyVisible(property);
   const shouldOpenOfferForm = firstParam(query.intent) === 'offer';
   const returnTo = safeReturnTo(firstParam(query.returnTo));
-  const similarProperties = await getSimilarProperties(property, 6);
+  const similarProperties = await getSimilarProperties(property, 6).catch((error) => {
+    console.warn('[property-details:similar]', {
+      propertyId: property.id,
+      message: error instanceof Error ? error.message : 'Unknown similar properties error',
+    });
+
+    return [];
+  });
   const similarSearchHref = `/${listingType === 'rent' ? 'rent' : 'sale'}?${new URLSearchParams({
     city: property.city,
     type: property.propertyType,

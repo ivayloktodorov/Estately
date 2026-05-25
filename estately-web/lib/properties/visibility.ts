@@ -9,9 +9,9 @@ export function getPublicPropertyVisibilityCondition(): SQL {
 
 export function isPublicPropertyVisible(property: {
   isPublished: boolean;
-  moderationStatus: string;
+  moderationStatus: string | null | undefined;
 }): boolean {
-  return property.isPublished && property.moderationStatus === 'approved';
+  return property.isPublished && property.moderationStatus?.toLowerCase() === 'approved';
 }
 
 export function canViewProperty(
