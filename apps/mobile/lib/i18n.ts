@@ -6,7 +6,7 @@ type TranslationKey = keyof Dictionary;
 
 const dictionaries = { bg, en } satisfies Record<string, Dictionary>;
 
-const locale = 'bg';
+const locale = 'en';
 
 export function t(key: TranslationKey): string {
   return dictionaries[locale][key] ?? dictionaries.en[key];

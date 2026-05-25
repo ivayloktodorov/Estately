@@ -20,17 +20,17 @@ export function PropertyCard({
   onFavoritePress,
 }: PropertyCardProps) {
   return (
-    <View className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <View className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <View>
         <Pressable accessibilityRole="button" className="active:opacity-80" onPress={onPress}>
           {property.imageCoverUrl ? (
             <Image
-              className="h-48 w-full bg-slate-200"
+              className="h-52 w-full bg-slate-200"
               resizeMode="cover"
               source={{ uri: property.imageCoverUrl }}
             />
           ) : (
-            <View className="h-48 w-full items-center justify-center bg-slate-200">
+            <View className="h-52 w-full items-center justify-center bg-slate-200">
               <Text className="text-sm font-medium text-slate-500">{t('noImage')}</Text>
             </View>
           )}
@@ -59,10 +59,18 @@ export function PropertyCard({
 
       <Pressable accessibilityRole="button" className="gap-3 p-4 active:opacity-80" onPress={onPress}>
         <View className="gap-1">
-          <Text className="text-2xl font-bold text-slate-950">{formatPrice(property.price)}</Text>
-          <Text className="text-lg font-semibold text-slate-900">{property.title}</Text>
-          <Text className="text-sm text-slate-600">{property.address}</Text>
-          <Text className="text-sm font-medium text-slate-700">{property.city}</Text>
+          <Text className="text-2xl font-bold text-slate-950" numberOfLines={1}>
+            {formatPrice(property.price)}
+          </Text>
+          <Text className="text-lg font-semibold text-slate-900" numberOfLines={2}>
+            {property.title}
+          </Text>
+          <Text className="text-sm text-slate-600" numberOfLines={1}>
+            {property.address}
+          </Text>
+          <Text className="text-sm font-medium text-slate-700" numberOfLines={1}>
+            {property.city}
+          </Text>
         </View>
 
         <View className="flex-row flex-wrap gap-2">

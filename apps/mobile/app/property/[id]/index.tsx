@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { ContactAgentCard } from '@/components/property/contact-agent-card';
 import { PropertyDetailsInfo } from '@/components/property/property-details-info';
 import { PropertyImageGallery } from '@/components/property/property-image-gallery';
@@ -63,6 +64,21 @@ export default function PropertyDetailsScreen() {
   return (
     <Screen scroll>
       <View className="gap-6">
+        <Pressable
+          accessibilityLabel={t('backToListings')}
+          accessibilityRole="button"
+          className="h-11 flex-row items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-4 active:bg-slate-100"
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+              return;
+            }
+
+            router.replace('/(tabs)/home');
+          }}>
+          <Ionicons color="#334155" name="chevron-back" size={20} />
+          <Text className="text-sm font-semibold text-slate-700">{t('backToListings')}</Text>
+        </Pressable>
         <PropertyImageGallery property={property} />
         <PropertyDetailsInfo
           isFavorite={favoriteIds.has(property.id)}

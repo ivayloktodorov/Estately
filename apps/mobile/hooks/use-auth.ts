@@ -44,6 +44,8 @@ export function useLogout() {
     mutationFn: authService.logout,
     onSuccess: () => {
       queryClient.setQueryData(authSessionQueryKey, null);
+      queryClient.removeQueries({ queryKey: ['auth', 'me'] });
+      queryClient.removeQueries({ queryKey: ['favorites'] });
     },
   });
 }

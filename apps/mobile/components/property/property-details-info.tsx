@@ -31,7 +31,9 @@ export function PropertyDetailsInfo({
 
         <View className="flex-row items-start gap-4">
           <View className="flex-1 gap-2">
-            <Text className="text-3xl font-bold text-slate-950">{formatPrice(property.price)}</Text>
+            <Text className="text-3xl font-bold text-slate-950" numberOfLines={1}>
+              {formatPrice(property.price)}
+            </Text>
             <Text className="text-2xl font-semibold text-slate-900">{property.title}</Text>
           </View>
 
@@ -56,10 +58,12 @@ export function PropertyDetailsInfo({
         <Text className="text-base font-medium text-slate-700">{property.city}</Text>
       </View>
 
-      <View className="gap-2">
-        <Text className="text-xl font-bold text-slate-950">{t('description')}</Text>
-        <Text className="text-base leading-7 text-slate-700">{property.description}</Text>
-      </View>
+      {property.description ? (
+        <View className="gap-2">
+          <Text className="text-xl font-bold text-slate-950">{t('description')}</Text>
+          <Text className="text-base leading-7 text-slate-700">{property.description}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }

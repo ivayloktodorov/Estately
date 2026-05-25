@@ -154,6 +154,12 @@ R2_BUCKET_NAME=
 
 The mobile app is deployed separately as a static Expo Web export.
 
+Production mobile review URL:
+
+```text
+https://estatelybg-mobile.netlify.app
+```
+
 Set the mobile app API URL to the deployed web/backend origin:
 
 ```env

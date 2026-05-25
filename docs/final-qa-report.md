@@ -22,6 +22,14 @@ Date: 2026-05-25
 3. Admin: sign in from `/softuni-exam`, check admin dashboard, property moderation, user management, messages, approve/reject property, edit user, and logout.
 4. Mobile web: open the mobile URL, check property list, property details, login, favorites, and profile.
 
+## Mobile API Verification
+
+- `GET https://estatelybg.netlify.app/api/mobile/properties`: passed with published property results and pagination.
+- `GET https://estatelybg.netlify.app/api/mobile/properties/23`: passed with image, EUR-compatible price data, title, address, description, beds, baths, area, and gallery data.
+- `POST https://estatelybg.netlify.app/api/mobile/auth/login`: passed for `softuni_user@estately.com` / `pass123`.
+- Authenticated `GET /api/mobile/me`: passed with the SoftUni user profile.
+- Authenticated `GET /api/mobile/favorites`: passed with an empty-state-compatible response.
+
 ## Hardening Changes
 
 - Visible EN/BG language switcher was removed from the header and mobile menu for final submission.
@@ -51,6 +59,7 @@ Date: 2026-05-25
 - R2 should be verified through the real add/edit property image upload workflow in the deployed environment.
 - Seed and load-test scripts are intended for demo/review databases, not long-lived production data.
 - Production mobile export must be built with `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`.
+- Mobile UI is intentionally focused on core review flows: browse, search, details, login/register, favorites, profile, and logout.
 
 ## Final Checklist
 
@@ -60,6 +69,8 @@ Date: 2026-05-25
 - [x] Guest, user, admin, and mobile review paths documented.
 - [x] Requirement coverage documented.
 - [x] Production URLs and demo accounts documented.
+- [x] Mobile production API connection verified.
+- [x] Mobile core flows and empty/error/loading states reviewed.
 
 ## Final Build Verification
 

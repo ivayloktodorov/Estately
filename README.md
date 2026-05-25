@@ -220,6 +220,18 @@ API docs:
 - Favorites
 - Profile
 
+Mobile review URL:
+
+```text
+https://estatelybg-mobile.netlify.app
+```
+
+The mobile web export is built with:
+
+```bash
+EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app npm run mobile:export-web
+```
+
 ## 13. Scalability
 
 Estately includes scalability support for large listing datasets:

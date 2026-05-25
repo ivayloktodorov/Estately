@@ -75,6 +75,7 @@ const knownLimitations = [
   'Bulgarian translation files remain in the repository, but the visible language switcher is hidden and the final UI defaults to English.',
   'R2 should be verified through the real add/edit property image workflow with production credentials.',
   'Seed and load-test scripts are for demo/review databases and should not be run against long-lived production data.',
+  'Mobile web focuses on the core reviewer flows: browse, search, details, login/register, favorites, profile, and logout.',
 ];
 
 const finalChecklist = [
@@ -82,6 +83,7 @@ const finalChecklist = [
   'User dashboard, favorites, property, inquiry, offer, messages, notifications, and logout paths documented',
   'Admin dashboard, moderation, users, messages, approve/reject, edit user, and logout paths documented',
   'Mobile web property list, details, login, favorites, and profile paths documented',
+  'Mobile production API endpoints verified against https://estatelybg.netlify.app',
   'Public debug/test routes removed except SoftUni Exam',
   'Build, lint, mobile typecheck, and mobile export commands documented in final QA',
 ];

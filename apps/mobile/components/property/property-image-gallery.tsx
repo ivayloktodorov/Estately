@@ -1,4 +1,4 @@
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { t } from '@/lib/i18n';
 import type { PropertyDetails } from '@/types/property';
 
@@ -16,12 +16,14 @@ function imageUrlsForProperty(property: PropertyDetails): string[] {
 }
 
 export function PropertyImageGallery({ property }: PropertyImageGalleryProps) {
+  const { width } = useWindowDimensions();
   const imageUrls = imageUrlsForProperty(property);
   const [heroImageUrl, ...secondaryImageUrls] = imageUrls;
+  const heroHeight = Math.min(320, Math.max(240, Math.round(width * 0.68)));
 
   if (!heroImageUrl) {
     return (
-      <View className="h-72 items-center justify-center rounded-xl bg-slate-200">
+      <View className="items-center justify-center rounded-xl bg-slate-200" style={{ height: heroHeight }}>
         <Text className="text-base font-medium text-slate-500">{t('noImagesAvailable')}</Text>
       </View>
     );
@@ -29,7 +31,12 @@ export function PropertyImageGallery({ property }: PropertyImageGalleryProps) {
 
   return (
     <View className="gap-3">
-      <Image className="h-72 w-full rounded-xl bg-slate-200" resizeMode="cover" source={{ uri: heroImageUrl }} />
+      <Image
+        className="w-full rounded-xl bg-slate-200"
+        resizeMode="cover"
+        source={{ uri: heroImageUrl }}
+        style={{ height: heroHeight }}
+      />
 
       {secondaryImageUrls.length > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
