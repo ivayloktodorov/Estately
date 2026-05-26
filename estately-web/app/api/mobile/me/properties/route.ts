@@ -1,14 +1,14 @@
 import { desc, eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { db } from '@/src/db/client';
 import { properties } from '@/src/db/schema';
 
 export async function GET(request: NextRequest) {
   const user = await getMobileAuthUser(request);
 
-  if (!user) return mobileError('Authentication required.', 401);
+  if (!user) return mobileError('Authentication required.', 401, request);
 
   try {
     const rows = await db
@@ -34,8 +34,10 @@ export async function GET(request: NextRequest) {
       .orderBy(desc(properties.createdAt), desc(properties.id))
       .limit(100);
 
-    return mobileSuccess(rows);
+    return mobileSuccess(rows, 200, request);
   } catch {
-    return mobileError('Unable to load your properties right now.', 500);
+    return mobileError('Unable to load your properties right now.', 500, request);
   }
 }
+
+export const OPTIONS = mobileOptions;

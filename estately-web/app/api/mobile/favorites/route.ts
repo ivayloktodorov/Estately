@@ -3,14 +3,14 @@ import { NextRequest } from 'next/server';
 import { db } from '@/src/db/client';
 import { favorites, properties } from '@/src/db/schema';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { mobileFavoriteSchema, validationErrorMessage } from '@/lib/mobile-api/validation';
 
 export async function GET(request: NextRequest) {
   const user = await getMobileAuthUser(request);
 
   if (!user) {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 
   const savedProperties = await db
@@ -40,14 +40,14 @@ export async function GET(request: NextRequest) {
     .where(and(eq(favorites.userId, user.id), eq(properties.moderationStatus, 'approved'), eq(properties.isPublished, true)))
     .orderBy(desc(favorites.createdAt));
 
-  return mobileSuccess({ properties: savedProperties });
+  return mobileSuccess({ properties: savedProperties }, 200, request);
 }
 
 export async function POST(request: NextRequest) {
   const user = await getMobileAuthUser(request);
 
   if (!user) {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 
   try {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       .then((rows) => rows[0]);
 
     if (!property) {
-      return mobileError('Property not found.', 404);
+      return mobileError('Property not found.', 404, request);
     }
 
     await db
@@ -69,8 +69,10 @@ export async function POST(request: NextRequest) {
         target: [favorites.userId, favorites.propertyId],
       });
 
-    return mobileSuccess({ propertyId, isFavorited: true }, 201);
+    return mobileSuccess({ propertyId, isFavorited: true }, 201, request);
   } catch (error) {
-    return mobileError(validationErrorMessage(error), 400);
+    return mobileError(validationErrorMessage(error), 400, request);
   }
 }
+
+export const OPTIONS = mobileOptions;

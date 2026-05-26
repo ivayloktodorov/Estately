@@ -1,20 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { verifyAuthToken } from './lib/auth/jwt';
 import { AUTH_COOKIE_NAME } from './lib/auth/types';
+import { withMobileCorsHeaders } from './lib/mobile-api/responses';
 
 const protectedPagePaths = ['/dashboard', '/profile', '/favorites'];
 const adminPaths = ['/admin', '/api/admin'];
 const protectedApiPaths = ['/api/protected', '/api/notifications', '/api/profile', '/api/messages/attachments'];
 const mobileApiPaths = ['/api/mobile'];
-
-function withMobileCorsHeaders(response: NextResponse): NextResponse {
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  response.headers.set('Access-Control-Max-Age', '86400');
-
-  return response;
-}
 
 function isPathMatch(pathname: string, paths: string[]): boolean {
   return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -39,13 +31,13 @@ export async function middleware(request: NextRequest) {
   const isProtectedApi = isPathMatch(pathname, protectedApiPaths);
 
   if (isMobileApi && request.method === 'OPTIONS') {
-    return withMobileCorsHeaders(new NextResponse(null, { status: 204 }));
+    return withMobileCorsHeaders(new NextResponse(null, { status: 204 }), request);
   }
 
   if (!isAdminRoute && !isProtectedPage && !isProtectedApi) {
     const response = NextResponse.next();
 
-    return isMobileApi ? withMobileCorsHeaders(response) : response;
+    return isMobileApi ? withMobileCorsHeaders(response, request) : response;
   }
 
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -55,7 +47,7 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/api/')) {
       const response = unauthorizedJson(401, 'UNAUTHORIZED', 'Authentication required.');
 
-      return isMobileApi ? withMobileCorsHeaders(response) : response;
+      return isMobileApi ? withMobileCorsHeaders(response, request) : response;
     }
 
     return redirectToLogin(request);
@@ -73,7 +65,7 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  return isMobileApi ? withMobileCorsHeaders(response) : response;
+  return isMobileApi ? withMobileCorsHeaders(response, request) : response;
 }
 
 export const config = {

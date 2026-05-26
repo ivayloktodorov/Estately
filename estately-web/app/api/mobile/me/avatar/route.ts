@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createActivity } from '@/lib/activity/service';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { getUserProfile, updateUserProfile } from '@/lib/users/profile';
 import { uploadR2Image, validateR2ImageFile } from '@/services/storage/r2';
 
@@ -24,21 +24,21 @@ export async function POST(request: NextRequest) {
   try {
     user = await getMobileAuthUser(request);
   } catch {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 
-  if (!user) return mobileError('Authentication required.', 401);
+  if (!user) return mobileError('Authentication required.', 401, request);
 
   try {
     const profile = await getUserProfile(user.id);
     const body = await request.json();
     const file = fileFromDataUrl(String(body.dataUrl ?? ''), String(body.fileName ?? 'avatar'));
 
-    if (!profile) return mobileError('Profile could not be found.', 404);
-    if (!file) return mobileError('Only JPG, JPEG, PNG, and WEBP images are allowed.', 400);
+    if (!profile) return mobileError('Profile could not be found.', 404, request);
+    if (!file) return mobileError('Only JPG, JPEG, PNG, and WEBP images are allowed.', 400, request);
 
     const validationError = validateR2ImageFile(file);
-    if (validationError) return mobileError(validationError, 400);
+    if (validationError) return mobileError(validationError, 400, request);
 
     const upload = await uploadR2Image(file, 'avatars');
     await updateUserProfile(user.id, {
@@ -58,14 +58,15 @@ export async function POST(request: NextRequest) {
       entityId: user.id,
     });
 
-    return mobileSuccess({ avatarUrl: upload.imageUrl });
+    return mobileSuccess({ avatarUrl: upload.imageUrl }, 200, request);
   } catch (error) {
     if (error instanceof SyntaxError) {
-      return mobileError('Invalid avatar upload request.', 400);
+      return mobileError('Invalid avatar upload request.', 400, request);
     }
 
-    return mobileError('Unable to upload avatar. Please try again.', 400);
+    return mobileError('Unable to upload avatar. Please try again.', 400, request);
   }
 }
 
 export const PATCH = POST;
+export const OPTIONS = mobileOptions;

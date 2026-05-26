@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { db } from '@/src/db/client';
 import { properties, propertyMessages } from '@/src/db/schema';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { createActivity } from '@/lib/activity/service';
 import { createOrReuseConversationAndMessage } from '@/lib/messages/service';
 import { notifyPropertyOwnerOfInquiry } from '@/lib/notifications/service';
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
   const user = await getMobileAuthUser(request);
 
   if (!user) {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 
   try {
@@ -43,11 +43,11 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
       .then((rows) => rows[0]);
 
     if (!property || property.moderationStatus !== 'approved' || !property.isPublished) {
-      return mobileError('Property not found.', 404);
+      return mobileError('Property not found.', 404, request);
     }
 
     if (property.ownerUserId === user.id) {
-      return mobileError('You cannot send an inquiry to your own property.', 400);
+      return mobileError('You cannot send an inquiry to your own property.', 400, request);
     }
 
     const [inquiry] = await db
@@ -81,8 +81,10 @@ export async function POST(request: NextRequest, { params }: MobilePropertyInqui
     });
     await notifyPropertyOwnerOfInquiry(propertyId);
 
-    return mobileSuccess({ inquiry }, 201);
+    return mobileSuccess({ inquiry }, 201, request);
   } catch (error) {
-    return mobileError(validationErrorMessage(error), 400);
+    return mobileError(validationErrorMessage(error), 400, request);
   }
 }
+
+export const OPTIONS = mobileOptions;

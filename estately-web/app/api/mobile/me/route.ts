@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createActivity } from '@/lib/activity/service';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { getUserProfile, updateUserProfile } from '@/lib/users/profile';
 
 function nameParts(fullName: string) {
@@ -26,11 +26,11 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getMobileAuthUser(request);
 
-    if (!user) return mobileError('Authentication required.', 401);
+    if (!user) return mobileError('Authentication required.', 401, request);
 
-    return mobileSuccess(user);
+    return mobileSuccess(user, 200, request);
   } catch {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 }
 
@@ -40,16 +40,16 @@ export async function PATCH(request: NextRequest) {
   try {
     user = await getMobileAuthUser(request);
   } catch {
-    return mobileError('Authentication required.', 401);
+    return mobileError('Authentication required.', 401, request);
   }
 
-  if (!user) return mobileError('Authentication required.', 401);
+  if (!user) return mobileError('Authentication required.', 401, request);
 
   try {
     const profile = await getUserProfile(user.id);
     const body = await request.json();
 
-    if (!profile) return mobileError('Profile could not be found.', 404);
+    if (!profile) return mobileError('Profile could not be found.', 404, request);
 
     const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : profile.fullName;
     const email = typeof body.email === 'string' ? body.email.trim() : profile.email;
@@ -73,8 +73,10 @@ export async function PATCH(request: NextRequest) {
     });
 
     const updatedProfile = await getUserProfile(user.id);
-    return mobileSuccess(updatedProfile);
+    return mobileSuccess(updatedProfile, 200, request);
   } catch (error) {
-    return mobileError(safeProfileError(error), 400);
+    return mobileError(safeProfileError(error), 400, request);
   }
 }
+
+export const OPTIONS = mobileOptions;

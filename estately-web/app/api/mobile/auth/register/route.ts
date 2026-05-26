@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { AuthError } from '@/lib/auth/errors';
 import { signAuthToken } from '@/lib/auth/jwt';
 import { authService } from '@/lib/auth/service';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { mobileRegisterSchema, validationErrorMessage } from '@/lib/mobile-api/validation';
 
 export async function POST(request: NextRequest) {
@@ -15,10 +15,12 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    return mobileSuccess({ token, user }, 201);
+    return mobileSuccess({ token, user }, 201, request);
   } catch (error) {
     const status = error instanceof AuthError && error.code === 'DUPLICATE_EMAIL' ? 409 : 400;
 
-    return mobileError(validationErrorMessage(error), status);
+    return mobileError(validationErrorMessage(error), status, request);
   }
 }
+
+export const OPTIONS = mobileOptions;

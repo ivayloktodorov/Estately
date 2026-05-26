@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { createActivity } from '@/lib/activity/service';
 import { getMobileAuthUser } from '@/lib/mobile-api/auth';
 import { getMobilePaginatedProperties } from '@/lib/mobile-api/properties';
-import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
+import { mobileError, mobileOptions, mobileSuccess } from '@/lib/mobile-api/responses';
 import { mobilePropertyFiltersSchema, validationErrorMessage } from '@/lib/mobile-api/validation';
 import { notifyAdminsOfPendingListing } from '@/lib/notifications/service';
 import { LISTING_TYPES, PROPERTY_TYPES } from '@/lib/properties/constants';
@@ -52,16 +52,16 @@ export async function GET(request: NextRequest) {
     const filters = mobilePropertyFiltersSchema.parse(searchParamsToRecord(request.nextUrl.searchParams));
     const result = await getMobilePaginatedProperties(filters);
 
-    return mobileSuccess(result);
+    return mobileSuccess(result, 200, request);
   } catch (error) {
-    return mobileError(validationErrorMessage(error), 400);
+    return mobileError(validationErrorMessage(error), 400, request);
   }
 }
 
 export async function POST(request: NextRequest) {
   const user = await getMobileAuthUser(request);
 
-  if (!user) return mobileError('Authentication required.', 401);
+  if (!user) return mobileError('Authentication required.', 401, request);
 
   try {
     const body = await request.json();
@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
       areaSqm: String(body.areaSqm ?? ''),
     });
 
-    if (!parsed.success) return mobileError(parsed.error.issues[0]?.message ?? 'Please check the property details.', 400);
+    if (!parsed.success) return mobileError(parsed.error.issues[0]?.message ?? 'Please check the property details.', 400, request);
     if (parsed.data.price > maxPropertyPrice) {
-      return mobileError('Price is too large. Please enter a realistic property price.', 400);
+      return mobileError('Price is too large. Please enter a realistic property price.', 400, request);
     }
 
     if (!PROPERTY_TYPES.includes(parsed.data.propertyType) || !LISTING_TYPES.includes(parsed.data.listingType)) {
-      return mobileError('Please select valid property and listing types.', 400);
+      return mobileError('Please select valid property and listing types.', 400, request);
     }
 
     const images: unknown[] = Array.isArray(body.images) ? body.images.slice(0, maxPropertyImages) : [];
@@ -92,18 +92,18 @@ export async function POST(request: NextRequest) {
       .map((image, index) => fileFromDataUrl(imageDataUrl(image), index))
       .filter((file): file is File => Boolean(file));
 
-    if (images.length > maxPropertyImages) return mobileError(`Please upload ${maxPropertyImages} images or fewer.`, 400);
+    if (images.length > maxPropertyImages) return mobileError(`Please upload ${maxPropertyImages} images or fewer.`, 400, request);
 
     for (const file of files) {
       const validationError = validatePropertyImageFile(file);
-      if (validationError) return mobileError(validationError, 400);
+      if (validationError) return mobileError(validationError, 400, request);
     }
 
     if (files.length > 0) {
       try {
         assertPropertyImageUploadsConfigured();
       } catch {
-        return mobileError('Image upload is not configured in production.', 400);
+        return mobileError('Image upload is not configured in production.', 400, request);
       }
     }
 
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       })
       .returning({ id: properties.id, title: properties.title });
 
-    if (!createdProperty) return mobileError('Unable to create property right now. Please try again.', 400);
+    if (!createdProperty) return mobileError('Unable to create property right now. Please try again.', 400, request);
 
     await createActivity({
       userId: user.id,
@@ -158,8 +158,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return mobileSuccess({ id: createdProperty.id, title: createdProperty.title, status: 'pending' }, 201);
+    return mobileSuccess({ id: createdProperty.id, title: createdProperty.title, status: 'pending' }, 201, request);
   } catch {
-    return mobileError('Unable to create property right now. Please try again.', 400);
+    return mobileError('Unable to create property right now. Please try again.', 400, request);
   }
 }
+
+export const OPTIONS = mobileOptions;
