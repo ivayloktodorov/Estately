@@ -19,7 +19,13 @@ function fileFromDataUrl(dataUrl: string, fileName = 'avatar'): File | null {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getMobileAuthUser(request);
+  let user;
+
+  try {
+    user = await getMobileAuthUser(request);
+  } catch {
+    return mobileError('Authentication required.', 401);
+  }
 
   if (!user) return mobileError('Authentication required.', 401);
 
@@ -53,7 +59,13 @@ export async function POST(request: NextRequest) {
     });
 
     return mobileSuccess({ avatarUrl: upload.imageUrl });
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return mobileError('Invalid avatar upload request.', 400);
+    }
+
     return mobileError('Unable to upload avatar. Please try again.', 400);
   }
 }
+
+export const PATCH = POST;

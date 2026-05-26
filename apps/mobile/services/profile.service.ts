@@ -17,14 +17,16 @@ export function updateProfile(input: UpdateProfileInput): Promise<AuthUser> {
     method: 'PATCH',
     body: input,
     requiresAuth: true,
+    diagnosticsLabel: 'profile-update',
   });
 }
 
 export function changePassword(input: ChangePasswordInput): Promise<{ changed: boolean }> {
   return apiRequest<{ changed: boolean }, ChangePasswordInput>('/me/password', {
-    method: 'POST',
+    method: 'PATCH',
     body: input,
     requiresAuth: true,
+    diagnosticsLabel: 'profile-password',
   });
 }
 
@@ -33,5 +35,6 @@ export function uploadAvatar(input: { dataUrl: string; fileName?: string }): Pro
     method: 'POST',
     body: input,
     requiresAuth: true,
+    diagnosticsLabel: 'profile-avatar',
   });
 }

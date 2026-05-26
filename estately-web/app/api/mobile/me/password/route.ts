@@ -3,8 +3,14 @@ import { getMobileAuthUser } from '@/lib/mobile-api/auth';
 import { mobileError, mobileSuccess } from '@/lib/mobile-api/responses';
 import { changeUserPassword } from '@/lib/users/profile';
 
-export async function POST(request: NextRequest) {
-  const user = await getMobileAuthUser(request);
+export async function PATCH(request: NextRequest) {
+  let user;
+
+  try {
+    user = await getMobileAuthUser(request);
+  } catch {
+    return mobileError('Authentication required.', 401);
+  }
 
   if (!user) return mobileError('Authentication required.', 401);
 
@@ -18,6 +24,12 @@ export async function POST(request: NextRequest) {
 
     return mobileSuccess({ changed: true });
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      return mobileError('Invalid password change request.', 400);
+    }
+
     return mobileError(error instanceof Error ? error.message : 'Could not change password.', 400);
   }
 }
+
+export const POST = PATCH;

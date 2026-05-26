@@ -23,15 +23,25 @@ function safeProfileError(error: unknown): string {
 }
 
 export async function GET(request: NextRequest) {
-  const user = await getMobileAuthUser(request);
+  try {
+    const user = await getMobileAuthUser(request);
 
-  if (!user) return mobileError('Authentication required.', 401);
+    if (!user) return mobileError('Authentication required.', 401);
 
-  return mobileSuccess(user);
+    return mobileSuccess(user);
+  } catch {
+    return mobileError('Authentication required.', 401);
+  }
 }
 
 export async function PATCH(request: NextRequest) {
-  const user = await getMobileAuthUser(request);
+  let user;
+
+  try {
+    user = await getMobileAuthUser(request);
+  } catch {
+    return mobileError('Authentication required.', 401);
+  }
 
   if (!user) return mobileError('Authentication required.', 401);
 

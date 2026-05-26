@@ -10,6 +10,7 @@ interface ApiRequestOptions<TBody> {
   token?: string | null;
   requiresAuth?: boolean;
   headers?: Record<string, string>;
+  diagnosticsLabel?: string;
 }
 
 const REQUEST_TIMEOUT_MS = 8000;
@@ -24,6 +25,7 @@ export async function apiRequest<TData, TBody = unknown>(
 ): Promise<TData> {
   const token = options.token ?? (options.requiresAuth ? await getStoredToken() : null);
   const url = buildUrl(path);
+  const method = options.method ?? 'GET';
   const abortController = new AbortController();
   const timeoutId = setTimeout(() => abortController.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
@@ -31,7 +33,7 @@ export async function apiRequest<TData, TBody = unknown>(
   try {
     response = await Promise.race([
       fetch(url, {
-        method: options.method ?? 'GET',
+        method,
         headers: {
           Accept: 'application/json',
           ...(options.body ? { 'Content-Type': 'application/json' } : {}),
@@ -54,6 +56,23 @@ export async function apiRequest<TData, TBody = unknown>(
   const contentType = response.headers.get('content-type') ?? '';
   const responseText = await response.text();
   let payload: ApiResponse<TData> | null = null;
+
+  if (options.diagnosticsLabel) {
+    const diagnostics = {
+      label: options.diagnosticsLabel,
+      url,
+      method,
+      status: response.status,
+      contentType,
+      ...(contentType.includes('application/json') ? {} : { bodyPreview: responseText.slice(0, 240) }),
+    };
+
+    if (response.ok) {
+      console.info('[mobile-api:profile-request]', diagnostics);
+    } else {
+      console.warn('[mobile-api:profile-request]', diagnostics);
+    }
+  }
 
   try {
     payload = JSON.parse(responseText) as ApiResponse<TData>;
