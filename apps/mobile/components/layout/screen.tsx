@@ -10,14 +10,16 @@ export function Screen({ children, scroll = false }: ScreenProps) {
   if (scroll) {
     return (
       <SafeAreaView className="flex-1 bg-slate-50">
-        <ScrollView contentContainerClassName="px-4 py-5 sm:px-5 sm:py-6">{children}</ScrollView>
+        <ScrollView contentContainerClassName="px-4 pb-28 pt-5 sm:px-5 sm:pb-32 sm:pt-6">
+          {children}
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      <View className="flex-1 px-4 py-5 sm:px-5 sm:py-6">{children}</View>
+      <View className="flex-1 px-4 pb-28 pt-5 sm:px-5 sm:pb-32 sm:pt-6">{children}</View>
     </SafeAreaView>
   );
 }

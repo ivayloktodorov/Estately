@@ -146,32 +146,43 @@ function NumericFilter({ label, value, onChangeText, placeholder }: NumericFilte
 }
 
 export default function SearchScreen() {
-  const [filters, setFilters] = useState<SearchFilters>(defaultFilters);
+  const [draftFilters, setDraftFilters] = useState<SearchFilters>(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState<SearchFilters>(defaultFilters);
   const favoriteIds = useFavoriteIds();
   const toggleFavoriteMutation = useToggleFavorite();
   const searchQuery = useInfiniteQuery({
-    queryKey: ['properties', 'search', filters],
-    queryFn: ({ pageParam }) => getProperties(toPropertyFilters(filters, pageParam)),
+    queryKey: ['properties', 'search', appliedFilters],
+    queryFn: ({ pageParam }) => getProperties(toPropertyFilters(appliedFilters, pageParam)),
     initialPageParam: 1,
     retry: false,
     getNextPageParam: (lastPage) =>
       lastPage.pagination.hasNextPage ? lastPage.pagination.page + 1 : undefined,
   });
   const properties = flattenProperties(searchQuery.data?.pages);
-  const hasActiveFilters = JSON.stringify(filters) !== JSON.stringify(defaultFilters);
+  const hasActiveFilters = JSON.stringify(appliedFilters) !== JSON.stringify(defaultFilters);
+  const hasDraftChanges = JSON.stringify(draftFilters) !== JSON.stringify(appliedFilters);
 
   function updateFilter<TKey extends keyof SearchFilters>(key: TKey, value: SearchFilters[TKey]) {
-    setFilters((current) => ({ ...current, [key]: value }));
+    setDraftFilters((current) => ({ ...current, [key]: value }));
   }
 
   function toggleFilter<TKey extends keyof SearchFilters>(key: TKey, value: string) {
-    setFilters((current) => ({ ...current, [key]: current[key] === value ? '' : value }));
+    setDraftFilters((current) => ({ ...current, [key]: current[key] === value ? '' : value }));
   }
 
   function handleLoadMore() {
     if (searchQuery.hasNextPage && !searchQuery.isFetchingNextPage) {
       searchQuery.fetchNextPage();
     }
+  }
+
+  function applyFilters() {
+    setAppliedFilters(draftFilters);
+  }
+
+  function clearFilters() {
+    setDraftFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
   }
 
   return (
@@ -231,10 +242,11 @@ export default function SearchScreen() {
               <TextInput
                 className="h-12 rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900"
                 onChangeText={(value) => updateFilter('search', value)}
+                onSubmitEditing={applyFilters}
                 placeholder={t('searchMobilePlaceholder')}
                 placeholderTextColor="#94a3b8"
                 returnKeyType="search"
-                value={filters.search}
+                value={draftFilters.search}
               />
             </View>
 
@@ -244,7 +256,7 @@ export default function SearchScreen() {
                   key={city}
                   label={city}
                   onPress={() => toggleFilter('city', city)}
-                  selected={filters.city === city}
+                  selected={draftFilters.city === city}
                 />
               ))}
             </FilterGroup>
@@ -255,7 +267,7 @@ export default function SearchScreen() {
                   key={propertyType}
                   label={formatFilterLabel(propertyType)}
                   onPress={() => toggleFilter('propertyType', propertyType)}
-                  selected={filters.propertyType === propertyType}
+                  selected={draftFilters.propertyType === propertyType}
                 />
               ))}
             </FilterGroup>
@@ -266,7 +278,7 @@ export default function SearchScreen() {
                   key={listingType}
                   label={formatFilterLabel(listingType)}
                   onPress={() => toggleFilter('listingType', listingType)}
-                  selected={filters.listingType === listingType}
+                  selected={draftFilters.listingType === listingType}
                 />
               ))}
             </FilterGroup>
@@ -276,25 +288,25 @@ export default function SearchScreen() {
                 label={t('minPrice')}
                 onChangeText={(value) => updateFilter('minPrice', value)}
                 placeholder={t('any')}
-                value={filters.minPrice}
+                value={draftFilters.minPrice}
               />
               <NumericFilter
                 label={t('maxPrice')}
                 onChangeText={(value) => updateFilter('maxPrice', value)}
                 placeholder={t('any')}
-                value={filters.maxPrice}
+                value={draftFilters.maxPrice}
               />
               <NumericFilter
                 label={t('minBedrooms')}
                 onChangeText={(value) => updateFilter('bedrooms', value)}
                 placeholder={t('any')}
-                value={filters.bedrooms}
+                value={draftFilters.bedrooms}
               />
               <NumericFilter
                 label={t('minBathrooms')}
                 onChangeText={(value) => updateFilter('bathrooms', value)}
                 placeholder={t('any')}
-                value={filters.bathrooms}
+                value={draftFilters.bathrooms}
               />
             </View>
 
@@ -304,17 +316,24 @@ export default function SearchScreen() {
                   key={sortOption.value}
                   label={t(sortOption.labelKey)}
                   onPress={() => updateFilter('sort', sortOption.value)}
-                  selected={filters.sort === sortOption.value}
+                  selected={draftFilters.sort === sortOption.value}
                 />
               ))}
             </FilterGroup>
 
-            <Button
-              disabled={!hasActiveFilters}
-              label={t('clearFilters')}
-              onPress={() => setFilters(defaultFilters)}
-              variant="secondary"
-            />
+            <View className="gap-3">
+              <Button
+                disabled={!hasDraftChanges && !searchQuery.isError}
+                label={searchQuery.isFetching && !searchQuery.isFetchingNextPage ? t('loading') : t('apply')}
+                onPress={applyFilters}
+              />
+              <Button
+                disabled={!hasActiveFilters && JSON.stringify(draftFilters) === JSON.stringify(defaultFilters)}
+                label={t('clearFilters')}
+                onPress={clearFilters}
+                variant="secondary"
+              />
+            </View>
           </View>
 
           <View className="flex-row items-center justify-between">

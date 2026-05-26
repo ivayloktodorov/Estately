@@ -1,5 +1,10 @@
 import { apiRequest } from '@/services/api';
-import type { PropertyDetails, PropertyListFilters, PropertyListResponse } from '@/types/property';
+import type {
+  MyPropertiesResponse,
+  PropertyDetails,
+  PropertyListFilters,
+  PropertyListResponse,
+} from '@/types/property';
 
 function toQueryString(filters: PropertyListFilters): string {
   const searchParams = new URLSearchParams();
@@ -20,5 +25,9 @@ export function getProperties(filters: PropertyListFilters = {}): Promise<Proper
 }
 
 export function getPropertyById(propertyId: number): Promise<PropertyDetails> {
-  return apiRequest<PropertyDetails>(`/properties/${propertyId}`);
+  return apiRequest<PropertyDetails>(`/properties/${propertyId}`, { requiresAuth: true });
+}
+
+export function getMyProperties(): Promise<MyPropertiesResponse> {
+  return apiRequest<MyPropertiesResponse>('/me/properties', { requiresAuth: true });
 }

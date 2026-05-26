@@ -23,13 +23,14 @@ export async function apiRequest<TData, TBody = unknown>(
   options: ApiRequestOptions<TBody> = {},
 ): Promise<TData> {
   const token = options.token ?? (options.requiresAuth ? await getStoredToken() : null);
+  const url = buildUrl(path);
   const abortController = new AbortController();
   const timeoutId = setTimeout(() => abortController.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
 
   try {
     response = await Promise.race([
-      fetch(buildUrl(path), {
+      fetch(url, {
         method: options.method ?? 'GET',
         headers: {
           Accept: 'application/json',
@@ -50,10 +51,25 @@ export async function apiRequest<TData, TBody = unknown>(
     clearTimeout(timeoutId);
   }
 
-  const payload = (await response.json().catch(() => null)) as ApiResponse<TData> | null;
+  const contentType = response.headers.get('content-type') ?? '';
+  const responseText = await response.text();
+  let payload: ApiResponse<TData> | null = null;
+
+  try {
+    payload = JSON.parse(responseText) as ApiResponse<TData>;
+  } catch {
+    payload = null;
+  }
 
   if (!payload) {
-    throw new ApiError('The Estately API returned an invalid response.', response.status);
+    console.warn('[mobile-api:invalid-response]', {
+      url,
+      status: response.status,
+      contentType,
+      bodyPreview: responseText.slice(0, 240),
+    });
+
+    throw new ApiError(`The Estately API returned an invalid response (${response.status}).`, response.status);
   }
 
   if (response.status === 401) {

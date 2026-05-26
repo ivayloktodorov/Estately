@@ -160,6 +160,21 @@ export default function ProfileScreen() {
         <View className="gap-3">
           <Text className="text-xl font-bold text-slate-950">{t('quickActions')}</Text>
           <QuickAction
+            description="Update your name, email, password, and avatar."
+            label="Edit Profile"
+            onPress={() => router.push('/(tabs)/profile/edit')}
+          />
+          <QuickAction
+            description="Review your listings and open each property."
+            label="My Properties"
+            onPress={() => router.push('/(tabs)/profile/properties')}
+          />
+          <QuickAction
+            description="Create a sale or rent listing from your phone."
+            label={t('addProperty')}
+            onPress={() => router.push('/(tabs)/property/new')}
+          />
+          <QuickAction
             description={t('myFavoritesDescription')}
             label={t('myFavorites')}
             onPress={() => router.push('/(tabs)/favorites')}

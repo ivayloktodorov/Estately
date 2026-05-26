@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 const MOBILE_API_PATH = '/api/mobile';
+const PRODUCTION_API_ORIGIN = 'https://estatelybg.netlify.app';
 
 function normalizeApiUrl(url: string): string {
   const trimmedUrl = url.trim().replace(/\/+$/, '');
@@ -17,7 +18,11 @@ function getExpoHostApiUrl(): string | null {
 }
 
 function getDefaultApiUrl(): string {
-  if (Platform.OS === 'web' || Platform.OS === 'ios') {
+  if (Platform.OS === 'web') {
+    return `${PRODUCTION_API_ORIGIN}${MOBILE_API_PATH}`;
+  }
+
+  if (Platform.OS === 'ios') {
     return 'http://localhost:3000/api/mobile';
   }
 

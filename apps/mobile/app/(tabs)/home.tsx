@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 import { PropertyCard } from '@/components/property/property-card';
 import { Button } from '@/components/ui/button';
 import { ApiErrorState } from '@/components/ui/api-error-state';
@@ -10,15 +11,18 @@ import { getProperties } from '@/services/property.service';
 import type { Property } from '@/types/property';
 
 const pageSize = 10;
+const listingTypes = ['sale', 'rent'] as const;
+type ListingType = (typeof listingTypes)[number];
 
 function flattenProperties(pages: { properties: Property[] }[] | undefined): Property[] {
   return pages?.flatMap((page) => page.properties) ?? [];
 }
 
 export default function HomeScreen() {
+  const [listingType, setListingType] = useState<ListingType>('sale');
   const propertiesQuery = useInfiniteQuery({
-    queryKey: ['properties', 'home'],
-    queryFn: ({ pageParam }) => getProperties({ page: pageParam, limit: pageSize }),
+    queryKey: ['properties', 'home', listingType],
+    queryFn: ({ pageParam }) => getProperties({ page: pageParam, limit: pageSize, listingType }),
     initialPageParam: 1,
     retry: false,
     getNextPageParam: (lastPage) =>
@@ -76,9 +80,31 @@ export default function HomeScreen() {
         ) : null
       }
       ListHeaderComponent={
-        <View className="gap-2">
-          <Text className="text-4xl font-bold text-slate-950">Estately</Text>
-          <Text className="text-base text-slate-600">{t('findYourNextHome')}</Text>
+        <View className="gap-4">
+          <View className="gap-2">
+            <Text className="text-4xl font-bold text-slate-950">Estately</Text>
+            <Text className="text-base text-slate-600">{t('findYourNextHome')}</Text>
+          </View>
+          <Button label={t('addProperty')} onPress={() => router.push('/(tabs)/property/new')} />
+          <View className="flex-row rounded-xl border border-slate-200 bg-white p-1">
+            {listingTypes.map((type) => {
+              const selected = listingType === type;
+
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  className={`min-h-11 flex-1 items-center justify-center rounded-lg px-4 ${
+                    selected ? 'bg-brand-600' : 'bg-white'
+                  }`}
+                  key={type}
+                  onPress={() => setListingType(type)}>
+                  <Text className={`text-sm font-bold ${selected ? 'text-white' : 'text-slate-700'}`}>
+                    {type === 'sale' ? t('saleLabel') : t('rentLabel')}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       }
       renderItem={({ item }) => (

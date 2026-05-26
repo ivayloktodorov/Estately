@@ -67,3 +67,23 @@ export interface FavoriteMutationResponse {
   propertyId: number;
   isFavorited: boolean;
 }
+
+export interface MyProperty {
+  id: number;
+  title: string;
+  price: string;
+  city: string;
+  address: string;
+  listingType: string;
+  propertyType: string;
+  bedrooms: number;
+  bathrooms: number;
+  areaSqm: number;
+  imageCoverUrl: string;
+  isPublished: boolean;
+  moderationStatus: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MyPropertiesResponse = MyProperty[];

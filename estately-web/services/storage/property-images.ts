@@ -52,22 +52,6 @@ export function getPropertyImageUploadMode(): PropertyImageUploadMode {
   return shouldUseLocalDevStorage() ? 'local fallback' : 'disabled';
 }
 
-export function getPropertyImageUploadConfigDiagnostics() {
-  const config = getR2ConfigStatus();
-
-  return {
-    hasR2Url: config.hasR2Url,
-    hasAccountId: config.hasAccountId,
-    hasBucket: config.hasBucket,
-    hasPublicUrl: config.hasPublicUrl,
-    hasAccessKey: config.hasAccessKey,
-    hasSecretKey: config.hasSecretKey,
-    bucketNameUsed: config.bucketNameUsed,
-    publicUrlHost: config.publicUrlHost,
-    uploadMode: getPropertyImageUploadMode(),
-  };
-}
-
 export function assertPropertyImageUploadsConfigured(): void {
   const missing = missingR2ConfigKeys();
 

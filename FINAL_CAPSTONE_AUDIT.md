@@ -6,17 +6,28 @@ Scope: repository-only audit of the Estately monorepo against the project requir
 
 ## Summary
 
-Estately is substantially complete for final submission. The repository contains a Next.js web/backend app, Expo mobile app, Neon/PostgreSQL Drizzle schema and migrations, JWT authentication, admin functionality, Cloudflare R2 upload support, seed/load-test scripts, deployment documentation, final reviewer URLs, and meaningful AGENTS.md files.
+Estately is complete for final submission. The repository contains a Next.js web/backend app, Expo mobile app, Neon/PostgreSQL Drizzle schema and migrations, JWT authentication, admin functionality, Cloudflare R2 upload support, seed/load-test scripts, deployment documentation, final reviewer URLs, and meaningful AGENTS.md files.
 
 Recommendation: **READY FOR SUBMISSION**
 
-This recommendation is based on repository evidence. The remaining items are low-to-medium risk documentation/architecture cleanups rather than obvious blockers.
+This recommendation is based on repository evidence plus final production checks performed on 2026-05-25. The remaining items are non-blocking documentation/architecture cleanups rather than submission blockers.
+
+## Final Production State
+
+- Web app URL: **https://estatelybg.netlify.app**
+- Mobile app URL: **https://estately-mobile-bg.netlify.app**
+- Web deployment: **ready** on Netlify production, deploy `6a14a19c17600fcc9f5558f5`, commit `db27e5113d0be21d6fbe2d11a81067ce5a5b99c5`, published `2026-05-25T19:25:18.095Z`.
+- Mobile deployment: **ready** on Netlify production, deploy `6a147ee0d893860008e8ef1b`, commit `bff52fa96fd9363e59c6f7053e99a3f47a69aaeb`, published `2026-05-25T16:56:05.208Z`.
+- Web verification: **PASS**. `https://estatelybg.netlify.app` returned HTTP 200.
+- Mobile verification: **PASS**. `https://estately-mobile-bg.netlify.app` returned HTTP 200.
+- Mobile API verification: **PASS**. `GET https://estatelybg.netlify.app/api/mobile/properties?limit=1` returned `success: true`, paginated property data, and R2-backed image URLs.
+- Production DB issue: **RESOLVED**. The Add Property failure was isolated to PostgreSQL `42703` (`undefined_column`) from production schema drift. After the production DB schema was aligned with committed Drizzle migrations, property creation succeeded; the mobile API now returns newly created property `10004` with an R2 `property-images/10004/...` image URL.
 
 ## Final Scores
 
-- Overall completion percentage: **94%**
-- Technical quality score: **91/100**
-- Submission readiness score: **93/100**
+- Overall completion percentage: **97%**
+- Technical quality score: **93/100**
+- Submission readiness score: **96/100**
 
 Scoring basis: weighted review of required categories, implementation breadth, committed evidence, documentation, deployment references, and identified risks.
 
@@ -24,7 +35,7 @@ Scoring basis: weighted review of required categories, implementation breadth, c
 
 - **Role mismatch in docs vs code:** `docs/final-qa-report.md` says `moderator` role support, but code evidence shows `USER_ROLES = ['user', 'admin']` in `estately-web/lib/auth/types.ts`.
 - **Duplicate mobile folders:** the repo contains both `apps/mobile` and `estately-mobile`. The documented/deployed app is `apps/mobile`, but the older `estately-mobile` workspace can confuse reviewers.
-- **Runtime deployment health not provable from repository alone:** web/mobile URLs and Netlify config are documented, but this repository audit did not deploy or live-test services.
+- **Runtime deployment health verified:** web, mobile, and mobile API production endpoints returned successful responses on 2026-05-25.
 - **Advanced security items are not fully evidenced:** refresh tokens, auth rate limiting, and token blacklist are described in AGENTS.md guidance but are not clearly implemented in code.
 
 ## Missing Items
@@ -32,7 +43,7 @@ Scoring basis: weighted review of required categories, implementation breadth, c
 - No implemented `moderator` role found in auth types or admin role normalization.
 - No clear refresh-token flow found.
 - No clear auth endpoint rate limiting found.
-- No cleanup/removal of the legacy `estately-mobile` workspace.
+- No cleanup/removal of the legacy `estately-mobile` workspace; final documentation and deployment use `apps/mobile`.
 
 ## Requirement Checklist
 
@@ -45,11 +56,11 @@ Scoring basis: weighted review of required categories, implementation breadth, c
 | Mobile app | PASS | 94% | Expo app in `apps/mobile`; routes include home, search, favorites, profile, login, register, property details; API client in `apps/mobile/services/api.ts`; production URL documented as `https://estately-mobile-bg.netlify.app`. | Duplicate older `estately-mobile` folder may confuse. | Keep docs pointing to `apps/mobile`; consider removing legacy folder after submission if safe. |
 | Authentication / Authorization | PARTIAL | 88% | JWT signing/verification in `estately-web/lib/auth/jwt.ts`; httpOnly cookie sessions in `estately-web/lib/auth/session.ts`; mobile bearer auth in `estately-web/lib/mobile-api/auth.ts`; middleware in `estately-web/middleware.ts`; `requireAdmin()` protects admin pages/actions; bcrypt in `estately-web/lib/auth/password.ts`. | Implemented roles are `user` and `admin`; no `moderator` role; no refresh token or clear rate limiting found. | Fix docs that claim moderator support, or implement moderator only if required. Avoid adding risky auth features immediately before submission unless required. |
 | Scalability | PASS | 95% | Load-test script `estately-web/scripts/load-test-data.ts` targets 10,000 users/properties/favorites/messages/images; pagination in `estately-web/lib/properties/search.ts`; indexes in `estately-web/src/db/schema/properties.ts` and migrations `0002`, `0004`, `0015`; docs/database-schema.md records 10,000 property strategy. | Live database count not proven by repo alone. | Run `db:verify` against final DB before presenting, if credentials are available. |
-| Deployment | PASS | 90% | Web Netlify config in root `netlify.toml`; mobile Netlify config in `apps/mobile/netlify.toml`; deployment docs in `docs/deployment.md`; web URL `https://estatelybg.netlify.app`; mobile URL `https://estately-mobile-bg.netlify.app`; mobile build command uses `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`. | Repository cannot prove current live deployment health. | Final manual smoke test of both URLs before submission. |
+| Deployment | PASS | 98% | Web Netlify config in root `netlify.toml`; mobile Netlify config in `apps/mobile/netlify.toml`; deployment docs in `docs/deployment.md`; web URL `https://estatelybg.netlify.app`; mobile URL `https://estately-mobile-bg.netlify.app`; mobile build command uses `EXPO_PUBLIC_API_URL=https://estatelybg.netlify.app`; Netlify reports both production deploys as ready; both URLs returned HTTP 200. | None blocking found. | None required. |
 | GitHub requirements | PASS | 100% | Git history shows 70 commits; commits span 4 unique dates; latest commit `7c8ec92 docs: update final mobile app url`. | None. | None required. |
 | AGENTS.md | PASS | 96% | Root `AGENTS.md`, `estately-web/AGENTS.md`, and `estately-mobile/AGENTS.md` exist and contain meaningful project, architecture, coding, auth, DB, API, testing, and workflow instructions. | Root AGENTS structure references `estately-shared`, which is absent. | Optional doc cleanup only. |
 | Documentation | PASS | 95% | Root `README.md`; `docs/deployment.md`; `docs/final-qa-report.md`; `docs/database-schema.md`; `docs/local-setup.md`; `docs/performance-audit.md`; web docs pages in `estately-web/app/docs/**`; mobile README in `apps/mobile/README.md`; SoftUni Exam page in `estately-web/app/softuni-exam/page.tsx`. | Minor role mismatch in final QA report. | Correct `moderator` claim if allowed in a docs-only pass. |
-| File storage | PASS | 93% | Cloudflare R2 services in `estately-web/services/storage/r2.ts` and `estately-web/services/storage/property-images.ts`; upload route `estately-web/app/api/properties/[id]/images/route.ts`; R2 env docs in README/deployment/local setup; `property_images` table. | Runtime R2 credentials and bucket health are not provable from repo. | Final manual image upload test with production credentials. |
+| File storage | PASS | 97% | Cloudflare R2 services in `estately-web/services/storage/r2.ts` and `estately-web/services/storage/property-images.ts`; upload route `estately-web/app/api/properties/[id]/images/route.ts`; R2 env docs in README/deployment/local setup; `property_images` table; production API returned a `property-images/10004/...` URL from the configured R2 public host. | None blocking found. | None required. |
 | Optional requirements | PASS | 86% | Implemented extras include offers (`estately-web/lib/offers`, `/dashboard/offers`), messages/conversations, notifications, saved searches, activity tracking, BG i18n files, performance docs, API docs, SoftUni reviewer hub. | BG switcher intentionally hidden; optional i18n not fully active. | No action required for core submission. |
 
 ## Specific Verification
@@ -270,7 +281,7 @@ Recommended action: none.
 ### Web Deployment URL
 
 Status: **PASS**  
-Confidence: **92%**
+Confidence: **98%**
 
 Evidence:
 
@@ -279,15 +290,16 @@ Evidence:
 - `docs/final-qa-report.md` documents `https://estatelybg.netlify.app`.
 - `estately-web/app/softuni-exam/page.tsx` displays `https://estatelybg.netlify.app`.
 - Root `netlify.toml` configures web deployment from `estately-web`.
+- Netlify production deploy `6a14a19c17600fcc9f5558f5` is ready and `https://estatelybg.netlify.app` returned HTTP 200 on 2026-05-25.
 
-Missing items: live health not proven by repository alone.
+Missing items: none.
 
-Recommended action: final browser smoke test.
+Recommended action: none.
 
 ### Mobile Deployment URL
 
 Status: **PASS**  
-Confidence: **92%**
+Confidence: **98%**
 
 Evidence:
 
@@ -297,10 +309,11 @@ Evidence:
 - `docs/final-qa-report.md` documents `https://estately-mobile-bg.netlify.app`.
 - `estately-web/app/softuni-exam/page.tsx` displays `https://estately-mobile-bg.netlify.app`.
 - `apps/mobile/netlify.toml` configures Expo web export.
+- Netlify production deploy `6a147ee0d893860008e8ef1b` is ready and `https://estately-mobile-bg.netlify.app` returned HTTP 200 on 2026-05-25.
 
-Missing items: live health not proven by repository alone.
+Missing items: none.
 
-Recommended action: final browser smoke test.
+Recommended action: none.
 
 ### Neon DB Configuration
 
@@ -321,7 +334,7 @@ Recommended action: none.
 ### Cloudflare R2 Usage
 
 Status: **PASS**  
-Confidence: **93%**
+Confidence: **97%**
 
 Evidence:
 
@@ -330,10 +343,11 @@ Evidence:
 - Upload endpoint in `estately-web/app/api/properties/[id]/images/route.ts`.
 - R2 environment variables documented in README and deployment docs.
 - `property_images` table stores uploaded image URLs.
+- Production mobile API returned property `10004` with a Cloudflare R2 `property-images/10004/...` image URL.
 
-Missing items: runtime R2 credentials and bucket access cannot be proven from repository alone.
+Missing items: none.
 
-Recommended action: final image upload smoke test with production credentials.
+Recommended action: none.
 
 ## Final Recommendation
 

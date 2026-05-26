@@ -10,7 +10,6 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="property/[id]" options={{ headerShown: true, title: 'Property' }} />
       </Stack>
       <StatusBar style="dark" />
     </AppProvider>
